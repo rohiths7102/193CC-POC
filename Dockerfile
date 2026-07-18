@@ -24,5 +24,9 @@ COPY --from=build /app/node_modules/prisma ./node_modules/prisma
 COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
 RUN mkdir -p storage && chown -R app:app /app
 USER app
+# Bind to all interfaces so cloud hosts (Railway/Render) can route to it;
+# they inject their own PORT, which the standalone server honours.
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 EXPOSE 3000
 CMD ["node", "server.js"]

@@ -66,7 +66,15 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
           <GlassCard strong className="p-7">
             <h2 className="font-display text-xl text-ivory-50">Create your account</h2>
             <p className="mb-6 mt-1 text-sm text-mist">Step 1 of 3 — details, contract, payment.</p>
-            <EnrolForm productCode={product.code} summitCategories={summitCategories} org={product.code.startsWith("ENT_")} />
+            {/* Organisation details + document upload apply to every business
+                membership: the Enterprise tiers and the event-linked Temporary
+                membership (whose applicants are companies pitching at the
+                Summit). Only the Individual tier skips it. */}
+            <EnrolForm
+              productCode={product.code}
+              summitCategories={summitCategories}
+              org={product.code !== "INDIVIDUAL"}
+            />
           </GlassCard>
         </Reveal>
       </div>

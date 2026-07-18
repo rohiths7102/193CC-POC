@@ -6,7 +6,7 @@ import { CheckCircle2, AlertTriangle, XCircle, Loader2 } from "lucide-react";
 import { Button, Field, inputCls, DemoTag } from "@/components/ui";
 import {
   loginAction, startEnrolmentAction, signContractAction, payCardAction, payDirectDebitAction,
-  previewCompanyCheckAction,
+  previewCompanyCheckAction, confirmEmailCodeAction, resendEmailCodeAction,
 } from "@/server/actions/public";
 import {
   submitIntentAction, bookSessionAction, saveArticleAction, submitVideoBriefAction, savePitchAction,
@@ -59,8 +59,10 @@ export function LoginForm() {
 /* ── Enrolment wizard ─────────────────────────────────── */
 
 /** Live Companies House preview as the applicant types — the "immediate"
- *  half of "immediate verification": feedback before they even submit. */
-function LiveCompanyCheck({ number, name }: { number: string; name: string }) {
+ *  half of "immediate verification": feedback before they even submit.
+ *  Reports honestly: an unrecognised number says so rather than inventing
+ *  a match. Also surfaces the director check. */
+function LiveCompanyCheck({ number, name, applicant }: { number: string; name: string; applicant: string }) {
   const [result, setResult] = useState<Awaited<ReturnType<typeof previewCompanyCheckAction>>>(null);
   const [checking, setChecking] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -70,11 +72,11 @@ function LiveCompanyCheck({ number, name }: { number: string; name: string }) {
     if (number.trim().length < 6 || !name.trim()) { setResult(null); return; }
     setChecking(true);
     timer.current = setTimeout(async () => {
-      const r = await previewCompanyCheckAction(number, name);
+      const r = await previewCompanyCheckAction(number, name, applicant);
       setResult(r); setChecking(false);
     }, 600);
     return () => clearTimeout(timer.current);
-  }, [number, name]);
+  }, [number, name, applicant]);
 
   if (checking) {
     return <p className="flex items-center gap-1.5 text-xs text-mist"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking Companies House…</p>;
@@ -82,20 +84,72 @@ function LiveCompanyCheck({ number, name }: { number: string; name: string }) {
   if (!result) return null;
 
   return (
-    <div className="rounded-lg border hairline bg-ink-800/50 px-3 py-2 text-xs">
-      {result.status === "active" && (
-        <p className="flex items-center gap-1.5 text-emerald-400">
-          <CheckCircle2 className="h-3.5 w-3.5" /> Found: {result.officialName} — active
-          {result.nameMatches === false && <span className="text-amber-300"> (name differs from what you typed)</span>}
+    <div className="space-y-1 rounded-lg border hairline bg-ink-800/50 px-3 py-2 text-xs">
+      {result.status === "invalid_format" && (
+        <p className="flex items-center gap-1.5 text-amber-300">
+          <AlertTriangle className="h-3.5 w-3.5" /> That isn't a valid UK company number — 8 digits, or 2 letters + 6 digits.
         </p>
       )}
+      {result.status === "active" && (
+        <>
+          <p className="flex items-center gap-1.5 text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Found: {result.officialName} — active
+          </p>
+          {result.nameMatches === false && (
+            <p className="flex items-center gap-1.5 text-amber-300">
+              <AlertTriangle className="h-3.5 w-3.5" /> Registered name differs from what you typed.
+            </p>
+          )}
+          {result.directorMatch === true && (
+            <p className="flex items-center gap-1.5 text-emerald-400">
+              <CheckCircle2 className="h-3.5 w-3.5" /> You are listed as an officer of this company.
+            </p>
+          )}
+          {result.directorMatch === false && (
+            <p className="flex items-center gap-1.5 text-amber-300">
+              <AlertTriangle className="h-3.5 w-3.5" /> Your name isn't on this company's officers register — our team will review.
+            </p>
+          )}
+        </>
+      )}
       {result.status === "dissolved" && (
-        <p className="flex items-center gap-1.5 text-amber-300"><AlertTriangle className="h-3.5 w-3.5" /> This company shows as dissolved — double-check your number.</p>
+        <p className="flex items-center gap-1.5 text-amber-300"><AlertTriangle className="h-3.5 w-3.5" /> {result.officialName} shows as DISSOLVED on the register.</p>
       )}
       {result.status === "not_found" && (
-        <p className="flex items-center gap-1.5 text-mist"><XCircle className="h-3.5 w-3.5" /> No match found yet — you can still submit; our team will verify manually.</p>
+        <p className="flex items-center gap-1.5 text-mist"><XCircle className="h-3.5 w-3.5" /> No company found with that number — you can still submit; our team will verify from your documents.</p>
       )}
-      {result.simulated && <span className="mt-1 block text-[10px] text-mist/60">Simulated preview — live once Companies House is connected.</span>}
+      {result.simulated && <span className="block text-[10px] text-mist/60">Demo data — live once a Companies House API key is configured.</span>}
+    </div>
+  );
+}
+
+/** 6-digit email confirmation code. */
+export function EmailCodeForm({ membershipId }: { membershipId: string }) {
+  const [state, action] = useActionState(confirmEmailCodeAction as FormAction, undefined);
+  const [resent, resendAction] = useActionState(resendEmailCodeAction as FormAction, undefined);
+  return (
+    <div className="space-y-4">
+      <form action={action} className="space-y-4">
+        <input type="hidden" name="membershipId" value={membershipId} />
+        <Field label="6-digit code">
+          <input
+            name="code" required inputMode="numeric" autoComplete="one-time-code" maxLength={6}
+            className={`${inputCls} text-center font-mono text-2xl tracking-[0.5em]`}
+            placeholder="000000"
+          />
+        </Field>
+        <FormError error={state?.error} />
+        <Submit size="lg">Confirm and continue →</Submit>
+      </form>
+      <form action={resendAction}>
+        <input type="hidden" name="membershipId" value={membershipId} />
+        <button type="submit" className="text-xs text-gold-300 underline underline-offset-2 hover:text-gold-200">
+          Didn't get it? Send a new code
+        </button>
+        {(resent as { sent?: boolean } | undefined)?.sent && (
+          <span className="ml-2 text-xs text-emerald-400">New code sent.</span>
+        )}
+      </form>
     </div>
   );
 }
@@ -108,6 +162,7 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
   const [state, action] = useActionState(startEnrolmentAction as FormAction, undefined);
   const [orgName, setOrgName] = useState("");
   const [orgNumber, setOrgNumber] = useState("");
+  const [applicantName, setApplicantName] = useState("");
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="productCode" value={productCode} />
@@ -127,8 +182,13 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
           </select>
         </Field>
       )}
-      <Field label="Full name"><input name="name" required className={inputCls} placeholder="Jane Whitfield" /></Field>
-      <Field label="Email"><input name="email" type="email" required className={inputCls} placeholder="jane@company.com" /></Field>
+      <Field label="Full name">
+        <input name="name" required value={applicantName} onChange={(e) => setApplicantName(e.target.value)}
+          className={inputCls} placeholder="Jane Whitfield" />
+      </Field>
+      <Field label="Email" hint={org ? "We'll send a confirmation code here. A company address helps verification." : undefined}>
+        <input name="email" type="email" required className={inputCls} placeholder="jane@company.com" />
+      </Field>
       {org ? (
         <>
           <Field label="Organisation registered name">
@@ -140,7 +200,7 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
               onChange={(e) => setOrgNumber(e.target.value.toUpperCase())}
               className={inputCls} placeholder="e.g. 14499310" />
           </Field>
-          <LiveCompanyCheck number={orgNumber} name={orgName} />
+          <LiveCompanyCheck number={orgNumber} name={orgName} applicant={applicantName} />
           <Field label="Organisation documents" hint="Certificate of incorporation, letterhead, or similar — PDF or image, up to 10 MB each.">
             <input name="orgDocs" type="file" multiple required accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
               className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-2 file:text-sm file:text-gold-300 hover:file:bg-gold-500/30" />

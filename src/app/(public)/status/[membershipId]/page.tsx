@@ -22,7 +22,7 @@ export default async function StatusPage({ params }: { params: Promise<{ members
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-14">
-      <Steps current={active ? 4 : 3} />
+      <Steps current={active ? 5 : 4} />
       <Reveal>
         <GlassCard strong className="mt-10 p-10 text-center">
           {active ? (

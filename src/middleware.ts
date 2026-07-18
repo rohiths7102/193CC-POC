@@ -8,7 +8,10 @@ const secret = () => new TextEncoder().encode(process.env.SESSION_SECRET ?? "dev
 const ROLE_PREFIXES: Record<string, string[]> = {
   MEMBER: ["/portal/dashboard", "/portal/membership", "/portal/mentoring", "/portal/summit", "/portal/content", "/portal/pitch", "/portal/news", "/portal/profile"],
   ADMIN: ["/portal/admin"],
-  SALES_REP: ["/portal/sales"],
+  // Sales reps get the shared verification queue too (permission matrix §4.3
+  // "Approve intent letters & waitlist" = Admin + Sales Rep). The page itself
+  // re-checks the permission server-side; this only routes them there.
+  SALES_REP: ["/portal/sales", "/portal/admin/verification"],
   MENTOR: ["/portal/mentor"],
   INVESTOR: ["/portal/investor"],
   CONSULTANT: ["/portal/consultant"],

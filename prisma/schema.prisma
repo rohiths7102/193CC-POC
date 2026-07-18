@@ -41,6 +41,11 @@ model User {
   photoPath     String? // uploaded profile picture
   profileBio    String?
 
+  // Email ownership verification (6-digit code sent at enrolment)
+  emailVerifiedAt   DateTime?
+  emailCode         String?
+  emailCodeExpires  DateTime?
+
   memberships       Membership[]
   ledgerEntries     LedgerEntry[]      @relation("LedgerUser")
   unlocks           BenefitUnlock[]    @relation("UnlockUser")
@@ -162,12 +167,14 @@ model Membership {
 
   // Automated Companies House cross-check (runs at enrolment; admin sees the
   // result in the verification queue alongside the uploaded document).
-  chStatus         String? // active | dissolved | not_found | not_configured | error
+  chStatus         String? // active | dissolved | not_found | invalid_format | not_configured | error
   chOfficialName   String? // registered name as held by Companies House
   chIncorporatedAt DateTime?
   chNameMatches    Boolean?
   chCheckedAt      DateTime?
-  chSimulated      Boolean   @default(false) // true = no API key configured, demo data
+  chSimulated      Boolean   @default(false) // true = no API key configured, fixture data
+  chOfficers       Json      @default("[]") // director/officer names on the register
+  chDirectorMatch  Boolean? // is the applicant named among those officers?
 
   user          User          @relation(fields: [userId], references: [id])
   product       Product       @relation(fields: [productId], references: [id])

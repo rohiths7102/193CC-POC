@@ -175,16 +175,21 @@ async function main() {
     ruleId: rule.id, ledgerEntryId: chenEntry.id,
   }});
 
-  // ── Events: Main Event + Summit 23 July 2026 with 3×15 categories ──
+  // ── Events: Main Event + Summit with 3×15 categories ──
+  // Dates are RELATIVE to seed time so the demo never goes stale: a fixed
+  // deadline in the past silently closes applications and breaks the journey.
+  const summitAt = new Date(now.getTime() + 35 * 24 * 3600 * 1000);
+  const summitDeadline = new Date(now.getTime() + 21 * 24 * 3600 * 1000);
   await db.event.create({ data: {
     kind: "MAIN_EVENT", name: "House of Lords Reception — Autumn 2026",
-    venue: "House of Lords, UK Parliament, London", startsAt: new Date("2026-10-15T18:00:00Z"), capacity: 120,
+    venue: "House of Lords, UK Parliament, London",
+    startsAt: new Date(now.getTime() + 90 * 24 * 3600 * 1000), capacity: 120,
   }});
   const summitEvent = await db.event.create({ data: {
     kind: "SUMMIT", name: "UK Investors Summit — Summer 2026",
-    venue: "One Great George Street, Westminster, London", startsAt: new Date("2026-07-23T09:00:00Z"),
+    venue: "One Great George Street, Westminster, London", startsAt: summitAt,
     summit: { create: {
-      deadlineAt: new Date("2026-07-18T17:00:00Z"),
+      deadlineAt: summitDeadline,
       categories: { create: [
         { kind: SlotKind.PRESENTATION, capacity: 15 },
         { kind: SlotKind.BRAND_LAUNCH, capacity: 15 },
@@ -199,7 +204,7 @@ async function main() {
   const mDora = await db.membership.create({ data: {
     userId: dora.id, productId: temporary.id, status: "ACTIVE",
     periodStart: new Date(now.getTime() - 5 * 24 * 3600 * 1000),
-    periodEnd: new Date("2026-07-30T23:59:59Z"), // event + 7 days (DECISIONS #9)
+    periodEnd: new Date(summitAt.getTime() + 7 * 24 * 3600 * 1000), // event + 7 days (DECISIONS #9)
     contract: { create: { status: "SIGNED", signedAt: new Date(now.getTime() - 5 * 24 * 3600 * 1000), signerName: dora.name, signerEmail: dora.email, docHtml: contractHtml("Temporary Membership", dora.name) } },
   }});
   await db.ledgerEntry.create({ data: {

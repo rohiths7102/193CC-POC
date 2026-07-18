@@ -5,7 +5,7 @@ import { gbp, ukDate } from "@/lib/utils";
 import { GlassCard, Badge, Empty, Avatar, DemoTag } from "@/components/ui";
 import { PageFx } from "@/components/motion";
 import { VerifyOrgForm } from "@/components/forms";
-import { companiesHousePublicUrl } from "@/server/companies-house";
+import { companiesHousePublicUrl, emailDomainKind } from "@/server/companies-house";
 import { recheckCompanyAction } from "@/server/actions/staff";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,9 @@ export const dynamic = "force-dynamic";
  *  sign-ups that have signed AND paid, waiting on a document review. Approve
  *  activates the membership; reject records a reason and emails the member. */
 export default async function VerificationQueue() {
-  await requireUser("manage_all_memberships");
+  // Client permission matrix §4.3: "Approve intent letters & waitlist" is
+  // Admin AND Sales Rep, so both can work this queue.
+  await requireUser("approve_intent_waitlist");
   const pending = await db.membership.findMany({
     where: { status: "PENDING_VERIFICATION" },
     include: { user: true, product: true, contract: true },
@@ -91,12 +93,12 @@ export default async function VerificationQueue() {
                 <div className="mt-2 space-y-1.5 text-sm">
                   <div className="flex items-center gap-2">
                     {m.chStatus === "active" && <CheckCircle2 className="h-4 w-4 text-emerald-400" />}
-                    {m.chStatus === "dissolved" && <XCircle className="h-4 w-4 text-red-400" />}
-                    {(m.chStatus === "not_found" || m.chStatus === "error") && <XCircle className="h-4 w-4 text-red-400" />}
+                    {m.chStatus !== "active" && <XCircle className="h-4 w-4 text-red-400" />}
                     <span className="text-ivory-100">
                       {m.chStatus === "active" && "Registered and active"}
                       {m.chStatus === "dissolved" && "⚠ This company is DISSOLVED"}
                       {m.chStatus === "not_found" && "⚠ No company found with this number"}
+                      {m.chStatus === "invalid_format" && "⚠ Company number is not a valid UK format"}
                       {m.chStatus === "error" && "Lookup failed — try re-checking"}
                     </span>
                   </div>
@@ -111,6 +113,23 @@ export default async function VerificationQueue() {
                       {m.chNameMatches === true && <span className="ml-2 text-emerald-400">✓ matches</span>}
                     </p>
                   )}
+                  {/* Director / founder check against the officers register */}
+                  {m.chDirectorMatch === true && (
+                    <p className="flex items-center gap-1.5 text-emerald-400">
+                      <CheckCircle2 className="h-4 w-4" /> {m.user.name} is listed as an officer of this company
+                    </p>
+                  )}
+                  {m.chDirectorMatch === false && (
+                    <p className="flex items-center gap-1.5 text-amber-300">
+                      <AlertTriangle className="h-4 w-4" />
+                      {m.user.name} is NOT on the officers register — confirm their authority to apply
+                    </p>
+                  )}
+                  {((m.chOfficers as string[]) ?? []).length > 0 && (
+                    <p className="text-xs text-mist">
+                      Officers on record: <span className="text-ivory-200/80">{(m.chOfficers as string[]).join(" · ")}</span>
+                    </p>
+                  )}
                   {m.chIncorporatedAt && (
                     <p className="text-mist">Incorporated: <span className="text-ivory-100">{ukDate(m.chIncorporatedAt)}</span></p>
                   )}
@@ -122,6 +141,28 @@ export default async function VerificationQueue() {
                   )}
                 </div>
               )}
+
+              {/* Applicant identity signals */}
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-t hairline pt-3 text-xs">
+                {m.user.emailVerifiedAt ? (
+                  <span className="flex items-center gap-1.5 text-emerald-400">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Email confirmed by code {ukDate(m.user.emailVerifiedAt)}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-amber-300">
+                    <AlertTriangle className="h-3.5 w-3.5" /> Email not confirmed
+                  </span>
+                )}
+                {emailDomainKind(m.user.email) === "free" ? (
+                  <span className="flex items-center gap-1.5 text-amber-300">
+                    <AlertTriangle className="h-3.5 w-3.5" /> Personal email domain ({m.user.email.split("@")[1]}), not a company address
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-mist">
+                    Company email domain ({m.user.email.split("@")[1]})
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="mt-5 border-t hairline pt-5">

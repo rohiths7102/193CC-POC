@@ -6,7 +6,8 @@ import { db } from "@/server/db";
 import { createSession, destroySession, verifyPassword } from "@/server/auth";
 import { ROLE_HOME } from "@/server/rbac";
 import { startEnrolment, markSigned, mockCardPayment, startDirectDebit } from "@/server/enrolment";
-import { checkCompany } from "@/server/companies-house";
+import { checkCompany, isValidCompanyNumber } from "@/server/companies-house";
+import { issueEmailCode, confirmEmailCode } from "@/server/email-verification";
 
 // Brute-force guard: 5 failures per identity per 15 minutes (in-memory; move
 // to Redis if the app is ever scaled beyond one node).
@@ -41,9 +42,30 @@ export async function logoutAction() {
 /** Live, pre-submit preview — applicant sees the Companies House match
  *  instantly as they type, before the account even exists. Nothing is
  *  persisted here; the authoritative check re-runs inside startEnrolment(). */
-export async function previewCompanyCheckAction(orgNumber: string, orgName: string) {
-  if (!orgNumber?.trim() || !orgName?.trim() || orgNumber.trim().length < 6) return null;
-  return checkCompany(orgNumber.trim(), orgName.trim());
+export async function previewCompanyCheckAction(orgNumber: string, orgName: string, applicantName = "") {
+  if (!orgNumber?.trim() || !orgName?.trim()) return null;
+  return checkCompany(orgNumber.trim(), orgName.trim(), applicantName.trim());
+}
+
+/** Resend the 6-digit code from the verify-email step. */
+export async function resendEmailCodeAction(_prev: { error?: string; sent?: boolean } | undefined, formData: FormData) {
+  const membershipId = String(formData.get("membershipId"));
+  const m = await db.membership.findUnique({ where: { id: membershipId } });
+  if (!m) return { error: "Application not found." };
+  await issueEmailCode(m.userId);
+  return { sent: true };
+}
+
+/** Confirm the emailed code, then continue to the contract. */
+export async function confirmEmailCodeAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const membershipId = String(formData.get("membershipId"));
+  const code = String(formData.get("code") ?? "");
+  const m = await db.membership.findUnique({ where: { id: membershipId } });
+  if (!m) return { error: "Application not found." };
+
+  const result = await confirmEmailCode(m.userId, code);
+  if (!result.ok) return { error: result.error ?? "Could not confirm that code." };
+  redirect(`/sign/${membershipId}`);
 }
 
 const EnrolSchema = z.object({
@@ -65,15 +87,22 @@ export async function startEnrolmentAction(_prev: { error?: string } | undefined
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const summitCategoryId = String(formData.get("summitCategoryId") || "") || undefined;
 
-  // Enterprise tiers: organisation details + documents are mandatory at enrolment
-  // (client change, Jul 13) — reviewed by an admin before activation.
-  const isEnterprise = parsed.data.productCode.startsWith("ENT_");
+  // Business memberships (Enterprise tiers AND the event-linked Temporary
+  // membership) must supply organisation details + documents at enrolment;
+  // these are verified by staff before activation. Must stay in step with the
+  // `org` prop on EnrolForm — only the Individual tier is exempt.
+  const isOrgTier = parsed.data.productCode !== "INDIVIDUAL";
   let orgName: string | undefined, orgNumber: string | undefined;
   const orgDocs: string[] = [];
-  if (isEnterprise) {
+  if (isOrgTier) {
     orgName = String(formData.get("orgName") ?? "").trim() || undefined;
     orgNumber = String(formData.get("orgNumber") ?? "").trim() || undefined;
     if (!orgName) return { error: "Enter your organisation's registered name." };
+    // Reject malformed company numbers outright rather than letting a
+    // meaningless value flow through and look "checked".
+    if (orgNumber && !isValidCompanyNumber(orgNumber)) {
+      return { error: "That company registration number isn't valid. UK numbers are 8 digits (e.g. 14499310), or 2 letters followed by 6 digits (e.g. SC123456). Leave it blank if you don't have one." };
+    }
     const files = formData.getAll("orgDocs").filter((f): f is File => f instanceof File && f.size > 0);
     if (files.length === 0) return { error: "Upload at least one organisation document (e.g. certificate of incorporation)." };
     const { saveUpload } = await import("@/server/storage");
@@ -101,6 +130,12 @@ export async function startEnrolmentAction(_prev: { error?: string } | undefined
   const { membershipId, userId } = result;
   const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
   await createSession(user.id, user.role); // pending member session so they can sign & pay
+
+  // Prove they own the address before anything gets signed in their name.
+  if (!user.emailVerifiedAt) {
+    await issueEmailCode(user.id);
+    redirect(`/verify-email/${membershipId}`);
+  }
   redirect(`/sign/${membershipId}`);
 }
 

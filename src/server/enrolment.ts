@@ -56,15 +56,17 @@ export async function startEnrolment(opts: {
   }
 
   // Automated Companies House cross-check — runs server-side at enrolment
-  // (never client-trusted), so the admin queue already has an authoritative
+  // (never client-trusted), so the review queue already has an authoritative
   // answer the moment the application appears, not just an uploaded PDF.
+  // Also checks the applicant against the company's officers register.
   let chFields = {};
   if (opts.orgNumber && opts.orgName) {
-    const check = await checkCompany(opts.orgNumber, opts.orgName);
+    const check = await checkCompany(opts.orgNumber, opts.orgName, opts.name);
     chFields = {
       chStatus: check.status, chOfficialName: check.officialName,
       chIncorporatedAt: check.incorporatedAt, chNameMatches: check.nameMatches,
       chCheckedAt: new Date(), chSimulated: check.simulated,
+      chOfficers: check.officers, chDirectorMatch: check.directorMatch,
     };
   }
 
@@ -103,9 +105,11 @@ export async function startEnrolment(opts: {
 /** E-signature completion (simulated provider). AWAITING_SIGNATURE → AWAITING_PAYMENT. */
 export async function markSigned(membershipId: string, signerName: string, signerEmail: string) {
   const m = await db.membership.findUniqueOrThrow({
-    where: { id: membershipId }, include: { contract: true, product: true },
+    where: { id: membershipId }, include: { contract: true, product: true, user: true },
   });
   if (m.status !== "AWAITING_SIGNATURE") throw new Error(`Cannot sign from state ${m.status}`);
+  // A signature bound to an unproven email address is worthless.
+  if (!m.user.emailVerifiedAt) throw new Error("Confirm your email address before signing the agreement.");
 
   await db.$transaction([
     db.contract.update({

@@ -21,7 +21,7 @@ export default async function PayPage({ params }: { params: Promise<{ membership
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-14">
-      <Steps current={3} />
+      <Steps current={4} />
       <Reveal>
         <div className="mt-8 flex items-center gap-3">
           <CreditCard className="h-6 w-6 text-gold-400" />

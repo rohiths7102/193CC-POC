@@ -20,7 +20,7 @@ export default async function SignPage({ params }: { params: Promise<{ membershi
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-14">
-      <Steps current={2} />
+      <Steps current={3} />
       <Reveal>
         <div className="mt-8 flex items-center gap-3">
           <FileSignature className="h-6 w-6 text-gold-400" />

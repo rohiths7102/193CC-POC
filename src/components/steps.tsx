@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const STEPS = ["Details", "Contract", "Payment", "Active"];
-const HINTS = ["~5 min", "~5 min", "~5 min", ""];
+const STEPS = ["Details", "Email", "Contract", "Payment", "Active"];
+const HINTS = ["~5 min", "~1 min", "~5 min", "~5 min", ""];
 
-export function Steps({ current }: { current: 1 | 2 | 3 | 4 }) {
+export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
   return (
     <div>
     <div className="flex items-center gap-0">

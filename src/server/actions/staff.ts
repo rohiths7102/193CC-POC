@@ -264,18 +264,20 @@ export async function eraseMemberAction(_prev: { error?: string } | undefined, f
 // ── Admin: re-run the Companies House cross-check (e.g. after a real API
 //    key is configured, or the applicant corrected a typo'd number) ──
 export async function recheckCompanyAction(formData: FormData) {
-  const admin = await requireUser("manage_all_memberships");
+  const admin = await requireUser("approve_intent_waitlist");
   const membershipId = String(formData.get("membershipId"));
   const m = await db.membership.findUniqueOrThrow({ where: { id: membershipId } });
   if (!m.orgNumber || !m.orgName) return;
 
-  const check = await checkCompany(m.orgNumber, m.orgName);
+  const applicant = await db.user.findUnique({ where: { id: m.userId }, select: { name: true } });
+  const check = await checkCompany(m.orgNumber, m.orgName, applicant?.name ?? "");
   await db.membership.update({
     where: { id: membershipId },
     data: {
       chStatus: check.status, chOfficialName: check.officialName,
       chIncorporatedAt: check.incorporatedAt, chNameMatches: check.nameMatches,
       chCheckedAt: new Date(), chSimulated: check.simulated,
+      chOfficers: check.officers, chDirectorMatch: check.directorMatch,
     },
   });
   await audit({
@@ -288,7 +290,7 @@ export async function recheckCompanyAction(formData: FormData) {
 
 // ── Admin: organisation verification queue (client change, Jul 13 notes) ──
 export async function verifyOrgAction(_prev: { error?: string } | undefined, formData: FormData) {
-  const admin = await requireUser("manage_all_memberships");
+  const admin = await requireUser("approve_intent_waitlist");
   const membershipId = String(formData.get("membershipId"));
   const decision = formData.get("decision") === "approve" ? "approve" as const : "reject" as const;
   const reason = String(formData.get("reason") ?? "").trim() || undefined;

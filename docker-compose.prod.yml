@@ -1,0 +1,50 @@
+# Production stack: app + Postgres + automated daily backups (14-day retention).
+# Run behind a TLS-terminating reverse proxy (Caddy/nginx/ALB) on a UK-region host.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - app_storage:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+      POSTGRES_DB: membership
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d membership"]
+      interval: 10s
+      retries: 10
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c 'while true; do
+        pg_dump -h db -U postgres -Fc membership > "/backups/membership-$$(date +%Y%m%d-%H%M).dump" &&
+        ls -1t /backups/membership-*.dump | tail -n +15 | xargs -r rm -- &&
+        echo "backup ok $$(date)";
+        sleep 86400;
+      done'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  app_storage:

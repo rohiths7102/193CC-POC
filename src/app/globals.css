@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #080f1f;
+  --gold: #c6a15b;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink-900 text-ivory-100 antialiased;
+  background-image: radial-gradient(1200px 800px at 80% -10%, rgba(27, 46, 88, 0.55), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(198, 161, 91, 0.08), transparent 55%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(198, 161, 91, 0.35);
+}
+
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(198, 161, 91, 0.25);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(198, 161, 91, 0.45); }
+
+/* ── Film grain overlay ─────────────────────────────── */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Glass surfaces ─────────────────────────────────── */
+.glass {
+  background: linear-gradient(160deg, rgba(19, 34, 68, 0.55), rgba(8, 15, 31, 0.65));
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(198, 161, 91, 0.16);
+}
+.glass-strong {
+  background: linear-gradient(160deg, rgba(19, 34, 68, 0.8), rgba(8, 15, 31, 0.9));
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(198, 161, 91, 0.22);
+}
+
+/* ── Gold text + hairlines ──────────────────────────── */
+.text-gold-grad {
+  background: linear-gradient(120deg, #e8cf9a 0%, #c6a15b 45%, #f3e3bb 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hairline { border-color: rgba(198, 161, 91, 0.18); }
+
+/* ── Aurora field (hero) ────────────────────────────── */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+/* ── Shimmer skeleton ───────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 800px 100%;
+  @apply animate-shimmer;
+}
+
+/* ── Focus ring (keyboard reachability) ─────────────── */
+:focus-visible {
+  outline: 2px solid rgba(198, 161, 91, 0.8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Contract document ──────────────────────────────── */
+.contract-doc h2 { @apply font-display text-2xl text-ivory-50 mb-4; }
+.contract-doc p { @apply text-sm leading-6 text-ivory-200/80 mb-3; }
+.contract-doc em { @apply text-gold-400 not-italic font-medium; }
+
+/* ── Print: contract PDF via browser ────────────────── */
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .no-print { display: none !important; }
+  .contract-doc h2, .contract-doc p, .contract-doc em { color: #111 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

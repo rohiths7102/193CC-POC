@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Real environment files — NEVER commit secrets, even placeholder ones.
+# .env.example and .env.production.example are safe templates and ARE tracked.
+.env
+.env.local
+.env.production
+.env*.local
+
+# Member-uploaded content (org verification docs, article images, etc.) —
+# never belongs in source control.
+storage/
+
+# Prisma
+prisma/migrations/**/migration.sql.bak
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

@@ -1,0 +1,537 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Identity & access ───────────────────────────
+
+enum Role {
+  MEMBER
+  ADMIN
+  SALES_REP
+  MENTOR
+  INVESTOR
+  CONSULTANT
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  company      String?
+  role         Role       @default(MEMBER)
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+
+  // Public profile (Enterprise benefit): shareable page at /profile/[slug]
+  profileSlug   String?  @unique
+  profilePublic Boolean  @default(false)
+  logoPath      String? // uploaded company logo
+  photoPath     String? // uploaded profile picture
+  profileBio    String?
+
+  memberships       Membership[]
+  ledgerEntries     LedgerEntry[]      @relation("LedgerUser")
+  unlocks           BenefitUnlock[]    @relation("UnlockUser")
+  registrations     EventRegistration[]
+  slotApplications  SlotApplication[]
+  mentorAssignments MentorAssignment[] @relation("MentorSide")
+  menteeAssignments MentorAssignment[] @relation("MemberSide")
+  articles          Article[]
+  videoTasks        VideoTask[]
+  pitches           Pitch[]
+  interests         InvestorInterest[]
+  leads             Lead[]
+}
+
+// ─────────────────────────── Catalog & entitlements ──────────────────────
+
+enum Billing {
+  ANNUAL
+  ONE_TIME
+}
+
+model Product {
+  id                String  @id @default(uuid())
+  code              String  @unique
+  name              String
+  strapline         String
+  priceMinor        Int
+  currency          String  @default("GBP")
+  billing           Billing
+  allowsDirectDebit Boolean @default(true)
+  active            Boolean @default(true)
+  sortOrder         Int     @default(0)
+
+  entitlements ProductEntitlement[]
+  memberships  Membership[]
+}
+
+model ProductEntitlement {
+  id        String  @id @default(uuid())
+  productId String
+  key       String
+  params    Json?
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([productId, key])
+}
+
+model ThresholdRule {
+  id                   String  @id @default(uuid())
+  name                 String
+  benefitKey           String
+  thresholdMinor       Int
+  qualifyingProductIds Json // string[] of product ids; empty = all products
+  active               Boolean @default(true)
+
+  unlocks BenefitUnlock[]
+}
+
+enum UnlockSource {
+  RULE
+  MANUAL
+}
+
+model BenefitUnlock {
+  id            String       @id @default(uuid())
+  userId        String
+  benefitKey    String
+  source        UnlockSource
+  ruleId        String?
+  ledgerEntryId String?
+  adminId       String?
+  reason        String?
+  createdAt     DateTime     @default(now())
+  revokedAt     DateTime?
+
+  user User           @relation("UnlockUser", fields: [userId], references: [id])
+  rule ThresholdRule? @relation(fields: [ruleId], references: [id])
+}
+
+// ─────────────────────────── Membership lifecycle ─────────────────────────
+
+enum MembershipStatus {
+  DRAFT
+  AWAITING_SIGNATURE
+  AWAITING_PAYMENT
+  PENDING_VERIFICATION // Enterprise: org documents under admin review (post-sign, post-pay)
+  ACTIVE
+  LAPSED
+  CANCELLED
+  EXPIRED
+}
+
+enum CreatedVia {
+  ONLINE
+  MANUAL
+}
+
+model Membership {
+  id               String           @id @default(uuid())
+  userId           String
+  productId        String
+  status           MembershipStatus @default(DRAFT)
+  periodStart      DateTime?
+  periodEnd        DateTime?
+  createdVia       CreatedVia       @default(ONLINE)
+  salesRepId       String?
+  discountId       String?
+  summitCategoryId String? // Temporary membership: the Summit slot category chosen at enrolment
+  createdAt        DateTime         @default(now())
+
+  // Organization verification (Enterprise tiers): docs uploaded at enrolment,
+  // reviewed by an admin before activation.
+  orgName        String?
+  orgNumber      String? // Companies House / registration number
+  orgDocs        Json      @default("[]") // stored file keys
+  verifiedById   String?
+  verifiedAt     DateTime?
+  rejectedReason String?
+
+  // Automated Companies House cross-check (runs at enrolment; admin sees the
+  // result in the verification queue alongside the uploaded document).
+  chStatus         String? // active | dissolved | not_found | not_configured | error
+  chOfficialName   String? // registered name as held by Companies House
+  chIncorporatedAt DateTime?
+  chNameMatches    Boolean?
+  chCheckedAt      DateTime?
+  chSimulated      Boolean   @default(false) // true = no API key configured, demo data
+
+  user          User          @relation(fields: [userId], references: [id])
+  product       Product       @relation(fields: [productId], references: [id])
+  discount      Discount?     @relation(fields: [discountId], references: [id])
+  contract      Contract?
+  paymentPlan   PaymentPlan?
+  ledgerEntries LedgerEntry[]
+}
+
+enum ContractStatus {
+  DRAFT
+  SENT
+  SIGNED
+  DECLINED
+}
+
+model Contract {
+  id           String         @id @default(uuid())
+  membershipId String         @unique
+  status       ContractStatus @default(SENT)
+  docHtml      String
+  signerName   String?
+  signerEmail  String?
+  signedAt     DateTime?
+  envelopeRef  String         @default(uuid())
+
+  membership Membership @relation(fields: [membershipId], references: [id])
+}
+
+// ─────────────────────────── Money (append-only ledger) ───────────────────
+
+enum LedgerType {
+  CHARGE
+  INSTALMENT
+  REFUND
+  ADJUSTMENT
+  MIGRATION_CREDIT
+}
+
+enum PayProvider {
+  MOCK_CARD
+  MOCK_DD
+  MANUAL
+}
+
+model LedgerEntry {
+  id             String      @id @default(uuid())
+  userId         String
+  membershipId   String?
+  type           LedgerType
+  amountMinor    Int
+  currency       String      @default("GBP")
+  provider       PayProvider
+  providerRef    String      @unique @default(uuid())
+  walletEligible Boolean     @default(true)
+  reason         String?
+  createdById    String?
+  createdAt      DateTime    @default(now())
+
+  user       User        @relation("LedgerUser", fields: [userId], references: [id])
+  membership Membership? @relation(fields: [membershipId], references: [id])
+
+  @@index([userId, walletEligible])
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETE
+  AT_RISK
+  CANCELLED
+}
+
+model PaymentPlan {
+  id               String     @id @default(uuid())
+  membershipId     String     @unique
+  months           Int
+  instalmentMinor  Int
+  collected        Int        @default(0)
+  status           PlanStatus @default(ACTIVE)
+  nextCollectionAt DateTime?
+  mandateRef       String     @default(uuid())
+
+  membership Membership @relation(fields: [membershipId], references: [id])
+}
+
+enum DiscountKind {
+  PERCENT
+  FIXED
+}
+
+model Discount {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  kind         DiscountKind
+  value        Int // percent (0-100) or pence
+  approvedById String
+  active       Boolean      @default(true)
+
+  memberships Membership[]
+}
+
+// ─────────────────────────── Events & Summit ─────────────────────────────
+
+enum EventKind {
+  MAIN_EVENT
+  SUMMIT
+}
+
+model Event {
+  id       String    @id @default(uuid())
+  kind     EventKind
+  name     String
+  venue    String
+  startsAt DateTime
+  capacity Int?
+
+  summit        Summit?
+  registrations EventRegistration[]
+}
+
+enum RegStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model EventRegistration {
+  id      String    @id @default(uuid())
+  eventId String
+  userId  String
+  roleAt  String    @default("delegate")
+  status  RegStatus @default(CONFIRMED)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+enum SummitStatus {
+  OPEN
+  CLOSED
+  COMPLETE
+}
+
+model Summit {
+  id         String       @id @default(uuid())
+  eventId    String       @unique
+  deadlineAt DateTime
+  status     SummitStatus @default(OPEN)
+
+  event      Event            @relation(fields: [eventId], references: [id])
+  categories SummitCategory[]
+}
+
+enum SlotKind {
+  PRESENTATION
+  BRAND_LAUNCH
+  AWARD
+}
+
+model SummitCategory {
+  id       String   @id @default(uuid())
+  summitId String
+  kind     SlotKind
+  capacity Int      @default(15)
+
+  summit       Summit            @relation(fields: [summitId], references: [id])
+  applications SlotApplication[]
+
+  @@unique([summitId, kind])
+}
+
+enum SlotStatus {
+  INVITED
+  INTENT_SUBMITTED
+  CONFIRMED
+  WAITLISTED
+  OFFERED
+  CANCELLED
+  EXPIRED
+}
+
+model SlotApplication {
+  id               String     @id @default(uuid())
+  categoryId       String
+  userId           String
+  status           SlotStatus @default(INVITED)
+  intentLetterPath String?
+  submittedAt      DateTime?
+  waitlistPos      Int?
+  offerExpiresAt   DateTime?
+  decidedById      String?
+  createdAt        DateTime   @default(now())
+
+  category SummitCategory @relation(fields: [categoryId], references: [id])
+  user     User           @relation(fields: [userId], references: [id])
+
+  @@unique([categoryId, userId])
+}
+
+// ─────────────────────────── Mentoring ───────────────────────────────────
+
+model MentorAssignment {
+  id       String  @id @default(uuid())
+  mentorId String
+  memberId String
+  kind     String  @default("senior") // senior | enterprise | investment
+  active   Boolean @default(true)
+
+  mentor   User               @relation("MentorSide", fields: [mentorId], references: [id])
+  member   User               @relation("MemberSide", fields: [memberId], references: [id])
+  sessions MentoringSession[]
+
+  @@unique([mentorId, memberId])
+}
+
+enum SessionStatus {
+  BOOKED
+  DELIVERED
+  CANCELLED
+  NO_SHOW
+}
+
+model MentoringSession {
+  id           String        @id @default(uuid())
+  assignmentId String
+  scheduledAt  DateTime
+  durationMin  Int
+  status       SessionStatus @default(BOOKED)
+  notes        String?
+  loggedById   String
+  createdAt    DateTime      @default(now())
+
+  assignment MentorAssignment @relation(fields: [assignmentId], references: [id])
+}
+
+// ─────────────────────────── Content ─────────────────────────────────────
+
+enum ArticleStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+  PUBLISHED
+}
+
+model Article {
+  id           String        @id @default(uuid())
+  memberId     String
+  title        String
+  body         String
+  wordCount    Int           @default(0)
+  status       ArticleStatus @default(DRAFT)
+  reviewerId   String?
+  reviewNote   String?
+  publishedAt  DateTime?
+  images       Json // string[] of stored file paths, max 2
+  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+
+  member User @relation(fields: [memberId], references: [id])
+}
+
+enum VideoStatus {
+  BRIEF_SUBMITTED
+  SCHEDULED
+  IN_PRODUCTION
+  DELIVERED
+  PUBLISHED
+}
+
+model VideoTask {
+  id        String      @id @default(uuid())
+  memberId  String
+  status    VideoStatus @default(BRIEF_SUBMITTED)
+  brief     String
+  shootDate DateTime?
+  assetPath String?
+  updatedAt DateTime    @updatedAt
+  createdAt DateTime    @default(now())
+
+  member User @relation(fields: [memberId], references: [id])
+}
+
+// ─────────────────────────── Deal-flow ───────────────────────────────────
+
+model Pitch {
+  id                String   @id @default(uuid())
+  memberId          String
+  title             String
+  summary           String
+  materials         Json // string[] file paths
+  visibilityConsent Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  member    User               @relation(fields: [memberId], references: [id])
+  interests InvestorInterest[]
+}
+
+model InvestorInterest {
+  id         String   @id @default(uuid())
+  pitchId    String
+  investorId String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  pitch    Pitch @relation(fields: [pitchId], references: [id])
+  investor User  @relation(fields: [investorId], references: [id])
+
+  @@unique([pitchId, investorId])
+}
+
+// ─────────────────────────── CRM & platform ──────────────────────────────
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  WON
+  LOST
+}
+
+model Lead {
+  id         String    @id @default(uuid())
+  salesRepId String
+  name       String
+  email      String
+  company    String?
+  stage      LeadStage @default(NEW)
+  notes      String?
+  createdAt  DateTime  @default(now())
+
+  salesRep User @relation(fields: [salesRepId], references: [id])
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actorName  String?
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model EmailOutbox {
+  id        String   @id @default(uuid())
+  toEmail   String
+  subject   String
+  body      String
+  createdAt DateTime @default(now())
+}

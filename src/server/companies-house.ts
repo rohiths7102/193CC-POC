@@ -51,6 +51,13 @@ const FIXTURES: Record<string, { name: string; status: "active" | "dissolved"; i
     name: "193 COUNTRIES CONSORTIUM LTD", status: "active", incorporated: "2022-11-22",
     officers: ["UALIKKARA SUDHAN, Aashin"],
   },
+  // Our own company. Real, verified from the Companies House registration
+  // email. Officers left empty because we haven't confirmed them from the
+  // register — an empty list reads as "unknown", never as "not a director".
+  "17125057": {
+    name: "KRONEUS ZTS SECURITY LTD", status: "active", incorporated: "2025-01-01",
+    officers: [],
+  },
   "12345678": {
     name: "HARBOR LANE TRADING LTD", status: "active", incorporated: "2020-01-14",
     officers: ["RAHMAN, Yusuf", "DIALLO, Amara"],
@@ -84,7 +91,12 @@ function simulate(number: string, claimedName: string, applicantName: string): C
     incorporatedAt: new Date(f.incorporated),
     nameMatches: norm(f.name) === norm(claimedName),
     officers: f.officers,
-    directorMatch: f.officers.some((o) => personMatches(applicantName, o)),
+    // null = "we don't know" (no officer list available). Only claim a
+    // mismatch when there is a register to be absent from — otherwise the
+    // reviewer sees an accusation we can't support.
+    directorMatch: f.officers.length === 0 || !applicantName
+      ? null
+      : f.officers.some((o) => personMatches(applicantName, o)),
     simulated: true,
   };
 }

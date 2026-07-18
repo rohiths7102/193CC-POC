@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "prisma generate && prisma migrate deploy && next build",
+  "framework": "nextjs",
+  "regions": ["lhr1"],
+  "crons": [
+    {
+      "_comment": "Vercel's free Hobby plan permits once-daily cron only. On Pro, change to '0 * * * *' (hourly) or finer. The same job can also be triggered manually: GET /api/cron/tick?key=$CRON_SECRET",
+      "path": "/api/cron/tick",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

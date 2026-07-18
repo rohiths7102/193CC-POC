@@ -6,6 +6,7 @@ import * as bcrypt from "bcryptjs";
 import type { Role, User } from "@prisma/client";
 import { db } from "./db";
 import { can, type Permission } from "./rbac";
+import { appUrl } from "@/lib/app-url";
 
 const COOKIE = "mp_session";
 const PROD = process.env.NODE_ENV === "production";
@@ -23,7 +24,7 @@ export async function createSession(userId: string, role: Role) {
     .sign(secret());
   (await cookies()).set(COOKIE, jwt, {
     httpOnly: true, sameSite: "lax",
-    secure: PROD && (process.env.APP_URL ?? "").startsWith("https"),
+    secure: PROD && appUrl().startsWith("https"),
     path: "/", maxAge: 7 * 24 * 3600,
   });
 }

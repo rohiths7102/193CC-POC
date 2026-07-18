@@ -7,6 +7,7 @@ import { titleCase } from "@/lib/utils";
 import { GlassCard, Badge, Empty } from "@/components/ui";
 import { PageFx } from "@/components/motion";
 import { ProfileForm } from "@/components/forms";
+import { appUrl } from "@/lib/app-url";
 import { ShareTools } from "@/components/share-tools";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +70,7 @@ export default async function MyProfile() {
           }} />
           {link && (
             <p className="mt-4 rounded-xl border hairline bg-ink-800/40 px-4 py-3 text-xs text-mist">
-              Your link: <span className="font-mono text-gold-300">{`${process.env.APP_URL ?? "http://127.0.0.1:3000"}${link}`}</span>
+              Your link: <span className="font-mono text-gold-300">{`${appUrl()}${link}`}</span>
               {!me.profilePublic && <> — currently hidden; tick "Make my profile public" to go live.</>}
             </p>
           )}
@@ -78,7 +79,7 @@ export default async function MyProfile() {
         <div className="space-y-6">
         {link && me.profilePublic && (
           <ShareTools
-            url={`${process.env.APP_URL ?? "http://127.0.0.1:3000"}${link}`}
+            url={`${appUrl()}${link}`}
             name={me.company ?? me.name}
           />
         )}

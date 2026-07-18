@@ -1,0 +1,33 @@
+# Render deployment (free tier). Blueprint: creates the web service and a
+# managed Postgres, wiring DATABASE_URL between them automatically.
+#
+# Free-tier caveats, stated plainly:
+#  - the web service sleeps after ~15 min idle; first request after that
+#    takes ~50s to wake
+#  - the free database expires 30 days after creation
+services:
+  - type: web
+    name: 193cc-poc
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt # closest free region to the UK
+    healthCheckPath: /login
+    # Migrations run on every boot; safe and idempotent.
+    dockerCommand: sh -c "npx prisma migrate deploy && node server.js"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: 193cc-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true # Render generates a strong secret automatically
+      - key: NODE_ENV
+        value: production
+      # SHOW_DEMO_LOGINS is deliberately NOT set: demo credentials stay hidden
+      # on the public URL.
+
+databases:
+  - name: 193cc-db
+    plan: free
+    region: frankfurt

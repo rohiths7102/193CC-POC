@@ -195,8 +195,8 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
             <input name="orgName" required value={orgName} onChange={(e) => setOrgName(e.target.value)}
               className={inputCls} placeholder="Whitfield Industries Ltd" />
           </Field>
-          <Field label="Company registration number (optional)" hint="Add it for an instant Companies House check — speeds up your approval.">
-            <input name="orgNumber" value={orgNumber} maxLength={8}
+          <Field label="Company registration number" hint="We verify this against Companies House — it's required to confirm your organisation.">
+            <input name="orgNumber" required value={orgNumber} maxLength={8}
               onChange={(e) => setOrgNumber(e.target.value.toUpperCase())}
               className={inputCls} placeholder="e.g. 14499310" />
           </Field>

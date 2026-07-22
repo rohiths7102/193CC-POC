@@ -98,10 +98,13 @@ export async function startEnrolmentAction(_prev: { error?: string } | undefined
     orgName = String(formData.get("orgName") ?? "").trim() || undefined;
     orgNumber = String(formData.get("orgNumber") ?? "").trim() || undefined;
     if (!orgName) return { error: "Enter your organisation's registered name." };
+    // Company registration number is mandatory — it is how we verify the
+    // organisation against Companies House. No number, no enrolment.
+    if (!orgNumber) return { error: "Enter your company registration number so we can verify your organisation." };
     // Reject malformed company numbers outright rather than letting a
     // meaningless value flow through and look "checked".
-    if (orgNumber && !isValidCompanyNumber(orgNumber)) {
-      return { error: "That company registration number isn't valid. UK numbers are 8 digits (e.g. 14499310), or 2 letters followed by 6 digits (e.g. SC123456). Leave it blank if you don't have one." };
+    if (!isValidCompanyNumber(orgNumber)) {
+      return { error: "That company registration number isn't valid. UK numbers are 8 digits (e.g. 14499310), or 2 letters followed by 6 digits (e.g. SC123456)." };
     }
     const files = formData.getAll("orgDocs").filter((f): f is File => f instanceof File && f.size > 0);
     if (files.length === 0) return { error: "Upload at least one organisation document (e.g. certificate of incorporation)." };

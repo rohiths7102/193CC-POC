@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const alt = "Member of the 193 Countries Consortium";
 
 /** Branded OG card: what LinkedIn/WhatsApp/X show when a member shares
  *  their public profile link. */

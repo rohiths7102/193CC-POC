@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 
 const STEPS = ["Details", "Email", "Contract", "Payment", "Active"];
 const HINTS = ["~5 min", "~1 min", "~5 min", "~5 min", ""];
+// Roman indices — the engraved-invitation register, not a checkout wizard.
+const NUMERALS = ["I", "II", "III", "IV", "V"];
 
 export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
   return (
@@ -27,7 +29,7 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
                   !done && !active && "border-gold-500/20 text-mist"
                 )}
               >
-                {done ? "✓" : n}
+                <span className="font-display">{done ? "✓" : NUMERALS[i]}</span>
               </motion.span>
               <span className={cn("text-[10px] uppercase tracking-widest", active ? "text-gold-300" : "text-mist/70")}>{label}</span>
               {HINTS[i] && <span className="text-[9px] text-mist/50">{HINTS[i]}</span>}

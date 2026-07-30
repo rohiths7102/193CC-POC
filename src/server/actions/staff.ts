@@ -350,10 +350,20 @@ export async function manualEnrolAction(_prev: { error?: string } | undefined, f
   const email = String(formData.get("email") ?? "").trim();
   const productCode = String(formData.get("productCode"));
   if (!name || !email) return { error: "Name and email are required." };
-  const { membershipId } = await startEnrolment({
+  const { membershipId, userId } = await startEnrolment({
     name, email, company: String(formData.get("company") ?? "") || undefined,
     productCode, via: "MANUAL", salesRepId: rep.id,
   });
+  // Same gates as online: the member's email must be proven before signature.
+  // Issue the code now and land on the verify step — in demo mode the verify
+  // page shows the code inline to the enrolling staff member (role-gated),
+  // so a phone enrolment completes live without inbox access.
+  const member = await db.user.findUniqueOrThrow({ where: { id: userId } });
+  if (!member.emailVerifiedAt) {
+    const { issueEmailCode } = await import("@/server/email-verification");
+    await issueEmailCode(userId);
+    redirect(`/verify-email/${membershipId}`);
+  }
   redirect(`/sign/${membershipId}?manual=1`);
 }
 

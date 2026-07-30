@@ -29,6 +29,7 @@ const NAV: Record<string, NavItem[]> = {
   SALES_REP: [
     { href: "/portal/sales", label: "Pipeline", icon: "pipeline" },
     { href: "/portal/admin/verification", label: "Verification", icon: "verification" },
+    { href: "/portal/admin/summit", label: "Summit console", icon: "summit-console" },
     { href: "/portal/sales/enrol", label: "Manual enrolment", icon: "enrol" },
   ],
   MENTOR: [{ href: "/portal/mentor", label: "My members", icon: "sessions" }],

@@ -38,7 +38,8 @@ const config: Config = {
       },
       animation: {
         aurora: "aurora 18s ease-in-out infinite alternate",
-        marquee: "marquee 36s linear infinite",
+        // ≥45s/loop — a luxury ticker drifts, it never races
+        marquee: "marquee 48s linear infinite",
         shimmer: "shimmer 1.8s linear infinite",
         "pulse-soft": "pulseSoft 3s ease-in-out infinite",
       },

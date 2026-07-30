@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useIntroDone, EASE } from "@/components/premium";
 
 /* ── Living constellation — the organisation's network-globe motif, animated.
       Brand gradient nodes drift and link; pointer adds gentle parallax. ── */
@@ -109,11 +110,17 @@ export function LiquidRibbons({ className }: { className?: string }) {
     ];
 
     const resize = () => {
-      W = window.innerWidth; H = window.innerHeight;
+      // Size the bitmap from the element's actual box, not the window — on
+      // mobile the URL-bar show/hide makes innerHeight disagree with 100vh
+      // and the drawing stretches. Matches NetworkCanvas.
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.height;
       canvas.width = W * DPR; canvas.height = H * DPR;
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     };
     resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
     window.addEventListener("resize", resize);
     const onScroll = () => { scrollTarget = window.scrollY; };
     const onMove = (e: PointerEvent) => { mouseY = e.clientY / H; };
@@ -160,6 +167,7 @@ export function LiquidRibbons({ className }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(raf);
+      ro.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onMove);
@@ -188,9 +196,10 @@ export function Countdown({ target, label }: { target: string; label: string }) 
   return (
     <div>
       <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-mist">{label}</p>
-      <div className="flex gap-3">
+      {/* wraps + narrower floor so four cells never overflow a 375px screen */}
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         {cells.map(([unit, v]) => (
-          <div key={unit} className="glass-strong min-w-[76px] rounded-2xl px-4 py-3 text-center">
+          <div key={unit} className="glass-strong min-w-[64px] rounded-2xl px-3 py-3 text-center sm:min-w-[76px] sm:px-4">
             <motion.p key={v} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
               className="font-display text-3xl text-ivory-50 tabular-nums">
               {String(v).padStart(2, "0")}
@@ -203,20 +212,23 @@ export function Countdown({ target, label }: { target: string; label: string }) 
   );
 }
 
-/* ── Kinetic headline — words cascade in with a spring ── */
+/* ── Kinetic headline — line-mask word reveal, choreographed to begin the
+      moment the preloader curtain lifts (intro store). ── */
 export function KineticTitle({ words, className }: { words: { text: string; gold?: boolean; italic?: boolean }[]; className?: string }) {
+  const introDone = useIntroDone();
   return (
     <h1 className={className}>
       {words.map((w, i) => (
-        <motion.span
-          key={i}
-          className={`inline-block whitespace-pre ${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
-          initial={{ opacity: 0, y: 34, rotateX: 45 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ delay: 0.12 + i * 0.07, type: "spring", stiffness: 130, damping: 16 }}
-        >
-          {w.text}{" "}
-        </motion.span>
+        <span key={i} className="inline-block overflow-hidden pb-[0.1em] -mb-[0.1em] align-bottom">
+          <motion.span
+            className={`inline-block whitespace-pre will-change-transform ${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
+            initial={{ y: "118%" }}
+            animate={introDone ? { y: 0 } : { y: "118%" }}
+            transition={{ delay: 0.06 + i * 0.055, duration: 0.85, ease: EASE }}
+          >
+            {w.text}{" "}
+          </motion.span>
+        </span>
       ))}
     </h1>
   );
@@ -253,13 +265,15 @@ export function TiltCard({ children, className }: { children: React.ReactNode; c
 }
 
 /* ── Event film block — plays real footage when the client supplies it ── */
-export function EventFilm({ src, poster }: { src?: string; poster?: string }) {
+export function EventFilm({ src, poster, className }: { src?: string; poster?: string; className?: string }) {
   if (!src) return null;
   return (
     <video
-      className="h-full w-full rounded-3xl object-cover"
+      className={className ?? "h-full w-full rounded-3xl object-cover"}
       src={src} poster={poster}
       autoPlay muted loop playsInline
+      preload="metadata"
+      aria-hidden="true"
       // Browser extensions (e.g. WebBoost) inject attributes into <video>
       // before React hydrates — harmless, so don't fail hydration over it.
       suppressHydrationWarning

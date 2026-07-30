@@ -61,7 +61,11 @@ body {
   background-clip: text;
   color: transparent;
 }
-.hairline { border-color: rgba(198, 161, 91, 0.18); }
+/* In @layer utilities so Tailwind generates variants — `md:hairline` was
+   previously a dead class and stat dividers rendered preflight grey. */
+@layer utilities {
+  .hairline { border-color: rgba(198, 161, 91, 0.18); }
+}
 
 /* ── Aurora field (hero) ────────────────────────────── */
 .aurora {
@@ -96,6 +100,127 @@ body {
   body { background: #fff !important; color: #111 !important; }
   .no-print { display: none !important; }
   .contract-doc h2, .contract-doc p, .contract-doc em { color: #111 !important; }
+}
+
+/* ── Lenis smooth scroll ────────────────────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Custom cursor keeps the NATIVE pointer visible — the trailing ring is an
+   accent, not a replacement (form ergonomics + accessibility). */
+
+/* ── Spotlight — pointer-tracked sheen (vars set by <Spotlight/>) ── */
+.spotlight { position: relative; }
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(232, 207, 154, 0.10),
+    transparent 65%
+  );
+}
+.spotlight:hover::after { opacity: 1; }
+
+/* ── Luxe card border — gradient hairline that ignites on hover ── */
+.card-lux {
+  position: relative;
+  border-radius: 1rem;
+}
+.card-lux::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, rgba(198,161,91,0.45), rgba(198,161,91,0.06) 38%, rgba(15,155,215,0.10) 72%, rgba(198,161,91,0.30));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0.55;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.card-lux:hover::before { opacity: 1; }
+
+/* ── Flagship conic ring — slowly revolving gold border ── */
+@property --lux-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes lux-spin { to { --lux-angle: 360deg; } }
+.card-flagship {
+  position: relative;
+  border-radius: 1rem;
+}
+.card-flagship::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--lux-angle),
+    rgba(198,161,91,0.9), rgba(232,207,154,0.15) 25%,
+    rgba(198,161,91,0.55) 50%, rgba(232,207,154,0.12) 75%,
+    rgba(198,161,91,0.9)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: lux-spin 7s linear infinite;
+  pointer-events: none;
+}
+/* Touch devices: static ring — no perpetual style/paint loop on battery. */
+@media (hover: none) {
+  .card-flagship::before { animation: none; }
+}
+
+/* ── Hero scroll cue — a breath of gold cycling down a hairline ── */
+@keyframes marquee-y {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+/* ── Preloader failsafe — if hydration never happens (blocked/failed JS),
+      pure CSS retires the curtain so the SSR page is always reachable.
+      The JS path unmounts the element well before this fires. ── */
+@keyframes preloader-retire {
+  to { opacity: 0; visibility: hidden; }
+}
+.preloader-failsafe { animation: preloader-retire 0.6s ease 5s forwards; }
+
+/* ── Shine sweep — light passes across on hover ── */
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -80%;
+  width: 55%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(247,243,234,0.055), transparent);
+  transition: left 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.shine:hover::after { left: 130%; }
+
+/* ── Marquee: pause on hover ── */
+.marquee-pause:hover .animate-marquee { animation-play-state: paused; }
+
+/* ── Giant outline wordmark (footer destination) ── */
+.text-outline-gold {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(198, 161, 91, 0.22);
 }
 
 @media (prefers-reduced-motion: reduce) {

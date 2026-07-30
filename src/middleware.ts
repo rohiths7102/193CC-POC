@@ -7,11 +7,14 @@ const secret = () => new TextEncoder().encode(process.env.SESSION_SECRET ?? "dev
  *  + row scoping) run again server-side in every action/page via requireUser. */
 const ROLE_PREFIXES: Record<string, string[]> = {
   MEMBER: ["/portal/dashboard", "/portal/membership", "/portal/mentoring", "/portal/summit", "/portal/content", "/portal/pitch", "/portal/news", "/portal/profile"],
-  ADMIN: ["/portal/admin"],
-  // Sales reps get the shared verification queue too (permission matrix §4.3
-  // "Approve intent letters & waitlist" = Admin + Sales Rep). The page itself
-  // re-checks the permission server-side; this only routes them there.
-  SALES_REP: ["/portal/sales", "/portal/admin/verification"],
+  // Admins also open members' contracts from the 360° view — that page
+  // re-checks ownership/role server-side (member sees own, admin sees all).
+  ADMIN: ["/portal/admin", "/portal/membership/contract"],
+  // Sales reps get the shared verification queue AND the Summit console
+  // (permission matrix §4.3: "Approve intent letters & waitlist" = Admin +
+  // Sales Rep). Each page re-checks the permission server-side; this only
+  // routes them there.
+  SALES_REP: ["/portal/sales", "/portal/admin/verification", "/portal/admin/summit"],
   MENTOR: ["/portal/mentor"],
   INVESTOR: ["/portal/investor"],
   CONSULTANT: ["/portal/consultant"],

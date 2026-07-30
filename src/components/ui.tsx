@@ -15,7 +15,12 @@ export function GlassCard({
 export function SectionTitle({ kicker, title, sub, className }: { kicker?: string; title: ReactNode; sub?: string; className?: string }) {
   return (
     <div className={cn("max-w-2xl", className)}>
-      {kicker && <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-gold-500">{kicker}</p>}
+      {kicker && (
+        <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-gold-500">
+          <span className="h-px w-8 bg-gold-500/40" aria-hidden />
+          {kicker}
+        </p>
+      )}
       <h2 className="font-display text-3xl leading-tight text-ivory-50 md:text-4xl">{title}</h2>
       {sub && <p className="mt-4 text-base leading-7 text-mist">{sub}</p>}
     </div>

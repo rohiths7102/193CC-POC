@@ -168,9 +168,9 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
       <input type="hidden" name="productCode" value={productCode} />
       {org && (
         <div className="rounded-xl border border-gold-500/25 bg-gold-500/8 px-4 py-3 text-sm leading-6 text-ivory-200/90">
-          <span className="font-medium text-gold-300">No paperwork.</span> Upload your documents and sign your
-          agreement online — around <span className="text-ivory-50">20 minutes</span> end to end, with
-          <span className="text-ivory-50"> immediate verification</span> by our team.
+          Upload your documents and sign your agreement online — around{" "}
+          <span className="text-ivory-50">20 minutes</span> end to end, with
+          <span className="text-ivory-50"> same-day verification</span> by our team.
         </div>
       )}
       {summitCategories && summitCategories.length > 0 && (
@@ -213,7 +213,8 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
         <input name="password" type="password" required minLength={8} className={inputCls} placeholder="••••••••" />
       </Field>
       <FormError error={state?.error} />
-      <Submit size="lg">Continue to contract →</Submit>
+      {/* Next screen is the email code, not the contract — say so. */}
+      <Submit size="lg">Continue →</Submit>
     </form>
   );
 }
@@ -278,7 +279,7 @@ export function SignForm({ membershipId }: { membershipId: string }) {
   const [state, action] = useActionState(signContractAction as FormAction, undefined);
   const [name, setName] = useState("");
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} className="space-y-4">
       <input type="hidden" name="membershipId" value={membershipId} />
       <Field label="Sign by typing your full legal name">
         <input name="signerName" value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} placeholder="Jane Whitfield" />
@@ -311,14 +312,14 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
 
   return (
     <div>
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         <button type="button" onClick={() => setTab("card")}
-          className={`rounded-full px-5 py-2 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+          className={`whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
           Pay by card
         </button>
         {allowsDirectDebit && (
           <button type="button" onClick={() => setTab("dd")}
-            className={`rounded-full px-5 py-2 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+            className={`whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
             Direct Debit instalments
           </button>
         )}

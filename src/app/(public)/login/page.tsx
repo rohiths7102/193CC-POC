@@ -4,11 +4,17 @@ import { GlassCard } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import { LoginForm } from "@/components/forms";
 import { Logo } from "@/components/logo";
+import { NetworkCanvas } from "@/components/showcase";
+
+// A members-only door has no search value — keep it out of the index.
+export const metadata = { title: "Member Sign In", robots: { index: false, follow: true } };
 
 export default function LoginPage() {
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
-      <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+    <main className="relative mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-16">
+      {/* Living constellation — the network-globe motif, drifting behind the door */}
+      <NetworkCanvas className="pointer-events-none fixed inset-0 -z-10 h-full w-full opacity-60" />
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="aurora animate-aurora left-[10%] top-[10%] h-80 w-80 bg-ink-600" />
         <div className="aurora animate-aurora right-[-10%] bottom-[15%] h-72 w-72 bg-gold-700/50 [animation-delay:-8s]" />
       </div>
@@ -19,13 +25,21 @@ export default function LoginPage() {
         <div className="relative z-10 mb-8 flex justify-center">
           <Logo size={56} stacked className="text-lg" />
         </div>
-        <GlassCard strong className="relative z-10 p-8">
-          <div className="mb-6">
-            <h1 className="font-display text-2xl text-ivory-50">Member sign in</h1>
-            <p className="mt-1 text-xs text-mist">One door for members, admins, sales, mentors, investors and consultants.</p>
-          </div>
-          <LoginForm />
-        </GlassCard>
+        <div className="card-flagship relative z-10 rounded-2xl">
+          <GlassCard strong className="p-8">
+            <div className="mb-6 text-center">
+              <h1 className="font-display text-2xl text-ivory-50">Member sign in</h1>
+              <p className="mt-1.5 text-xs leading-5 text-mist">One door for members, admins, sales, mentors, investors and consultants.</p>
+            </div>
+            <LoginForm />
+            <p className="mt-5 border-t hairline pt-4 text-center text-xs text-mist">
+              Not a member yet?{" "}
+              <Link href="/join" className="text-gold-300 underline decoration-gold-500/40 underline-offset-2 hover:text-gold-200">
+                Become a member
+              </Link>
+            </p>
+          </GlassCard>
+        </div>
       </Reveal>
       {/* Demo credentials are shown ONLY on local machines. On any deployed
           host they stay hidden so a public URL doesn't hand out admin access. */}

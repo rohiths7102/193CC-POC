@@ -7,8 +7,12 @@ import { gbp, ukDate } from "@/lib/utils";
 import { GlassCard, Badge, LinkButton, STATUS_TONE } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import { Steps, VerificationTimeline } from "@/components/steps";
+import { PublicHeader, PublicFooter } from "@/components/public-chrome";
 
 export const dynamic = "force-dynamic";
+
+// PII page (member name, membership status, wallet) — must never be indexed.
+export const metadata = { robots: { index: false, follow: false } };
 
 export default async function StatusPage({ params }: { params: Promise<{ membershipId: string }> }) {
   const { membershipId } = await params;
@@ -21,10 +25,12 @@ export default async function StatusPage({ params }: { params: Promise<{ members
   const active = m.status === "ACTIVE";
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-14">
+    <div className="flex min-h-svh flex-col">
+    <PublicHeader />
+    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <Steps current={active ? 5 : 4} />
       <Reveal>
-        <GlassCard strong className="mt-10 p-10 text-center">
+        <GlassCard strong className="mt-8 p-8 text-center">
           {active ? (
             <>
               <span className="mx-auto inline-flex rounded-full bg-gold-500/15 p-4 text-gold-300"><PartyPopper className="h-8 w-8" /></span>
@@ -58,5 +64,7 @@ export default async function StatusPage({ params }: { params: Promise<{ members
         </GlassCard>
       </Reveal>
     </main>
+    <PublicFooter />
+    </div>
   );
 }

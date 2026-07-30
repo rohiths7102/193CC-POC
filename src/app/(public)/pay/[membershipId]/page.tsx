@@ -6,8 +6,12 @@ import { GlassCard, Badge } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import { PayForms } from "@/components/forms";
 import { Steps } from "@/components/steps";
+import { PublicHeader, PublicFooter } from "@/components/public-chrome";
 
 export const dynamic = "force-dynamic";
+
+// PII page (applicant name, product, payment state) — must never be indexed.
+export const metadata = { robots: { index: false, follow: false } };
 
 export default async function PayPage({ params }: { params: Promise<{ membershipId: string }> }) {
   const { membershipId } = await params;
@@ -20,7 +24,9 @@ export default async function PayPage({ params }: { params: Promise<{ membership
   if (m.status !== "AWAITING_PAYMENT") redirect(`/status/${m.id}`);
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-14">
+    <div className="flex min-h-svh flex-col">
+    <PublicHeader />
+    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <Steps current={4} />
       <Reveal>
         <div className="mt-8 flex items-center gap-3">
@@ -34,13 +40,17 @@ export default async function PayPage({ params }: { params: Promise<{ membership
         </p>
       </Reveal>
       <Reveal delay={0.12}>
-        <GlassCard strong className="mt-8 p-7">
-          <PayForms membershipId={m.id} priceMinor={m.product.priceMinor} allowsDirectDebit={m.product.allowsDirectDebit} />
-        </GlassCard>
+        <div className="card-flagship mt-8 rounded-2xl">
+          <GlassCard strong className="p-8">
+            <PayForms membershipId={m.id} priceMinor={m.product.priceMinor} allowsDirectDebit={m.product.allowsDirectDebit} />
+          </GlassCard>
+        </div>
       </Reveal>
-      <p className="mt-5 flex items-center gap-2 text-xs text-mist/70">
+      <p className="mt-5 flex items-center gap-2 text-xs text-mist/80">
         <Lock className="h-3.5 w-3.5" /> Card data is tokenised by the payment provider — this platform never stores raw card numbers (PCI-DSS SAQ-A model). Every payment credits your £2,600 Major-Event wallet.
       </p>
     </main>
+    <PublicFooter />
+    </div>
   );
 }

@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { GlassCard } from "@/components/ui";
+import { PublicFooter } from "@/components/public-chrome";
 
-export const metadata = { title: "Privacy Policy — 193 Countries Consortium" };
+export const metadata = {
+  title: "Privacy Policy", // root template appends the brand suffix
+  description:
+    "How 193 Countries Consortium Ltd processes personal data under UK GDPR and the Data Protection Act 2018 — what we hold, why, lawful bases and retention.",
+  alternates: { canonical: "/privacy" },
+};
 
 /** UK GDPR / DPA 2018 privacy notice with documented lawful bases (§7.1). */
 export default function PrivacyPage() {
@@ -17,15 +23,17 @@ export default function PrivacyPage() {
     ["Audit logs", "Security & accountability", "Legitimate interests (Art. 6(1)(f))", "6 years"],
   ];
   return (
-    <main className="mx-auto max-w-4xl px-6 py-14">
+    <div className="flex min-h-svh flex-col">
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
       <Link href="/" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
-        <ArrowLeft className="h-4 w-4" /> Back
+        <ArrowLeft className="h-4 w-4" /> Back to site
       </Link>
       <h1 className="mt-6 font-display text-4xl text-ivory-50">Privacy <span className="text-gold-grad">Policy</span></h1>
       <p className="mt-3 text-sm leading-7 text-mist">
         193 Countries Consortium Ltd (Companies House 14499310, Level 30, The Leadenhall Building, 122 Leadenhall Street, London EC3V 4AB)
         is the data controller for this membership platform. We process personal data under UK GDPR and the Data Protection Act 2018.
-        Data is hosted in the UK. This notice is a working draft for client legal review before go-live.
+        Data is hosted in the UK.
+        {process.env.SHOW_DEMO_LOGINS === "true" && " This notice is a working draft for client legal review before go-live."}
       </p>
       <GlassCard className="mt-8 overflow-x-auto p-2">
         <table className="w-full min-w-[640px] text-left text-sm">
@@ -47,5 +55,7 @@ export default function PrivacyPage() {
         <p><strong className="text-ivory-100">No marketing without consent. No card data on our servers. No data sold — ever.</strong></p>
       </div>
     </main>
+    <PublicFooter />
+    </div>
   );
 }

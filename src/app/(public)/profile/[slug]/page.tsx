@@ -18,11 +18,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     where: { profileSlug: slug.toLowerCase(), profilePublic: true, role: "MEMBER" },
     select: { name: true, company: true, profileBio: true },
   });
-  if (!member) return { title: "Profile not found" };
+  if (!member) return { title: "Profile not found", robots: { index: false } };
   const title = `${member.company ?? member.name} — 193 Countries Consortium`;
   return {
     title,
     description: member.profileBio ?? "Member of the 193 Countries Consortium — summits at the House of Lords, UK Parliament.",
+    // Collapses case variants onto the canonical lowercase slug.
+    alternates: { canonical: `/profile/${slug.toLowerCase()}` },
     openGraph: { title, description: member.profileBio ?? "Member of the 193 Countries Consortium." },
     twitter: { card: "summary_large_image", title },
   };
@@ -50,18 +52,17 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
   const article = member.articles[0];
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-0">
+    <main className="relative min-h-svh overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="aurora animate-aurora left-[10%] top-[-4rem] h-[26rem] w-[26rem] bg-ink-600" />
         <div className="aurora animate-aurora right-[5%] top-[16rem] h-[22rem] w-[22rem] bg-gold-700/40 [animation-delay:-8s]" />
       </div>
 
-      <header className="relative z-10 mx-auto flex max-w-4xl items-center justify-between px-6 py-6">
-        <Link href="/" className="text-sm"><Logo size={34} /></Link>
-        <LinkButton href="/join" variant="ghost" size="sm">Become a member</LinkButton>
+      <header className="relative z-10 mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
+        <Link href="/" className="text-sm"><Logo size={40} /></Link>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 pb-24 pt-10">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 py-16">
         <Reveal>
           <GlassCard strong className="overflow-hidden">
             {/* banner strip in brand gradient */}
@@ -138,7 +139,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
         <Reveal delay={0.15}>
           <div className="mt-10 text-center">
             <p className="text-sm text-mist">Want your enterprise on this stage?</p>
-            <LinkButton href="/join" className="mt-4">Explore membership <ArrowRight className="h-4 w-4" /></LinkButton>
+            <LinkButton href="/join" className="mt-4">Become a member <ArrowRight className="h-4 w-4" /></LinkButton>
           </div>
         </Reveal>
       </div>

@@ -9,6 +9,7 @@ import { PreloaderGate, IntroReveal, Magnetic, Spotlight, TextReveal, ParallaxY,
 import { existsSync } from "fs";
 import path from "path";
 import { Logo, Crest } from "@/components/logo";
+import { MobileNav } from "@/components/mobile-nav";
 import { entitlementLabel, SLOT_KIND_LABEL } from "@/lib/labels";
 import { appUrl } from "@/lib/app-url";
 
@@ -90,7 +91,7 @@ export default async function Landing() {
       <header className="sticky top-0 z-40 border-b hairline bg-ink-950/75 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <IntroReveal delay={0.55} y={-14}>
-            <Link href="/" className="text-base">
+            <Link href="/" className="flex min-h-11 items-center text-sm sm:text-base">
               <Logo size={40} />
             </Link>
           </IntroReveal>
@@ -100,7 +101,11 @@ export default async function Landing() {
               <Link href="/summit" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 sm:block">Summit</Link>
               <Link href="/guides" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 md:block">Guides</Link>
               <Link href="/login" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 sm:block">Member sign in</Link>
-              <LinkButton href="/join" size="sm" className="shine">Join</LinkButton>
+              {/* Join pill is hidden on the smallest screens — the drawer's
+                  full-width CTA replaces it, which also frees the 44px the
+                  hamburger needs without crowding the logo. */}
+              <LinkButton href="/join" size="sm" className="shine hidden sm:inline-flex">Join</LinkButton>
+              <MobileNav />
             </nav>
           </IntroReveal>
         </div>
@@ -128,14 +133,15 @@ export default async function Landing() {
           </div>
         )}
 
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-6 py-10 sm:py-12 xl:py-16 text-center">
           <IntroReveal delay={0.1}>
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-500/25 bg-ink-950/40 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold-300 backdrop-blur-sm">
+            <p className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-2xl sm:rounded-full border border-gold-500/25 bg-ink-950/40 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold-300 backdrop-blur-sm">
               <Landmark className="h-3.5 w-3.5" /> Events held at the House of Lords, UK Parliament
             </p>
           </IntroReveal>
           <KineticTitle
-            className="font-display text-5xl leading-[1.08] text-ivory-50 md:text-7xl"
+            // 48px was too heavy at 375px (≈10 chars/line). Steps 34 → 48 → 72.
+            className="font-display text-[2.15rem] leading-[1.1] text-ivory-50 sm:text-5xl sm:leading-[1.08] md:text-6xl md:leading-[1.07] xl:text-7xl xl:leading-[1.05]"
             words={[
               { text: "Membership" }, { text: "that" }, { text: "opens" },
               { text: "the", gold: true, italic: true }, { text: "most", gold: true, italic: true },
@@ -144,12 +150,12 @@ export default async function Landing() {
             ]}
           />
           <IntroReveal delay={0.5}>
-            <p className="mx-auto mt-8 max-w-2xl text-xs uppercase leading-6 tracking-[0.28em] text-ivory-200/85">
+            <p className="mx-auto mt-6 max-w-2xl text-[11px] sm:text-xs uppercase leading-5 sm:leading-6 tracking-[0.14em] sm:tracking-[0.28em] xl:mt-8 text-ivory-200/85">
               Digital enrolment · e-signed agreements · mentoring, investors and the UK Investors Summit
             </p>
           </IntroReveal>
           <IntroReveal delay={0.68}>
-            <div className="mt-10 flex justify-center">
+            <div className="mt-8 flex justify-center xl:mt-10">
               <Magnetic>
                 <LinkButton href="/join" size="lg" className="shine">Become a member <ArrowRight className="h-4 w-4" /></LinkButton>
               </Magnetic>
@@ -186,7 +192,7 @@ export default async function Landing() {
               { n: 5, prefix: "", suffix: " hrs", label: "Monthly enterprise mentoring" },
             ].map((s, i) => (
               <StaggerItem key={s.label}>
-                <div className={`py-2 pl-5 pr-4 ${i > 0 ? "sm:border-l sm:hairline" : ""} border-l-0`}>
+                <div className={`py-2 pl-0 pr-4 sm:pl-5 ${i > 0 ? "sm:border-l sm:hairline" : ""} border-l-0`}>
                   <p className="font-display text-4xl text-ivory-50">
                     {s.prefix}<AnimatedNumber value={s.n} />{s.suffix}
                   </p>
@@ -199,7 +205,7 @@ export default async function Landing() {
       </section>
 
       {/* Tiers */}
-      <section id="tiers" className="relative z-10 mx-auto max-w-6xl px-6 py-24">
+      <section id="tiers" className="relative z-10 mx-auto max-w-6xl scroll-mt-24 px-6 py-16 sm:py-24">
         <Reveal>
           <SectionTitle
             kicker="Memberships"
@@ -207,7 +213,7 @@ export default async function Landing() {
             sub="Compare the tiers side by side — fees, benefits and access, stated plainly."
           />
         </Reveal>
-        <Stagger className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4 xl:gap-5">
           {products.map((p, i) => (
             <StaggerItem key={p.id} className="h-full">
               <LiftCard className="h-full">
@@ -218,8 +224,11 @@ export default async function Landing() {
                       {p.code === "ENT_INVESTOR" && <Badge>Flagship</Badge>}
                       {p.code === "TEMPORARY" && <Badge tone="purple">Event-linked</Badge>}
                     </div>
-                    <h3 className="mt-4 font-display text-xl text-ivory-50">{p.name}</h3>
-                    <p className="mt-1 min-h-10 text-sm leading-6 text-mist">{p.strapline}</p>
+                    <h3 className="mt-4 min-h-[3.125rem] font-display text-lg leading-snug text-ivory-50 xl:min-h-14 xl:text-xl">{p.name}</h3>
+                    {/* Reserve 3 lines once the grid is multi-column: at 4-up the cards are
+                        ~260px wide and the Investor Ready strapline wraps to 3 lines while
+                        the others take 2, which pushed its price 23px below the row. */}
+                    <p className="mt-1 min-h-10 text-sm leading-6 text-mist sm:min-h-[4.5rem]">{p.strapline}</p>
                     <p className="mt-4 font-display text-4xl text-ivory-50">
                       {gbp(p.priceMinor)}
                       <span className="ml-1 text-sm text-mist">{p.billing === "ANNUAL" ? "/year" : "one-time"}</span>
@@ -248,7 +257,7 @@ export default async function Landing() {
       {/* Statement band — one breath between chapters, exactly one screen's
           worth. (A pinned 3.6-screen version was measured at 14× sparser
           than every other section — luxury is pacing, not emptiness.) */}
-      <section className="relative z-10 border-t hairline py-24">
+      <section className="relative z-10 border-t hairline py-16 sm:py-24">
         <div className="mx-auto max-w-5xl px-6 text-center">
           <TextReveal
             as="p"
@@ -264,13 +273,13 @@ export default async function Landing() {
       </section>
 
       {/* How it works */}
-      <section className="relative z-10 border-t hairline bg-ink-950/30 py-24">
+      <section className="relative z-10 border-t hairline bg-ink-950/30 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
             <SectionTitle kicker="Enrolment" title={<>Signed, paid, <span className="text-gold-grad">activated.</span></>}
               sub="Your account is held pending until signature and payment both clear — then everything unlocks at once." />
           </Reveal>
-          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { t: "Choose your tier", d: "Compare benefits and fees, transparently." },
               { t: "Confirm & e-sign", d: "Prove your email with a 6-digit code, then sign electronically — stored on your record forever." },
@@ -293,7 +302,7 @@ export default async function Landing() {
       <section id="summit" className="relative z-10 overflow-hidden border-y hairline bg-ink-950/50">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_500px_at_75%_20%,rgba(198,161,91,0.07),transparent_60%),radial-gradient(700px_420px_at_15%_85%,rgba(15,155,215,0.05),transparent_55%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900 via-transparent to-ink-900" />
-        <div className="relative mx-auto max-w-6xl px-6 py-24">
+        <div className="relative mx-auto max-w-6xl px-6 py-16 sm:py-24">
           <Reveal>
             <SectionTitle
               kicker="The UK Investors Summit"
@@ -311,7 +320,7 @@ export default async function Landing() {
             </Reveal>
           )}
 
-          <Stagger className="mt-12 grid gap-5 md:grid-cols-3">
+          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { t: SLOT_KIND_LABEL.PRESENTATION, d: "Pitch one opportunity to the assembled investor panel — deal-flow interest is captured live on the platform.", n: "01" },
               { t: SLOT_KIND_LABEL.BRAND_LAUNCH, d: "Unveil your brand on the Summit stage, with the consortium's featured-video benefit amplifying it afterwards.", n: "02" },
@@ -341,7 +350,7 @@ export default async function Landing() {
 
       {/* Enterprise benefits — bento grid: one hero tile, stat tiles, a
           full-width closing strip. Asymmetric on desktop, stacked on mobile. */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
+      <section className="relative z-10 mx-auto max-w-6xl px-6 py-16 sm:py-24">
         <Reveal>
           <SectionTitle kicker="Enterprise tiers" title={<>Benefits that <span className="text-gold-grad">compound.</span></>}
             sub="Every enterprise membership stacks brand, publishing, mentoring and investor access — provisioned automatically the moment your membership activates." />
@@ -403,7 +412,7 @@ export default async function Landing() {
 
       {/* CTA */}
       <section className="relative z-10 border-t hairline">
-        <div className="mx-auto max-w-4xl px-6 pb-16 pt-24 text-center">
+        <div className="mx-auto max-w-4xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24 text-center">
           <Reveal>
             <h2 className="font-display text-4xl leading-tight text-ivory-50 md:text-5xl">
               Your seat at the table is <span className="text-gold-grad">one signature away.</span>
@@ -420,7 +429,7 @@ export default async function Landing() {
             <span className="text-outline-gold font-display text-[clamp(9rem,26vw,20rem)] leading-none">193</span>
           </div>
           <div className="relative mx-auto max-w-6xl px-6 py-16">
-            <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
               <div>
                 <Logo size={40} />
                 <p className="mt-5 max-w-xs text-sm leading-6 text-mist">
@@ -438,7 +447,8 @@ export default async function Landing() {
                     { href: "/guides", label: "Guides" },
                   ].map((l) => (
                     <li key={l.href}>
-                      <Link href={l.href} className="group inline-flex items-center gap-2 text-ivory-200/80 transition-colors hover:text-gold-300">
+                      {/* min-h-11: footer links measured 20px tall on a phone. */}
+                      <Link href={l.href} className="group inline-flex min-h-11 items-center gap-2 text-ivory-200/80 transition-colors hover:text-gold-300">
                         <span className="inline-block h-px w-0 bg-gold-400 transition-all duration-300 group-hover:w-4" />
                         {l.label}
                       </Link>
@@ -453,7 +463,7 @@ export default async function Landing() {
                   <li className="text-ivory-200/80">122 Leadenhall Street, London</li>
                   <li className="text-mist">Companies House 14499310</li>
                   <li>
-                    <Link href="/privacy" className="group inline-flex items-center gap-2 text-ivory-200/80 transition-colors hover:text-gold-300">
+                    <Link href="/privacy" className="group inline-flex min-h-11 items-center gap-2 text-ivory-200/80 transition-colors hover:text-gold-300">
                       <span className="inline-block h-px w-0 bg-gold-400 transition-all duration-300 group-hover:w-4" />
                       Privacy Policy
                     </Link>

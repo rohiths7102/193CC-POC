@@ -4,7 +4,7 @@ import { db } from "@/server/db";
 import { gbp } from "@/lib/utils";
 import { GlassCard, Badge } from "@/components/ui";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion";
-import { PublicFooter } from "@/components/public-chrome";
+import { PublicHeader, PublicFooter } from "@/components/public-chrome";
 import { FaqBlock } from "@/components/editorial";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +20,7 @@ export default async function JoinIndex() {
   const products = await db.product.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } });
   return (
     <div className="flex min-h-svh flex-col">
+    <PublicHeader />
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <Link href="/" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
         <ArrowLeft className="h-4 w-4" /> Back to site

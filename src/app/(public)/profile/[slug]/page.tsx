@@ -100,7 +100,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
                 <p className="mt-7 max-w-2xl text-base leading-8 text-ivory-200/85">{member.profileBio}</p>
               )}
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className={`mt-8 grid gap-4 ${awardApp ? "sm:grid-cols-2" : ""}`}>
                 {awardApp && (
                   <div className="rounded-2xl border hairline bg-ink-800/40 p-5">
                     <div className="flex items-center gap-2 text-gold-400"><Award className="h-4 w-4" />

@@ -101,7 +101,7 @@ export default async function SummitHub() {
       <Reveal>
         <section>
           <h2 className="font-display text-2xl leading-snug text-ivory-50 md:text-3xl">Three categories, fifteen slots each</h2>
-          <Stagger className="mt-6 grid gap-4 sm:grid-cols-3">
+          <Stagger className="mt-6 grid gap-4 md:grid-cols-3 lg:-mx-24">
             {(next?.summit?.categories ?? []).map((c) => (
               <StaggerItem key={c.id}>
                 <GlassCard className="flex h-full flex-col p-5">

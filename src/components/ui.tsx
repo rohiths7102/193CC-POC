@@ -35,7 +35,14 @@ const btnStyles = {
   dark: "bg-ink-700/70 text-ivory-100 hover:bg-ink-600",
   danger: "border border-red-400/40 text-red-300 hover:bg-red-500/10",
 } as const;
-const btnSizes = { sm: "px-4 py-1.5 text-xs", md: "px-6 py-2.5 text-sm", lg: "px-8 py-3.5 text-base" } as const;
+// Touch-target floors (WCAG 2.5.5 / Apple HIG = 44px). Previously sm rendered
+// at 28px and md at 41px, both under the minimum on a phone; min-h-* raises
+// the hit area without changing the visual weight of the pill.
+const btnSizes = {
+  sm: "min-h-11 px-4 py-1.5 text-xs lg:min-h-0",
+  md: "min-h-11 px-6 py-2.5 text-sm lg:min-h-0",
+  lg: "min-h-[52px] px-8 py-3.5 text-base",
+} as const;
 
 export function Button({
   children, variant = "gold", size = "md", className, ...props
@@ -89,13 +96,17 @@ export function Field({ label, children, hint }: { label: string; children: Reac
     <label className="block">
       <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-mist">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-mist/70">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-mist/85">{hint}</span>}
     </label>
   );
 }
 
+// text-base (16px) on phones is not a style choice: iOS Safari auto-zooms the
+// whole page when a focused input's font-size is under 16px, which yanks the
+// layout sideways mid-form. Drops to text-sm from sm: upward, so desktop
+// density is unchanged. min-h-11 gives a 44px touch target.
 export const inputCls =
-  "w-full rounded-xl border border-gold-500/20 bg-ink-800/70 px-4 py-2.5 text-sm text-ivory-100 placeholder:text-mist/50 focus:border-gold-500/60 focus:outline-none transition-colors";
+  "w-full min-h-11 rounded-xl border border-gold-500/20 bg-ink-800/70 px-4 py-3 text-base lg:py-2.5 lg:text-sm text-ivory-100 placeholder:text-mist/50 focus:border-gold-500/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500/80 transition-colors";
 
 export function Stat({ label, value, accent }: { label: string; value: ReactNode; accent?: boolean }) {
   return (

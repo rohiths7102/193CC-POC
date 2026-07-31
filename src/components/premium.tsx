@@ -24,6 +24,20 @@ export const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 /** Full-screen wipes/covers — sharp in, sharp out. */
 export const EASE_WIPE: [number, number, number, number] = [0.87, 0, 0.13, 1];
 
+/** True only on a mouse-driven viewport wide enough to warrant scroll-linked
+ *  motion. Hydration-safe: false for SSR and first paint. */
+function useFinePointer(): boolean {
+  const [fine, setFine] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
+    const apply = () => setFine(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  return fine;
+}
+
 /* ── Intro store — lets the hero choreograph AFTER the preloader curtain ──
       Module-level singleton so Preloader (on the page) and KineticTitle
       (deep in the tree) sync without threading context through server
@@ -77,8 +91,12 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     // Low-power tier: few cores, OR a coarse pointer (phone/tablet), OR the
     // browser reporting battery saver via reduced-motion. Any of these means
     // shed the GPU-expensive layers rather than drop frames.
-    const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
-    if ((navigator.hardwareConcurrency ?? 8) <= 4 || coarse) {
+    // Width-guarded: a large tablet (iPad Pro landscape, Surface) reports a
+    // coarse pointer but has plenty of GPU, so it keeps the full treatment.
+    const smallTouch = window.matchMedia(
+      "(max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse)"
+    ).matches;
+    if ((navigator.hardwareConcurrency ?? 8) <= 4 || smallTouch) {
       document.documentElement.classList.add("low-power");
     }
   }, []);
@@ -387,11 +405,12 @@ export function ParallaxY({
 }: { children: ReactNode; from?: number; to?: number; className?: string }) {
   const reduced = useReducedSafe();
   const ref = useRef<HTMLDivElement>(null);
+  const fine = useFinePointer();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const yRange = useTransform(scrollYProgress, [0, 1], [from, to]);
   return (
     <div ref={ref} className={className}>
-      <motion.div style={reduced ? undefined : { y: yRange }}>{children}</motion.div>
+      <motion.div style={reduced || !fine ? undefined : { y: yRange }}>{children}</motion.div>
     </div>
   );
 }
@@ -423,10 +442,11 @@ export function FadeOutOnScroll({ children, className }: { children: ReactNode; 
   const reduced = useReducedSafe();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const fine = useFinePointer();
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
   return (
     <div ref={ref} className={className}>
-      <motion.div style={reduced ? undefined : { opacity }}>{children}</motion.div>
+      <motion.div style={reduced || !fine ? undefined : { opacity }}>{children}</motion.div>
     </div>
   );
 }

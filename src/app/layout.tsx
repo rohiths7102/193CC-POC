@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import { appUrl } from "@/lib/app-url";
 import "./globals.css";
@@ -23,10 +23,19 @@ export const metadata: Metadata = {
   },
 };
 
+// Paints the mobile browser toolbar/status area navy instead of default light
+// chrome above a #080F1F page — the single most visible "native app" cue.
+export const viewport: Viewport = {
+  themeColor: "#080F1F",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${display.variable} ${sans.variable}`}>
-      <body className="grain font-sans min-h-screen">{children}</body>
+      <body className="grain font-sans min-h-svh">{children}</body>
     </html>
   );
 }

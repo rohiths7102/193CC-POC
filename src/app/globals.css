@@ -9,6 +9,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Clears the sticky header so #tiers / #summit jumps do not bury the heading. */
+  scroll-padding-top: 5.5rem;
   /* Tell the UA this is a dark surface. Without it Chrome/Safari treat the
      page as light and any browser-level contrast or battery-saver
      intervention repaints against white — which is how a dark site ends up
@@ -24,6 +26,19 @@ body {
   @apply bg-ink-900 text-ivory-100 antialiased;
   background-image: radial-gradient(1200px 800px at 80% -10%, rgba(27, 46, 88, 0.55), transparent 60%),
     radial-gradient(900px 600px at -10% 110%, rgba(198, 161, 91, 0.08), transparent 55%);
+}
+
+/* Small screens lose the fixed .grain overlay (it costs compositing), so the
+   same texture is folded into the already-painted body background — the grain
+   stays, the extra layer does not. */
+@media (max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse) {
+  body {
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
+      radial-gradient(1200px 800px at 80% -10%, rgba(27, 46, 88, 0.55), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, rgba(198, 161, 91, 0.08), transparent 55%);
+    background-size: 200px 200px, auto, auto;
+  }
 }
 
 /* background-attachment: fixed is desktop-only. On mobile Chrome/Safari it is
@@ -80,18 +95,34 @@ body {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-.low-power .aurora { animation: none; }
+.low-power .aurora { animation: none; will-change: auto; }
 .low-power .card-flagship::before { animation: none; }
 
-/* ── Touch / coarse-pointer devices: no live backdrop blur at all ──────────
-   There were 21 backdrop-filter layers on the landing page. Each one is a
-   GPU blur pass recomputed whenever anything beneath it moves; on a phone
-   (especially under battery saver, where Chrome sheds GPU compositing) that
-   is the whole frame budget, and when compositing is dropped the blurred
-   layers can fail to paint entirely.
-   The glass gradient tint is retained, so the surfaces look the same — they
-   just stop resampling what is behind them. Also parks the ambient loops. */
-@media (hover: none), (pointer: coarse) {
+/* ── Aurora field (hero) ─────────────────────────────────
+   Declared HERE, above the small-screen overrides. It used to live further
+   down the file, which meant the mobile `filter: blur(60px)` override was
+   dead code — same specificity, later rule won — and `will-change:transform`
+   stayed pinned on two large layers even where the animation was parked. */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+/* ── Small touch screens: shed the GPU-expensive layers ────────────────────
+   There were 21 backdrop-filter layers on the landing page. Each is a blur
+   pass recomputed whenever anything beneath it moves; on a phone (especially
+   under battery saver, where Chrome sheds GPU compositing) that is the whole
+   frame budget — and when compositing is dropped the blurred layers can fail
+   to paint at all, which is what turned the live site white.
+
+   The max-width guard matters: `(pointer: coarse)` alone also matches an iPad
+   Pro in landscape and Surface devices in tablet mode, which have ample GPU
+   and should keep the full treatment. Written as two comma-separated queries
+   rather than L4 `and ((a) or (b))` for compatibility. */
+@media (max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse) {
   /* Covers .glass/.glass-strong AND every Tailwind backdrop-blur-* utility
      (sticky header, mobile drawer, palette overlay). The header is the worst
      offender despite its size: it re-composites on every scroll frame. */
@@ -104,9 +135,27 @@ body {
   /* Slightly more opaque to compensate for the lost blur separation. */
   .glass { background: linear-gradient(160deg, rgba(19, 34, 68, 0.78), rgba(8, 15, 31, 0.86)); }
   .glass-strong { background: linear-gradient(160deg, rgba(19, 34, 68, 0.92), rgba(8, 15, 31, 0.96)); }
-  .aurora { animation: none; filter: blur(60px); }
+  /* Park the loop and release the compositor layer it was holding. */
+  .aurora { animation: none; filter: blur(60px); will-change: auto; }
   .card-flagship::before { animation: none; }
+  /* The fixed grain pseudo-element genuinely costs compositing, but removing
+     texture altogether made mobile read flat. The texture is folded into the
+     body background stack below instead — already painted, so free. */
   .grain::before { display: none; }
+
+  /* ── Richness restored without hover or GPU cost ──
+     Every card cue was :hover-only, so a phone saw plain rectangles. These
+     give a fixed light source instead: a static top-left sheen on spotlight
+     cards and a permanent gradient edge on the flagship ring. */
+  .spotlight::after {
+    opacity: 0.75;
+    background: radial-gradient(340px circle at 15% 0%, rgba(232, 207, 154, 0.085), transparent 62%);
+  }
+  .card-lux::before { opacity: 0.85; }
+  .card-flagship::before {
+    background: linear-gradient(150deg, rgba(198,161,91,0.85), rgba(232,207,154,0.12) 42%, rgba(15,155,215,0.14) 72%, rgba(198,161,91,0.6));
+    opacity: 1;
+  }
 }
 
 /* ── Gold text + hairlines ──────────────────────────── */
@@ -122,14 +171,8 @@ body {
   .hairline { border-color: rgba(198, 161, 91, 0.18); }
 }
 
-/* ── Aurora field (hero) ────────────────────────────── */
-.aurora {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.5;
-  will-change: transform;
-}
+/* (.aurora is declared near the top of this file, above the small-screen
+   overrides — see the note there about cascade order.) */
 
 /* ── Shimmer skeleton ───────────────────────────────── */
 .shimmer {
@@ -142,7 +185,6 @@ body {
 :focus-visible {
   outline: 2px solid rgba(198, 161, 91, 0.8);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 /* ── Contract document ──────────────────────────────── */
@@ -262,12 +304,13 @@ html.lenis, html.lenis body { height: auto; }
   top: 0; bottom: 0;
   left: -80%;
   width: 55%;
-  transform: skewX(-18deg);
   background: linear-gradient(90deg, transparent, rgba(247,243,234,0.055), transparent);
-  transition: left 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-180%) skewX(-18deg);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+  will-change: transform;
 }
-.shine:hover::after { left: 130%; }
+.shine:hover::after { transform: translateX(420%) skewX(-18deg); }
 
 /* ── Marquee: pause on hover ── */
 .marquee-pause:hover .animate-marquee { animation-play-state: paused; }

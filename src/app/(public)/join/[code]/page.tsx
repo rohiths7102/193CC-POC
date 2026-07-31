@@ -7,7 +7,7 @@ import { GlassCard, Badge } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import { EnrolForm } from "@/components/forms";
 import { Steps } from "@/components/steps";
-import { PublicFooter } from "@/components/public-chrome";
+import { PublicHeader, PublicFooter } from "@/components/public-chrome";
 import { entitlementLabel, SLOT_KIND_LABEL } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
@@ -48,11 +48,12 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
 
   return (
     <div className="flex min-h-svh flex-col">
+    <PublicHeader />
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <Link href="/join" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
         <ArrowLeft className="h-4 w-4" /> All memberships
       </Link>
-      <div className="mt-8">
+      <div className="mx-auto mt-8 w-full max-w-3xl">
         <Steps current={1} />
       </div>
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_1fr]">

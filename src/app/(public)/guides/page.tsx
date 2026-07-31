@@ -4,6 +4,7 @@ import { GlassCard, LinkButton, Badge } from "@/components/ui";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion";
 import { Logo } from "@/components/logo";
 import { PublicFooter } from "@/components/public-chrome";
+import { MobileNav } from "@/components/mobile-nav";
 
 export const metadata = {
   title: "Guides — Investor Readiness, House of Lords Events & Membership",
@@ -43,8 +44,11 @@ export default function GuidesHub() {
   return (
     <div className="flex min-h-svh flex-col">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="text-sm"><Logo size={40} /></Link>
-        <LinkButton href="/join" size="sm" className="shine">Join</LinkButton>
+        <Link href="/" className="flex min-h-11 items-center text-sm"><Logo size={40} /></Link>
+        <div className="flex items-center gap-5">
+          <LinkButton href="/join" size="sm" className="shine hidden sm:inline-flex">Join</LinkButton>
+          <MobileNav />
+        </div>
       </header>
       <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">

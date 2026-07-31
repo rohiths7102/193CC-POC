@@ -160,7 +160,10 @@ export function PortalShell({
 
   // Device tiering for the console too — same flag the public shell sets.
   useEffect(() => {
-    if ((navigator.hardwareConcurrency ?? 8) <= 4) {
+    const smallTouch = window.matchMedia(
+      "(max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse)"
+    ).matches;
+    if ((navigator.hardwareConcurrency ?? 8) <= 4 || smallTouch) {
       document.documentElement.classList.add("low-power");
     }
   }, []);
@@ -250,13 +253,13 @@ export function PortalShell({
       {/* Mobile top bar + drawer */}
       <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b hairline bg-ink-900/90 px-4 py-3 backdrop-blur lg:hidden">
         <Link href="/" className="text-xs"><Logo size={28} /></Link>
-        <button onClick={() => setOpen(!open)} className="rounded-lg p-2 text-ivory-100">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
+        <button onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} className="flex h-11 w-11 items-center justify-center rounded-lg text-ivory-100">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
       </div>
       {open && (
         <motion.div initial={{ x: -280 }} animate={{ x: 0 }} className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col glass-strong lg:hidden">
           <div className="flex items-center justify-between px-5 py-4">
             <span className="font-display text-ivory-50">Menu</span>
-            <button onClick={() => setOpen(false)}><X className="h-5 w-5 text-mist" /></button>
+            <button onClick={() => setOpen(false)} aria-label="Close menu" className="flex h-11 w-11 items-center justify-center rounded-lg"><X className="h-5 w-5 text-mist" /></button>
           </div>
           {NavLinks}
           {UserBlock}

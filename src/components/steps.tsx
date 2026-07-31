@@ -31,8 +31,8 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
               >
                 <span className="font-display">{done ? "✓" : NUMERALS[i]}</span>
               </motion.span>
-              <span className={cn("text-[10px] uppercase tracking-widest", active ? "text-gold-300" : "text-mist/70")}>{label}</span>
-              {HINTS[i] && <span className="text-[9px] text-mist/50">{HINTS[i]}</span>}
+              <span className={cn("hidden text-[10px] uppercase tracking-widest sm:block", active ? "text-gold-300" : "text-mist")}>{label}</span>
+              {HINTS[i] && <span className="hidden text-[10px] text-mist/80 sm:block">{HINTS[i]}</span>}
             </div>
             {n < STEPS.length && (
               <div className="relative mx-2 mb-5 h-px flex-1 bg-gold-500/15">
@@ -48,7 +48,7 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
         );
       })}
     </div>
-    <p className="mt-3 text-center text-[10px] uppercase tracking-[0.28em] text-mist/50">
+    <p className="mt-3 text-center text-[11px] uppercase tracking-[0.24em] text-mist/80">
       No paperwork · about 20 minutes end to end
     </p>
     </div>

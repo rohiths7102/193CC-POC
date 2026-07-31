@@ -8,16 +8,25 @@ import { useIntroDone, EASE } from "@/components/premium";
       Brand gradient nodes drift and link; pointer adds gentle parallax. ── */
 export function NetworkCanvas({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  // Never mount the element at all on devices that will not paint it —
+  // a CSS-hidden full-viewport <canvas> still costs a compositor layer.
+  const [on, setOn] = useState(false);
 
+  // Pass 1: decide. Touch/low-core devices skip the constellation entirely —
+  // an animated canvas is pure overhead on a phone, and on a throttled device
+  // it steals frames from scrolling.
   useEffect(() => {
-    // Touch/low-core devices skip the constellation entirely — an animated
-    // canvas is pure overhead on a phone, and on a throttled device it steals
-    // frames from scrolling.
     if (
       (navigator.hardwareConcurrency ?? 8) <= 4 ||
       window.matchMedia("(hover: none), (pointer: coarse)").matches ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) return;
+    setOn(true);
+  }, []);
+
+  // Pass 2: only now does the element exist, so the ref is safe.
+  useEffect(() => {
+    if (!on) return;
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
     let raf = 0;
@@ -90,8 +99,9 @@ export function NetworkCanvas({ className }: { className?: string }) {
     raf = requestAnimationFrame(frame);
 
     return () => { cancelAnimationFrame(raf); ro.disconnect(); window.removeEventListener("pointermove", onMove); };
-  }, []);
+  }, [on]);
 
+  if (!on) return null;
   return <canvas ref={ref} className={className} aria-hidden="true" />;
 }
 
@@ -100,15 +110,22 @@ export function NetworkCanvas({ className }: { className?: string }) {
       motion continues down the page. Additive blending = luminous chrome. ── */
 export function LiquidRibbons({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const [on, setOn] = useState(false);
 
+  // Pass 1: decide. Low-power / touch / reduced-motion devices skip the canvas
+  // entirely — the aurora field carries the ambience alone.
   useEffect(() => {
-    // Low-power / touch / reduced-motion devices skip the canvas entirely —
-    // the aurora field carries the ambience alone.
     if (
       (navigator.hardwareConcurrency ?? 8) <= 4 ||
       window.matchMedia("(hover: none), (pointer: coarse)").matches ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) return;
+    setOn(true);
+  }, []);
+
+  // Pass 2: the element now exists, so the ref is safe.
+  useEffect(() => {
+    if (!on) return;
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
     // DPR 1: this is a soft out-of-focus glow — extra pixels are pure waste.
@@ -200,8 +217,9 @@ export function LiquidRibbons({ className }: { className?: string }) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onMove);
     };
-  }, []);
+  }, [on]);
 
+  if (!on) return null;
   return <canvas ref={ref} className={className} aria-hidden="true" />;
 }
 
@@ -212,8 +230,15 @@ export function Countdown({ target, label }: { target: string; label: string }) 
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setInterval> | undefined;
+    // Only tick while the tab is actually visible — a background tab was
+    // paying for a re-render every second for nothing.
+    const start = () => { if (!id) id = setInterval(() => setNow(Date.now()), 1000); };
+    const stop = () => { if (id) { clearInterval(id); id = undefined; } };
+    const onVis = () => (document.hidden ? stop() : (setNow(Date.now()), start()));
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stop(); document.removeEventListener("visibilitychange", onVis); };
   }, []);
   const diff = now === null ? 0 : Math.max(0, new Date(target).getTime() - now);
   const d = Math.floor(diff / 86400000);
@@ -225,7 +250,7 @@ export function Countdown({ target, label }: { target: string; label: string }) 
     <div>
       <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-mist">{label}</p>
       {/* wraps + narrower floor so four cells never overflow a 375px screen */}
-      <div className="flex flex-wrap gap-2 sm:gap-3">
+      <div className="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap sm:gap-3">
         {cells.map(([unit, v]) => (
           <div key={unit} className="glass-strong min-w-[64px] rounded-2xl px-3 py-3 text-center sm:min-w-[76px] sm:px-4">
             <motion.p key={v} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -249,7 +274,7 @@ export function KineticTitle({ words, className }: { words: { text: string; gold
       {words.map((w, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.1em] -mb-[0.1em] align-bottom">
           <motion.span
-            className={`inline-block whitespace-pre will-change-transform ${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
+            className={`inline-block whitespace-pre ${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
             initial={{ y: "118%" }}
             animate={introDone ? { y: 0 } : { y: "118%" }}
             transition={{ delay: 0.06 + i * 0.055, duration: 0.85, ease: EASE }}
@@ -272,6 +297,7 @@ export function TiltCard({ children, className }: { children: React.ReactNode; c
       className={className}
       style={{ perspective: 900 }}
       onPointerMove={(e) => {
+        if (e.pointerType !== "mouse") return;
         const r = ref.current!.getBoundingClientRect();
         setT({
           ry: ((e.clientX - r.left) / r.width - 0.5) * 10,
@@ -301,9 +327,11 @@ export function TiltCard({ children, className }: { children: React.ReactNode; c
 export function EventFilm({ src, poster, className }: { src?: string; poster?: string; className?: string }) {
   const [playFilm, setPlayFilm] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
+    const mq = window.matchMedia("(min-width: 1024px)");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const apply = () => setPlayFilm(mq.matches && !reduced);
+    // Honour the OS/browser data-saver signal too.
+    const saveData = Boolean((navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData);
+    const apply = () => setPlayFilm(mq.matches && !reduced && !saveData);
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);

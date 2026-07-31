@@ -68,7 +68,7 @@ export default function MembershipComparedGuide() {
       <Reveal>
         <section>
           <h2 className="font-display text-2xl leading-snug text-ivory-50 md:text-3xl">The comparison</h2>
-          <GlassCard className="mt-6 overflow-x-auto rounded-2xl">
+          <GlassCard className="mt-6 overflow-x-auto rounded-2xl [mask-image:linear-gradient(to_right,#000_86%,transparent)] md:[mask-image:none]">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-b hairline">

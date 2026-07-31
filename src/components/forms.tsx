@@ -38,7 +38,7 @@ function Submit({ children, variant = "gold", size = "md" }: { children: ReactNo
 function FormError({ error }: { error?: string }) {
   if (!error) return null;
   return (
-    <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">{error}</p>
+    <p role="alert" aria-live="assertive" className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">{error}</p>
   );
 }
 
@@ -143,7 +143,7 @@ export function EmailCodeForm({ membershipId }: { membershipId: string }) {
       </form>
       <form action={resendAction}>
         <input type="hidden" name="membershipId" value={membershipId} />
-        <button type="submit" className="text-xs text-gold-300 underline underline-offset-2 hover:text-gold-200">
+        <button type="submit" className="inline-flex min-h-11 items-center text-xs text-gold-300 underline underline-offset-2 hover:text-gold-200">
           Didn't get it? Send a new code
         </button>
         {(resent as { sent?: boolean } | undefined)?.sent && (
@@ -183,16 +183,16 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
         </Field>
       )}
       <Field label="Full name">
-        <input name="name" required value={applicantName} onChange={(e) => setApplicantName(e.target.value)}
+        <input name="name" required autoComplete="name" value={applicantName} onChange={(e) => setApplicantName(e.target.value)}
           className={inputCls} placeholder="Jane Whitfield" />
       </Field>
       <Field label="Email" hint={org ? "We'll send a confirmation code here. A company address helps verification." : undefined}>
-        <input name="email" type="email" required className={inputCls} placeholder="jane@company.com" />
+        <input name="email" type="email" required autoComplete="email" inputMode="email" className={inputCls} placeholder="jane@company.com" />
       </Field>
       {org ? (
         <>
           <Field label="Organisation registered name">
-            <input name="orgName" required value={orgName} onChange={(e) => setOrgName(e.target.value)}
+            <input name="orgName" required autoComplete="organization" value={orgName} onChange={(e) => setOrgName(e.target.value)}
               className={inputCls} placeholder="Whitfield Industries Ltd" />
           </Field>
           <Field label="Company registration number" hint="We verify this against Companies House — it's required to confirm your organisation.">
@@ -203,14 +203,14 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
           <LiveCompanyCheck number={orgNumber} name={orgName} applicant={applicantName} />
           <Field label="Organisation documents" hint="Certificate of incorporation, letterhead, or similar — PDF or image, up to 10 MB each.">
             <input name="orgDocs" type="file" multiple required accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-              className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-2 file:text-sm file:text-gold-300 hover:file:bg-gold-500/30" />
+              className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-5 file:py-3 file:text-sm file:text-gold-300 hover:file:bg-gold-500/30" />
           </Field>
         </>
       ) : (
-        <Field label="Company (optional)"><input name="company" className={inputCls} placeholder="Whitfield Industries Ltd" /></Field>
+        <Field label="Company (optional)"><input name="company" autoComplete="organization" className={inputCls} placeholder="Whitfield Industries Ltd" /></Field>
       )}
       <Field label="Create a password" hint="At least 8 characters — this becomes your member login.">
-        <input name="password" type="password" required minLength={8} className={inputCls} placeholder="••••••••" />
+        <input name="password" type="password" required minLength={8} autoComplete="new-password" className={inputCls} placeholder="••••••••" />
       </Field>
       <FormError error={state?.error} />
       {/* Next screen is the email code, not the contract — say so. */}
@@ -229,11 +229,11 @@ export function VerifyOrgForm({ membershipId }: { membershipId: string }) {
         <input name="reason" className={`${inputCls} min-w-64`} placeholder="e.g. document illegible / name mismatch" />
       </Field>
       <button type="submit" name="decision" value="approve"
-        className="rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-5 py-2 text-sm font-medium text-ink-950 hover:shadow-glow">
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-5 text-sm font-medium text-ink-950 hover:shadow-glow">
         Approve & activate
       </button>
       <button type="submit" name="decision" value="reject"
-        className="rounded-full border border-red-400/40 px-5 py-2 text-sm text-red-300 hover:bg-red-500/10">
+        className="inline-flex min-h-11 items-center justify-center rounded-full border border-red-400/40 px-5 text-sm text-red-300 hover:bg-red-500/10">
         Reject
       </button>
       <FormError error={state?.error} />
@@ -258,11 +258,11 @@ export function ProfileForm({ profile }: {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={profile.hasLogo ? "Replace company logo" : "Company logo"} hint="Square PNG/JPG works best.">
           <input name="logo" type="file" accept="image/*"
-            className="block w-full text-sm text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-3 file:py-1.5 file:text-xs file:text-gold-300" />
+            className="block w-full text-sm text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-3 file:text-xs file:text-gold-300" />
         </Field>
         <Field label={profile.hasPhoto ? "Replace profile picture" : "Profile picture"}>
           <input name="photo" type="file" accept="image/*"
-            className="block w-full text-sm text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-3 file:py-1.5 file:text-xs file:text-gold-300" />
+            className="block w-full text-sm text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-3 file:text-xs file:text-gold-300" />
         </Field>
       </div>
       <label className="flex items-start gap-3 rounded-xl border border-gold-500/20 bg-ink-800/50 px-4 py-3 text-sm text-ivory-200/85">
@@ -295,7 +295,7 @@ export function SignForm({ membershipId }: { membershipId: string }) {
         I confirm I have read the agreement and intend my typed name to be my legally binding electronic signature.
       </label>
       <FormError error={state?.error} />
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Submit size="lg">Sign agreement</Submit>
         <DemoTag>Simulated e-signature</DemoTag>
       </div>
@@ -312,14 +312,14 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div role="tablist" aria-label="Payment method" className="mb-6 flex flex-wrap gap-2">
         <button type="button" onClick={() => setTab("card")}
-          className={`whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+          role="tab" aria-selected={tab === "card"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
           Pay by card
         </button>
         {allowsDirectDebit && (
           <button type="button" onClick={() => setTab("dd")}
-            className={`whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+            role="tab" aria-selected={tab === "dd"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
             Direct Debit instalments
           </button>
         )}
@@ -328,13 +328,13 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
       {tab === "card" ? (
         <form action={cardAction} className="space-y-4">
           <input type="hidden" name="membershipId" value={membershipId} />
-          <Field label="Card number"><input inputMode="numeric" className={inputCls} placeholder="4242 4242 4242 4242" defaultValue="4242 4242 4242 4242" /></Field>
+          <Field label="Card number"><input inputMode="numeric" autoComplete="cc-number" className={inputCls} placeholder="4242 4242 4242 4242" defaultValue="4242 4242 4242 4242" /></Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Expiry"><input className={inputCls} placeholder="12/28" defaultValue="12/28" /></Field>
-            <Field label="CVC"><input className={inputCls} placeholder="123" defaultValue="123" /></Field>
+            <Field label="Expiry"><input inputMode="numeric" autoComplete="cc-exp" className={inputCls} placeholder="12/28" defaultValue="12/28" /></Field>
+            <Field label="CVC"><input inputMode="numeric" autoComplete="cc-csc" className={inputCls} placeholder="123" defaultValue="123" /></Field>
           </div>
           <FormError error={cardState?.error} />
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Submit size="lg">Pay £{price.toLocaleString("en-GB")} now</Submit>
             <DemoTag>Simulated — no real charge</DemoTag>
           </div>
@@ -353,12 +353,12 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
             ))}
           </div>
           <Field label="Account holder"><input className={inputCls} placeholder="Jane Whitfield" defaultValue="Demo Account Holder" /></Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Sort code"><input className={inputCls} placeholder="20-00-00" defaultValue="20-00-00" /></Field>
-            <Field label="Account number"><input className={inputCls} placeholder="55779911" defaultValue="55779911" /></Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Sort code"><input inputMode="numeric" className={inputCls} placeholder="20-00-00" defaultValue="20-00-00" /></Field>
+            <Field label="Account number"><input inputMode="numeric" className={inputCls} placeholder="55779911" defaultValue="55779911" /></Field>
           </div>
           <FormError error={ddState?.error} />
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Submit size="lg">Set up mandate & pay first instalment</Submit>
             <DemoTag>Simulated Bacs</DemoTag>
           </div>
@@ -387,7 +387,7 @@ export function IntentUploadForm({ applicationId }: { applicationId: string }) {
     <form action={action} className="space-y-3">
       <input type="hidden" name="applicationId" value={applicationId} />
       <input name="intentLetter" type="file" accept=".pdf,.doc,.docx"
-        className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-2 file:text-sm file:text-gold-300 hover:file:bg-gold-500/30" />
+        className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-5 file:py-3 file:text-sm file:text-gold-300 hover:file:bg-gold-500/30" />
       <FormError error={state?.error} />
       <Submit size="sm">Upload intent letter</Submit>
     </form>
@@ -437,13 +437,13 @@ export function ArticleEditor({ article, maxWords }: {
       </div>
       <Field label="Images (up to 2, HD)" hint="JPEG or PNG.">
         <input name="images" type="file" accept="image/*" multiple disabled={locked}
-          className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-2 file:text-sm file:text-gold-300" />
+          className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-5 file:py-3 file:text-sm file:text-gold-300" />
       </Field>
       <FormError error={state?.error} />
       {!locked && (
-        <div className="flex gap-3">
-          <button type="submit" name="submit" value="false" className="rounded-full border border-gold-500/30 px-6 py-2.5 text-sm text-ivory-100 hover:bg-gold-500/10">Save draft</button>
-          <button type="submit" name="submit" value="true" disabled={over} className="rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-6 py-2.5 text-sm font-medium text-ink-950 hover:shadow-glow disabled:opacity-50">Submit for review</button>
+        <div className="flex flex-wrap gap-3">
+          <button type="submit" name="submit" value="false" className="inline-flex min-h-11 items-center rounded-full border border-gold-500/30 px-6 text-sm text-ivory-100 hover:bg-gold-500/10">Save draft</button>
+          <button type="submit" name="submit" value="true" disabled={over} className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-6 text-sm font-medium text-ink-950 hover:shadow-glow disabled:opacity-50">Submit for review</button>
         </div>
       )}
     </form>
@@ -472,7 +472,7 @@ export function PitchForm({ pitch }: { pitch?: { id: string; title: string; summ
       <Field label="Summary for investors"><textarea name="summary" rows={4} defaultValue={pitch?.summary} required className={inputCls} placeholder="Traction, market, raise…" /></Field>
       <Field label="Pitch materials (deck, one-pager)" hint="PDF preferred; visible to investors only with your consent.">
         <input name="materials" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx" multiple
-          className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-2 file:text-sm file:text-gold-300" />
+          className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-5 file:py-3 file:text-sm file:text-gold-300" />
       </Field>
       <label className="flex items-start gap-3 rounded-xl border border-gold-500/20 bg-ink-800/50 px-4 py-3 text-sm text-ivory-200/85">
         <input type="checkbox" name="consent" defaultChecked={pitch?.visibilityConsent} className="mt-0.5 h-4 w-4 accent-[#C6A15B]" />

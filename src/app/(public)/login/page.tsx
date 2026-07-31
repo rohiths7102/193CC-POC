@@ -11,7 +11,7 @@ export const metadata = { title: "Member Sign In", robots: { index: false, follo
 
 export default function LoginPage() {
   return (
-    <main className="relative mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-16">
+    <main className="relative mx-auto flex min-h-svh max-w-md flex-col justify-center px-5 py-8 sm:px-6 sm:py-16">
       {/* Living constellation — the network-globe motif, drifting behind the door */}
       <NetworkCanvas className="pointer-events-none fixed inset-0 -z-10 h-full w-full opacity-60" />
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -26,7 +26,7 @@ export default function LoginPage() {
           <Logo size={56} stacked className="text-lg" />
         </div>
         <div className="card-flagship relative z-10 rounded-2xl">
-          <GlassCard strong className="p-8">
+          <GlassCard strong className="p-6 sm:p-8">
             <div className="mb-6 text-center">
               <h1 className="font-display text-2xl text-ivory-50">Member sign in</h1>
               <p className="mt-1.5 text-xs leading-5 text-mist">One door for members, admins, sales, mentors, investors and consultants.</p>

@@ -91,7 +91,7 @@ export default async function Approvals() {
                   {next.status === "DELIVERED" && (
                     <label className="block">
                       <span className="mb-1 block text-[10px] uppercase tracking-widest text-mist">Final asset</span>
-                      <input name="asset" type="file" className="block text-xs text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-3 file:py-1.5 file:text-xs file:text-gold-300" />
+                      <input name="asset" type="file" className="block text-xs text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-3 file:py-3 file:text-xs file:text-gold-300" />
                     </label>
                   )}
                   <Button size="sm" variant="ghost">{next.label} →</Button>

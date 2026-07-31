@@ -92,7 +92,7 @@ export function MobileNav() {
           >
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between px-6 py-4">
-                <Link href="/" onClick={() => setOpen(false)} className="text-sm">
+                <Link href="/" onClick={() => setOpen(false)} className="flex min-h-11 items-center text-sm">
                   <Logo size={36} />
                 </Link>
                 <button

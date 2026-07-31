@@ -57,6 +57,18 @@ const introStore = {
   },
 };
 
+/* Wall-clock ceiling on the intro gate, armed at module scope so it does NOT
+   depend on <Preloader/> mounting. Everything above the fold (header, nav, h1,
+   subhead, the only CTA) is gated on useIntroDone(), and the only thing that
+   flipped that gate was a setTimeout inside Preloader's effect — so a slow or
+   failed hydration left a blank navy screen indefinitely. Anchoring to
+   performance.now() makes this a real ceiling rather than a delay measured from
+   whenever the chunk happened to evaluate. finish() is idempotent, so the
+   normal path (which fires earlier) still wins. */
+if (typeof window !== "undefined") {
+  setTimeout(() => introStore.finish(), Math.max(0, 2800 - performance.now()));
+}
+
 export function useIntroDone(): boolean {
   return useSyncExternalStore(
     (l) => introStore.subscribe(l),
@@ -174,8 +186,21 @@ export function Preloader() {
           pure-CSS failsafe (globals.css) fades it away after 5s regardless.
           The normal JS path unmounts it long before either fires. */}
       <noscript>
-        <style>{`[data-cc-preloader]{display:none!important}`}</style>
+        <style>{`[data-cc-preloader]{display:none!important}.intro-gate{opacity:1!important;transform:none!important}`}</style>
       </noscript>
+      {/* `mode` is null until the effect picks full-vs-fast, so the SSR curtain
+          was an empty opaque rectangle. On a slow phone that is several seconds
+          of featureless navy; paint the brand mark so the wait is branded. */}
+      {mode === null && (
+        <div className="flex flex-col items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/193cc-logo.png" alt="" width={72} height={72} className="rounded-full" />
+          <p className="mt-6 font-display text-xl tracking-wide text-ivory-50">
+            193 Countries <span className="text-gold-grad italic">Consortium</span>
+          </p>
+          <div className="mt-5 h-px w-44 bg-gradient-to-r from-gold-500/0 via-gold-500 to-gold-500/0" />
+        </div>
+      )}
       {mode === "full" && (
             <div className="relative flex flex-col items-center">
               <motion.div
@@ -240,9 +265,15 @@ export function IntroReveal({
   children, delay = 0, y = 26, className,
 }: { children: ReactNode; delay?: number; y?: number; className?: string }) {
   const done = useIntroDone();
+  // `intro-gate` is a pure-CSS failsafe for the case where JS never runs at all:
+  // framer serialises `initial` into the SSR HTML, so without it a dead bundle
+  // leaves the hero permanently at opacity 0. It is dropped the instant the gate
+  // opens, so the animation never fires for working JS and its `forwards` fill
+  // can't pin a transform on top of framer's inline styles.
+  const cls = done ? className : className ? `intro-gate ${className}` : "intro-gate";
   return (
     <motion.div
-      className={className}
+      className={cls}
       initial={{ opacity: 0, y }}
       animate={done ? { opacity: 1, y: 0 } : { opacity: 0, y }}
       transition={{ duration: 0.85, delay, ease: EASE }}

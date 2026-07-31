@@ -274,7 +274,10 @@ export function KineticTitle({ words, className }: { words: { text: string; gold
       {words.map((w, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.1em] -mb-[0.1em] align-bottom">
           <motion.span
-            className={`inline-block whitespace-pre ${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
+            // `intro-gate` only while the gate is shut: framer serialises the
+            // 118% offset into the SSR HTML inside an overflow-hidden mask, so a
+            // bundle that never runs would hide the h1 permanently.
+            className={`inline-block whitespace-pre ${introDone ? "" : "intro-gate "}${w.gold ? "text-gold-grad" : ""} ${w.italic ? "italic" : ""}`}
             initial={{ y: "118%" }}
             animate={introDone ? { y: 0 } : { y: "118%" }}
             transition={{ delay: 0.06 + i * 0.055, duration: 0.85, ease: EASE }}

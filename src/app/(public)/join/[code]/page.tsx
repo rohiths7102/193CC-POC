@@ -33,7 +33,10 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
   if (!product || !product.active) notFound();
 
   // Temporary membership is event-linked: applicant picks their Summit category up front.
-  let summitCategories: { id: string; label: string; slotsLeft: number }[] | undefined;
+  // label and event stay separate so the form can group options by event with a
+  // native <optgroup> — pre-joining them made every option ~84 chars, and a
+  // <select> cannot wrap, so the slot count was clipped off on a phone.
+  let summitCategories: { id: string; label: string; event: string; slotsLeft: number }[] | undefined;
   if (product.billing === "ONE_TIME") {
     const cats = await db.summitCategory.findMany({
       where: { summit: { status: "OPEN", deadlineAt: { gt: new Date() } } },
@@ -41,7 +44,8 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
     });
     summitCategories = cats.map((c) => ({
       id: c.id,
-      label: `${SLOT_KIND_LABEL[c.kind]} · ${c.summit.event.name}`,
+      label: SLOT_KIND_LABEL[c.kind],
+      event: c.summit.event.name,
       slotsLeft: Math.max(0, c.capacity - c.applications.length),
     }));
   }

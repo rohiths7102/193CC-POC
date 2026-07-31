@@ -33,7 +33,10 @@ export function GuideShell({
         </div>
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
-        <Link href={backHref} className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
+        {/* min-h-11 with -mx-2/px-2 cancelling out, so the hit box reaches the
+            44px floor while the icon and text stay on the same pixels. This is
+            the only "up" affordance on the editorial pages besides the logo. */}
+        <Link href={backHref} className="-mx-2 inline-flex min-h-11 items-center gap-2 px-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
           <ArrowLeft className="h-4 w-4" /> {backLabel}
         </Link>
         <Reveal>

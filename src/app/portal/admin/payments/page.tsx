@@ -65,7 +65,7 @@ export default async function AdminPayments() {
               <Td className="text-xs">{ukDate(l.createdAt, true)}</Td>
               <Td><Link href={`/portal/admin/members/${l.userId}`} className="text-ivory-50 hover:text-gold-300">{l.user.name}</Link></Td>
               <Td><Badge tone={l.amountMinor < 0 ? "red" : "green"}>{titleCase(l.type)}</Badge></Td>
-              <Td className="max-w-64 truncate text-xs">{l.reason ?? "—"}</Td>
+              <Td className="text-xs"><span className="block max-w-64 truncate" title={l.reason ?? undefined}>{l.reason ?? "—"}</span></Td>
               <Td className={l.amountMinor < 0 ? "text-red-300" : "text-ivory-50"}>{gbp(l.amountMinor)}</Td>
             </tr>
           ))}

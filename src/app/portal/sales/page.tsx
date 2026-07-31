@@ -54,7 +54,7 @@ export default async function SalesPipeline() {
                 </Td>
                 <Td>{l.company ?? "—"}</Td>
                 <Td><Badge tone={STATUS_TONE[l.stage] ?? "grey"}>{l.stage}</Badge></Td>
-                <Td className="max-w-56 truncate text-xs">{l.notes ?? "—"}</Td>
+                <Td className="text-xs"><span className="block max-w-56 truncate" title={l.notes ?? undefined}>{l.notes ?? "—"}</span></Td>
                 <Td className="text-xs text-mist">{ukDate(l.createdAt)}</Td>
               </tr>
             ))}

@@ -137,7 +137,7 @@ export default async function MemberDetail({ params }: { params: Promise<{ id: s
             <tr key={l.id}>
               <Td>{ukDate(l.createdAt, true)}</Td>
               <Td><Badge tone={l.amountMinor < 0 ? "red" : "green"}>{titleCase(l.type)}</Badge></Td>
-              <Td className="max-w-72 truncate">{l.reason ?? "—"}</Td>
+              <Td><span className="block max-w-72 truncate" title={l.reason ?? undefined}>{l.reason ?? "—"}</span></Td>
               <Td className="text-xs text-mist">{titleCase(l.provider)}</Td>
               <Td className={l.amountMinor < 0 ? "text-red-300" : "text-ivory-50"}>{gbp(l.amountMinor)}</Td>
             </tr>

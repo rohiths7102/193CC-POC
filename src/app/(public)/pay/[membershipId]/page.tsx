@@ -29,10 +29,10 @@ export default async function PayPage({ params }: { params: Promise<{ membership
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <Steps current={4} />
       <Reveal>
-        <div className="mt-8 flex items-center gap-3">
-          <CreditCard className="h-6 w-6 text-gold-400" />
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <CreditCard className="h-6 w-6 shrink-0 text-gold-400" />
           <h1 className="font-display text-3xl text-ivory-50">Payment</h1>
-          <Badge tone="green">Contract signed ✓</Badge>
+          <Badge tone="green" className="shrink-0 whitespace-nowrap">Contract signed ✓</Badge>
         </div>
         <p className="mt-2 text-sm text-mist">
           {m.product.name} — <span className="text-ivory-100">{gbp(m.product.priceMinor)}</span>

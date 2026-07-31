@@ -119,7 +119,22 @@ export function Stat({ label, value, accent }: { label: string; value: ReactNode
 
 export function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
-    <div className="glass overflow-x-auto rounded-2xl">
+    // Every console table is a horizontal scroller below ~560px, and iOS draws
+    // no scrollbar until you already guessed to swipe — so columns looked absent
+    // rather than off-screen, and a keyboard user could not scroll it at all.
+    // role+tabIndex make it focusable and announced; the gradient uses `local`
+    // attachment so it travels with the content and disappears at the end of the
+    // scroll, unlike a fixed mask that stays put and washes out the last column.
+    // The cue sits on an INNER div because .glass sets the `background`
+    // shorthand (resetting background-image/-size/-attachment) and is emitted
+    // after Tailwind's utilities, so it would overwrite the cue.
+    <div className="glass rounded-2xl">
+      <div
+        role="region"
+        aria-label="Table — scrolls sideways"
+        tabIndex={0}
+        className="overflow-x-auto rounded-2xl bg-[linear-gradient(to_left,rgba(8,15,31,0.92),transparent)] bg-right bg-no-repeat [background-attachment:local] [background-size:40px_100%] lg:bg-none"
+      >
       <table className="w-full min-w-[560px] text-left text-sm">
         <thead>
           <tr className="border-b hairline">
@@ -130,6 +145,7 @@ export function Table({ head, children }: { head: string[]; children: ReactNode 
         </thead>
         <tbody className="divide-y divide-gold-500/8">{children}</tbody>
       </table>
+      </div>
     </div>
   );
 }

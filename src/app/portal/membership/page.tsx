@@ -82,7 +82,7 @@ export default async function MembershipPage() {
           <tr key={l.id}>
             <Td>{ukDate(l.createdAt)}</Td>
             <Td><Badge tone={l.amountMinor < 0 ? "red" : "green"}>{titleCase(l.type)}</Badge></Td>
-            <Td className="max-w-72 truncate">{l.reason ?? "—"}</Td>
+            <Td><span className="block max-w-72 truncate" title={l.reason ?? undefined}>{l.reason ?? "—"}</span></Td>
             <Td className={l.amountMinor < 0 ? "text-red-300" : "text-ivory-50"}>{gbp(l.amountMinor)}</Td>
             <Td>{l.walletEligible ? "✓" : "—"}</Td>
           </tr>

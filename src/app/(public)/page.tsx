@@ -67,8 +67,15 @@ export default async function Landing() {
       }
     : null;
 
+  // overflow-x-clip, NOT overflow-hidden: `hidden` on either axis makes <main> a
+  // scroll container, which then becomes the nearest scrollport for the
+  // `sticky top-0` header below — and since <main> never scrolls internally, the
+  // header silently stopped sticking and scrolled away on the first swipe,
+  // taking the only mobile nav with it. `clip` clips the oversized decorative
+  // type horizontally just the same, without establishing a scrollport (and
+  // legally pairs with the default overflow-y: visible).
   return (
-    <main className="relative overflow-hidden">
+    <main className="relative overflow-x-clip">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       {eventLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventLd) }} />}
       {/* Brand-reveal curtain — plays once per session, hero waits for it */}
@@ -97,10 +104,15 @@ export default async function Landing() {
           </IntroReveal>
           <IntroReveal delay={0.65} y={-14}>
             <nav className="flex items-center gap-5">
-              <Link href="#tiers" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 sm:block">Memberships</Link>
-              <Link href="/summit" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 sm:block">Summit</Link>
-              <Link href="/guides" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 md:block">Guides</Link>
-              <Link href="/login" className="hidden text-sm text-mist transition-colors hover:text-ivory-100 sm:block">Member sign in</Link>
+              {/* min-h-11 + flex, not block: on a tablet the hamburger is gone
+                  (sm:hidden) so these are the whole navigation, and a bare
+                  text-sm link is only a ~20px-tall tap target. The header row is
+                  already 44px+ via the logo and Join pill, so desktop is
+                  unchanged. */}
+              <Link href="#tiers" className="hidden min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 sm:flex">Memberships</Link>
+              <Link href="/summit" className="hidden min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 sm:flex">Summit</Link>
+              <Link href="/guides" className="hidden min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 md:flex">Guides</Link>
+              <Link href="/login" className="hidden min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 sm:flex">Member sign in</Link>
               {/* Join pill is hidden on the smallest screens — the drawer's
                   full-width CTA replaces it, which also frees the 44px the
                   hamburger needs without crowding the logo. */}
@@ -287,7 +299,10 @@ export default async function Landing() {
               { t: "Access provisions itself", d: "Dashboard, mentoring hours, Summit booking — live in seconds." },
             ].map((s, i) => (
               <StaggerItem key={s.t}>
-                <div className="relative rounded-2xl border hairline bg-ink-800/40 p-6">
+                {/* h-full so the four bordered cards match height — the grid item
+                    stretches but the card inside it did not, leaving bottom edges
+                    up to ~48px apart once the copy lengths differ. */}
+                <div className="relative h-full rounded-2xl border hairline bg-ink-800/40 p-6">
                   <span className="font-display text-5xl text-gold-500/25">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="mt-3 font-display text-lg text-ivory-50">{s.t}</h3>
                   <p className="mt-2 text-sm leading-6 text-mist">{s.d}</p>
@@ -320,7 +335,10 @@ export default async function Landing() {
             </Reveal>
           )}
 
-          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Three cards, so go 3-up at md — at 768 a 2-column grid left the
+              Business Award card alone on row 2 beside an equal-width void,
+              reading as a card that failed to load. */}
+          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 md:grid-cols-3">
             {[
               { t: SLOT_KIND_LABEL.PRESENTATION, d: "Pitch one opportunity to the assembled investor panel — deal-flow interest is captured live on the platform.", n: "01" },
               { t: SLOT_KIND_LABEL.BRAND_LAUNCH, d: "Unveil your brand on the Summit stage, with the consortium's featured-video benefit amplifying it afterwards.", n: "02" },

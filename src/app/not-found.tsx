@@ -19,7 +19,7 @@ export default function NotFound() {
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
           <LinkButton href="/join">Become a member</LinkButton>
-          <Link href="/" className="text-sm text-mist transition-colors hover:text-ivory-100">Back to site</Link>
+          <Link href="/" className="inline-flex min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 lg:min-h-0">Back to site</Link>
         </div>
       </main>
       <PublicFooter />

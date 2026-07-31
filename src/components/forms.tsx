@@ -78,19 +78,35 @@ function LiveCompanyCheck({ number, name, applicant }: { number: string; name: s
     return () => clearTimeout(timer.current);
   }, [number, name, applicant]);
 
-  if (checking) {
-    return <p className="flex items-center gap-1.5 text-xs text-mist"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking Companies House…</p>;
-  }
-  if (!result) return null;
-
+  // The verdict arrives 600ms after typing stops and used to be an early-return,
+  // so the node did not exist until it had content — meaning nothing was ever
+  // announced. A screen-reader applicant got total silence for "not a valid
+  // number", "DISSOLVED", "no company found" and "your name isn't on the
+  // officers register", then submitted believing verification had passed. The
+  // live region must be in the DOM *before* the text lands, so render the
+  // wrapper unconditionally and put the branches inside it.
   return (
-    <div className="space-y-1 rounded-lg border hairline bg-ink-800/50 px-3 py-2 text-xs">
-      {result.status === "invalid_format" && (
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      className={
+        checking || result
+          ? "space-y-1 rounded-lg border hairline bg-ink-800/50 px-3 py-2 text-xs"
+          : "sr-only"
+      }
+    >
+      {checking && (
+        <p className="flex items-center gap-1.5 text-xs text-mist">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking Companies House…
+        </p>
+      )}
+      {!checking && result?.status === "invalid_format" && (
         <p className="flex items-center gap-1.5 text-amber-300">
           <AlertTriangle className="h-3.5 w-3.5" /> That isn't a valid UK company number — 8 digits, or 2 letters + 6 digits.
         </p>
       )}
-      {result.status === "active" && (
+      {!checking && result?.status === "active" && (
         <>
           <p className="flex items-center gap-1.5 text-emerald-400">
             <CheckCircle2 className="h-3.5 w-3.5" /> Found: {result.officialName} — active
@@ -112,13 +128,13 @@ function LiveCompanyCheck({ number, name, applicant }: { number: string; name: s
           )}
         </>
       )}
-      {result.status === "dissolved" && (
+      {!checking && result?.status === "dissolved" && (
         <p className="flex items-center gap-1.5 text-amber-300"><AlertTriangle className="h-3.5 w-3.5" /> {result.officialName} shows as DISSOLVED on the register.</p>
       )}
-      {result.status === "not_found" && (
+      {!checking && result?.status === "not_found" && (
         <p className="flex items-center gap-1.5 text-mist"><XCircle className="h-3.5 w-3.5" /> No company found with that number — you can still submit; our team will verify from your documents.</p>
       )}
-      {result.simulated && <span className="block text-[10px] text-mist/60">Demo data — live once a Companies House API key is configured.</span>}
+      {!checking && result?.simulated && <span className="block text-[10px] text-mist/60">Demo data — live once a Companies House API key is configured.</span>}
     </div>
   );
 }
@@ -134,7 +150,10 @@ export function EmailCodeForm({ membershipId }: { membershipId: string }) {
         <Field label="6-digit code">
           <input
             name="code" required inputMode="numeric" autoComplete="one-time-code" maxLength={6}
-            className={`${inputCls} text-center font-mono text-2xl tracking-[0.5em]`}
+            // !text-2xl: inputCls carries `text-base lg:text-sm`, and Tailwind
+            // emits .text-base after .text-2xl, so the plain utility lost and the
+            // code field rendered at 16px — then shrank to 14px past 1024px.
+            className={`${inputCls} text-center font-mono !text-2xl tracking-[0.5em] lg:!text-2xl`}
             placeholder="000000"
           />
         </Field>
@@ -146,9 +165,12 @@ export function EmailCodeForm({ membershipId }: { membershipId: string }) {
         <button type="submit" className="inline-flex min-h-11 items-center text-xs text-gold-300 underline underline-offset-2 hover:text-gold-200">
           Didn't get it? Send a new code
         </button>
-        {(resent as { sent?: boolean } | undefined)?.sent && (
-          <span className="ml-2 text-xs text-emerald-400">New code sent.</span>
-        )}
+        {/* Region must exist before the text arrives, or the change is never
+            announced — resend submits without navigating, so this span was the
+            only feedback and a screen-reader user heard nothing at all. */}
+        <span role="status" aria-live="polite" className="ml-2 text-xs text-emerald-400">
+          {(resent as { sent?: boolean } | undefined)?.sent ? "New code sent." : ""}
+        </span>
       </form>
     </div>
   );
@@ -156,7 +178,7 @@ export function EmailCodeForm({ membershipId }: { membershipId: string }) {
 
 export function EnrolForm({ productCode, summitCategories, org = false }: {
   productCode: string;
-  summitCategories?: { id: string; label: string; slotsLeft: number }[];
+  summitCategories?: { id: string; label: string; event: string; slotsLeft: number }[];
   org?: boolean;
 }) {
   const [state, action] = useActionState(startEnrolmentAction as FormAction, undefined);
@@ -175,9 +197,23 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
       )}
       {summitCategories && summitCategories.length > 0 && (
         <Field label="Choose your Summit opportunity" hint="One slot per member — 15 per category. Full categories join the waitlist.">
-          <select name="summitCategoryId" required className={inputCls}>
-            {summitCategories.map((c) => (
-              <option key={c.id} value={c.id}>{c.label} — {c.slotsLeft > 0 ? `${c.slotsLeft} slots left` : "waitlist"}</option>
+          {/* defaultValue="" + a disabled placeholder so `required` actually
+              gates: with no empty option the first category was silently
+              pre-accepted. Options are grouped by event and carry only the
+              category plus availability, so nothing important is clipped at
+              375px where the control is ~263px wide. */}
+          <select name="summitCategoryId" required defaultValue="" className={inputCls}>
+            <option value="" disabled>Choose…</option>
+            {Array.from(new Set(summitCategories.map((c) => c.event))).map((event) => (
+              <optgroup key={event} label={event}>
+                {summitCategories!
+                  .filter((c) => c.event === event)
+                  .map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label} — {c.slotsLeft > 0 ? `${c.slotsLeft} left` : "waitlist"}
+                    </option>
+                  ))}
+              </optgroup>
             ))}
           </select>
         </Field>
@@ -226,7 +262,7 @@ export function VerifyOrgForm({ membershipId }: { membershipId: string }) {
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="membershipId" value={membershipId} />
       <Field label="Rejection reason (required only to reject)">
-        <input name="reason" className={`${inputCls} min-w-64`} placeholder="e.g. document illegible / name mismatch" />
+        <input name="reason" className={`${inputCls} sm:min-w-64`} placeholder="e.g. document illegible / name mismatch" />
       </Field>
       <button type="submit" name="decision" value="approve"
         className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-5 text-sm font-medium text-ink-950 hover:shadow-glow">
@@ -312,14 +348,17 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
 
   return (
     <div>
-      <div role="tablist" aria-label="Payment method" className="mb-6 flex flex-wrap gap-2">
+      {/* role="group" + aria-pressed, not tablist/tab: there is no tabpanel and
+          no arrow-key handling here, so the tab roles promised a widget that does
+          not exist and AT announced "tab 1 of 2" against nothing. */}
+      <div role="group" aria-label="Payment method" className="mb-6 flex flex-wrap gap-2">
         <button type="button" onClick={() => setTab("card")}
-          role="tab" aria-selected={tab === "card"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+          aria-pressed={tab === "card"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
           Pay by card
         </button>
         {allowsDirectDebit && (
           <button type="button" onClick={() => setTab("dd")}
-            role="tab" aria-selected={tab === "dd"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+            aria-pressed={tab === "dd"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
             Direct Debit instalments
           </button>
         )}
@@ -343,9 +382,14 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
         <form action={ddAction} className="space-y-4">
           <input type="hidden" name="membershipId" value={membershipId} />
           <input type="hidden" name="months" value={months} />
-          <div className="grid grid-cols-2 gap-3">
+          {/* aria-pressed so the chosen term is exposed: it existed only as a
+              border-opacity difference plus a hidden input, so a screen-reader
+              user could not tell whether they were committing to 3 or 6
+              collections before submitting. */}
+          <div role="group" aria-label="Number of monthly collections" className="grid grid-cols-2 gap-3">
             {[3, 6].map((m) => (
               <button key={m} type="button" onClick={() => setMonths(m as 3 | 6)}
+                aria-pressed={months === m}
                 className={`rounded-xl border px-4 py-4 text-left transition-colors ${months === m ? "border-gold-500/60 bg-gold-500/10" : "border-gold-500/15 hover:border-gold-500/40"}`}>
                 <p className="font-display text-xl text-ivory-50">{m} months</p>
                 <p className="mt-1 text-sm text-mist">£{Math.ceil(priceMinor / m / 100).toLocaleString("en-GB")}/month</p>
@@ -560,7 +604,7 @@ export function LogSessionForm({ sessionId }: { sessionId: string }) {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="sessionId" value={sessionId} />
-      <Field label="Session notes"><input name="notes" className={`${inputCls} min-w-64`} placeholder="Outcomes, next steps…" /></Field>
+      <Field label="Session notes"><input name="notes" className={`${inputCls} sm:min-w-64`} placeholder="Outcomes, next steps…" /></Field>
       <Submit size="sm" variant="ghost">Mark delivered</Submit>
       <FormError error={state?.error} />
     </form>
@@ -635,7 +679,7 @@ export function EraseMemberForm({ userId }: { userId: string }) {
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="userId" value={userId} />
       <Field label="GDPR erasure — reason (audited)" hint="Anonymises identity; financial ledger retained under legal obligation.">
-        <input name="reason" required className={`${inputCls} min-w-64`} placeholder="Member requested erasure on…" />
+        <input name="reason" required className={`${inputCls} sm:min-w-64`} placeholder="Member requested erasure on…" />
       </Field>
       <Submit size="sm" variant="danger">Erase identity</Submit>
       <FormError error={state?.error} />
@@ -663,7 +707,7 @@ export function InterestForm({ pitchId, existingNote }: { pitchId: string; exist
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="pitchId" value={pitchId} />
       <Field label="Note to the team">
-        <input name="note" defaultValue={existingNote ?? ""} className={`${inputCls} min-w-64`} placeholder="Requesting data room…" />
+        <input name="note" defaultValue={existingNote ?? ""} className={`${inputCls} sm:min-w-64`} placeholder="Requesting data room…" />
       </Field>
       <Submit size="sm">{existingNote ? "Update interest" : "Express interest"}</Submit>
       <FormError error={state?.error} />

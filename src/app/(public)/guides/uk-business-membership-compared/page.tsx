@@ -68,7 +68,23 @@ export default function MembershipComparedGuide() {
       <Reveal>
         <section>
           <h2 className="font-display text-2xl leading-snug text-ivory-50 md:text-3xl">The comparison</h2>
-          <GlassCard className="mt-6 overflow-x-auto rounded-2xl [mask-image:linear-gradient(to_right,#000_86%,transparent)] md:[mask-image:none]">
+          {/* The old mask was anchored to the container, not the scroll
+              position, so the last column stayed faded even at maximum scroll —
+              the table read as broken rather than scrolled-to-the-end. A
+              background with `local` attachment travels with the content and
+              disappears when there is nothing left to reveal. */}
+          <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-mist/70 md:hidden">Swipe to compare &rarr;</p>
+          {/* The scroll container must NOT be the .glass element: .glass sets the
+              `background` SHORTHAND, which resets background-image/-size/
+              -attachment, and it is emitted after Tailwind's utilities — so a cue
+              applied to the card itself is silently wiped. */}
+          <GlassCard className="mt-6 rounded-2xl">
+            <div
+              role="region"
+              aria-label="UK business membership comparison — scrolls sideways"
+              tabIndex={0}
+              className="overflow-x-auto rounded-2xl bg-[linear-gradient(to_left,rgba(8,15,31,0.92),transparent)] bg-right bg-no-repeat [background-attachment:local] [background-size:48px_100%] md:bg-none"
+            >
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-b hairline">
@@ -88,6 +104,7 @@ export default function MembershipComparedGuide() {
                 ))}
               </tbody>
             </table>
+            </div>
           </GlassCard>
         </section>
       </Reveal>

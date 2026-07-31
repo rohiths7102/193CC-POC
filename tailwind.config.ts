@@ -4,6 +4,15 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      // Tailwind's default opacity scale is multiples of 5, so `gold-500/8` and
+      // `gold-500/12` silently generated nothing: 23 call sites rendered with no
+      // tint at all, and `divide-gold-500/8` fell through to preflight's
+      // near-white #e5e7eb. Registering the two steps the design actually uses
+      // fixes every call site at once and keeps the designed values exact.
+      opacity: {
+        8: "0.08",
+        12: "0.12",
+      },
       colors: {
         ink: {
           950: "#060B16",

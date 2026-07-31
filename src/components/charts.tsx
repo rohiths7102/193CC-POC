@@ -37,7 +37,12 @@ export function Donut({ fraction, label, sub, size = 110 }: { fraction: number; 
   const c = 2 * Math.PI * r;
   const f = Math.min(1, Math.max(0, fraction));
   return (
-    <div className="flex items-center gap-4">
+    // flex-wrap so the label drops under the ring in a narrow grid cell. The
+    // 110px SVG cannot shrink, so ring + gap + an unbreakable label word needs
+    // ~210px of min-content, but the Reports cells are only 122-149px at every
+    // laptop width — the labels ran over the neighbouring donut and the last one
+    // spilled outside the card, which has no overflow clip.
+    <div className="flex flex-wrap items-center gap-4">
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} className="stroke-ink-700" />

@@ -51,7 +51,11 @@ export default async function MemberDashboard() {
 
       <div className="mt-8 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         {/* Wallet card */}
-        <GlassCard strong className="flex flex-col items-center gap-8 p-8 sm:flex-row">
+        {/* Stay stacked through 1024-1279: the grid splits into two columns at
+            lg, and after p-8 plus the non-shrinkable 168px ring the text column
+            is only ~126px there — the h2 wrapped to four lines and the CTA pill
+            to three. Back to a row at xl, where there is room. */}
+        <GlassCard strong className="flex flex-col items-center gap-8 p-8 sm:flex-row lg:flex-col xl:flex-row">
           <ProgressRing
             fraction={wallet.unlocked ? 1 : wallet.balance / wallet.threshold}
             label={gbp(wallet.balance)}

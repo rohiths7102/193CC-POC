@@ -17,7 +17,12 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
         const done = n < current;
         const active = n === current;
         return (
-          <div key={label} className="flex flex-1 items-center">
+          // items-start + a fixed mt-4 on the connector pins the rail to the
+          // circle's centre. With items-center and mb-5 the rail's position
+          // depended on the column height, which changes when the labels appear
+          // at sm — so it sat ~10px above centre on a phone (crossing the
+          // numerals) and ~10px below it from 640px up.
+          <div key={label} className="flex flex-1 items-start">
             <div className="flex flex-col items-center gap-1.5">
               <motion.span
                 initial={false}
@@ -35,7 +40,7 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
               {HINTS[i] && <span className="hidden text-[10px] text-mist/80 sm:block">{HINTS[i]}</span>}
             </div>
             {n < STEPS.length && (
-              <div className="relative mx-2 mb-5 h-px flex-1 bg-gold-500/15">
+              <div className="relative mx-2 mt-4 h-px flex-1 bg-gold-500/15">
                 <motion.div
                   className="absolute inset-y-0 left-0 bg-gold-500"
                   initial={{ width: 0 }}

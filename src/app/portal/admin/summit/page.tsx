@@ -93,7 +93,7 @@ export default async function SummitConsole() {
                           {(a.status === "INTENT_SUBMITTED" || a.status === "WAITLISTED") && (
                             <div className="mt-2.5 flex flex-wrap items-center gap-2">
                               {a.intentLetterPath && (
-                                <a href={`/api/files/${a.intentLetterPath}`} className="text-xs text-gold-300 underline underline-offset-2">Intent letter</a>
+                                <a href={`/api/files/${a.intentLetterPath}`} className="inline-flex min-h-11 items-center text-xs text-gold-300 underline underline-offset-2 lg:min-h-0">Intent letter</a>
                               )}
                               <form action={confirmSlotAction}>
                                 <input type="hidden" name="applicationId" value={a.id} />

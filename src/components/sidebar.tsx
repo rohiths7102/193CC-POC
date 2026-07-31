@@ -168,6 +168,33 @@ export function PortalShell({
     }
   }, []);
 
+  // The console drawer was a bare 288px panel with nothing behind it: the
+  // exposed strip of page stayed live (taps hit member rows and Approve forms
+  // underneath), the page kept scrolling behind it, and Escape did nothing. Same
+  // treatment the public mobile-nav already has.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // Close if the viewport grows past lg — otherwise rotating to landscape hides
+  // the panel and its close button (lg:hidden) while `open` stays true, leaving
+  // the page scroll-locked with no way to release it.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => { if (mq.matches) setOpen(false); };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   // ⌘K / Ctrl+K opens the palette from anywhere in the portal.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -194,7 +221,7 @@ export function PortalShell({
         return (
           <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
             className={cn(
-              "relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors",
+              "relative flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors lg:min-h-0",
               active ? "text-ivory-50" : "text-mist hover:text-ivory-100 hover:bg-ink-700/40"
             )}>
             {active && (
@@ -237,7 +264,7 @@ export function PortalShell({
         <div className="px-3 pb-1">
           <button
             onClick={() => setPaletteOpen(true)}
-            className="flex w-full items-center gap-2.5 rounded-xl border hairline bg-ink-800/50 px-3.5 py-2 text-left text-xs text-mist transition-colors hover:border-gold-500/40 hover:text-ivory-100"
+            className="flex min-h-11 w-full items-center gap-2.5 rounded-xl border hairline bg-ink-800/50 px-3.5 py-2 text-left text-xs text-mist transition-colors hover:border-gold-500/40 hover:text-ivory-100 lg:min-h-0"
           >
             <Search className="h-3.5 w-3.5" />
             <span className="flex-1">Jump to…</span>
@@ -256,7 +283,15 @@ export function PortalShell({
         <button onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} className="flex h-11 w-11 items-center justify-center rounded-lg text-ivory-100">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
       </div>
       {open && (
-        <motion.div initial={{ x: -280 }} animate={{ x: 0 }} className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col glass-strong lg:hidden">
+        <>
+          {/* z-[45] deliberately covers the z-40 topbar, so the whole page
+              behind the drawer is inert; the drawer's own X is the close path. */}
+          <div
+            className="fixed inset-0 z-[45] bg-ink-950/60 lg:hidden"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+        <motion.div initial={{ x: -280 }} animate={{ x: 0 }} role="dialog" aria-modal="true" aria-label="Console menu" className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col glass-strong lg:hidden">
           <div className="flex items-center justify-between px-5 py-4">
             <span className="font-display text-ivory-50">Menu</span>
             <button onClick={() => setOpen(false)} aria-label="Close menu" className="flex h-11 w-11 items-center justify-center rounded-lg"><X className="h-5 w-5 text-mist" /></button>
@@ -264,6 +299,7 @@ export function PortalShell({
           {NavLinks}
           {UserBlock}
         </motion.div>
+        </>
       )}
 
       {/* Content */}

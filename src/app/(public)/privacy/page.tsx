@@ -25,7 +25,7 @@ export default function PrivacyPage() {
   return (
     <div className="flex min-h-svh flex-col">
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
-      <Link href="/" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
+      <Link href="/" className="inline-flex min-h-11 items-center gap-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
         <ArrowLeft className="h-4 w-4" /> Back to site
       </Link>
       <h1 className="mt-6 font-display text-4xl text-ivory-50">Privacy <span className="text-gold-grad">Policy</span></h1>
@@ -35,7 +35,17 @@ export default function PrivacyPage() {
         Data is hosted in the UK.
         {process.env.SHOW_DEMO_LOGINS === "true" && " This notice is a working draft for client legal review before go-live."}
       </p>
-      <GlassCard className="mt-8 overflow-x-auto p-2">
+      {/* At 375px the card is ~327px around a 640px-min table, so retention
+          periods — the core legal disclosure — sat off-screen with no cue. */}
+      <p className="mt-3 text-xs text-mist/70 sm:hidden">
+        Swipe the table sideways for lawful basis and retention &rarr;
+      </p>
+      <GlassCard
+        role="region"
+        aria-label="What we hold, why, lawful basis and retention — scrolls sideways"
+        tabIndex={0}
+        className="mt-8 overflow-x-auto overscroll-x-contain p-2"
+      >
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead><tr className="border-b hairline">
             {["What we hold", "Why", "Lawful basis", "Retention"].map((h) => (

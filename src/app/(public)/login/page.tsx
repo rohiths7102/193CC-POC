@@ -18,7 +18,8 @@ export default function LoginPage() {
         <div className="aurora animate-aurora left-[10%] top-[10%] h-80 w-80 bg-ink-600" />
         <div className="aurora animate-aurora right-[-10%] bottom-[15%] h-72 w-72 bg-gold-700/50 [animation-delay:-8s]" />
       </div>
-      <Link href="/" className="relative z-10 mb-8 inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
+      {/* /login renders no PublicHeader, so this is the page's only exit. */}
+      <Link href="/" className="relative z-10 mb-8 inline-flex min-h-11 items-center gap-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
         <ArrowLeft className="h-4 w-4" /> Back to site
       </Link>
       <Reveal>

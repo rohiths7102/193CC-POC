@@ -31,10 +31,13 @@ export default async function SignPage({ params }: { params: Promise<{ membershi
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <Steps current={3} />
       <Reveal>
-        <div className="mt-8 flex items-center gap-3">
-          <FileSignature className="h-6 w-6 text-gold-400" />
+        {/* flex-wrap + an atomic chip: at 375px all three items shrank to
+            min-content, crushing the h1 and turning the tier name into a
+            three-line pill whose caps collided with its own rounded edge. */}
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <FileSignature className="h-6 w-6 shrink-0 text-gold-400" />
           <h1 className="font-display text-3xl text-ivory-50">Sign your agreement</h1>
-          <Badge tone="blue">{m.product.name}</Badge>
+          <Badge tone="blue" className="shrink-0 whitespace-nowrap">{m.product.name}</Badge>
         </div>
         <p className="mt-2 text-sm text-mist">
           For {m.user.name} · {m.user.email}. Your account activates only after signature <em className="text-gold-400 not-italic">and</em> payment.

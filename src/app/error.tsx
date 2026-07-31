@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Crest } from "@/components/logo";
+import { Button } from "@/components/ui";
 
 /** Branded error boundary — a thrown server error previously rendered Next's
  *  unstyled default over the luxury shell. */
@@ -14,14 +15,11 @@ export default function ErrorPage({ reset }: { error: Error & { digest?: string 
         <p className="mt-4 text-sm leading-7 text-mist">
           The fault is on our side. Try again — if it persists, the membership office can help.
         </p>
+        {/* Use the shared Button: this was hand-rolled, so it bypassed btnSizes
+            and stayed a 40px target — on the one control that recovers the page. */}
         <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
-          <button
-            onClick={reset}
-            className="rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-6 py-2.5 text-sm font-medium text-ink-950 hover:shadow-glow"
-          >
-            Try again
-          </button>
-          <Link href="/" className="text-sm text-mist transition-colors hover:text-ivory-100">Back to site</Link>
+          <Button onClick={reset}>Try again</Button>
+          <Link href="/" className="inline-flex min-h-11 items-center text-sm text-mist transition-colors hover:text-ivory-100 lg:min-h-0">Back to site</Link>
         </div>
       </main>
     </div>

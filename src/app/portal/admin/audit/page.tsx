@@ -39,8 +39,18 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
               <Td>{r.actorName ?? <span className="text-mist">system</span>}</Td>
               <Td><Badge tone="grey">{r.action}</Badge></Td>
               <Td className="text-xs text-mist">{r.entityType}</Td>
-              <Td className="max-w-64 truncate text-xs">{r.after ? JSON.stringify(r.after) : "—"}</Td>
-              <Td className="max-w-48 truncate text-xs italic">{r.reason ?? "—"}</Td>
+              {/* truncate must sit on a block child, not the <td>: in an
+                  auto-layout table the cell's min-content is the whole string
+                  and max-width cannot shrink a column below it, so the ellipsis
+                  never appeared and the column grew instead. */}
+              <Td className="text-xs">
+                <span className="block max-w-64 truncate" title={r.after ? JSON.stringify(r.after) : undefined}>
+                  {r.after ? JSON.stringify(r.after) : "—"}
+                </span>
+              </Td>
+              <Td className="text-xs italic">
+                <span className="block max-w-48 truncate" title={r.reason ?? undefined}>{r.reason ?? "—"}</span>
+              </Td>
             </tr>
           ))}
         </Table>

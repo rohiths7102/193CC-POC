@@ -135,6 +135,13 @@ body {
   /* Slightly more opaque to compensate for the lost blur separation. */
   .glass { background: linear-gradient(160deg, rgba(19, 34, 68, 0.78), rgba(8, 15, 31, 0.86)); }
   .glass-strong { background: linear-gradient(160deg, rgba(19, 34, 68, 0.92), rgba(8, 15, 31, 0.96)); }
+  /* The [class*="backdrop-blur"] arm above strips the blur from raw Tailwind
+     consumers too, but the compensation only covered .glass/.glass-strong. The
+     landing nav and the portal topbar use the utility pair directly, so they
+     were left as flat ~75-90% strips with the hero type ghosting straight
+     through them while scrolling. */
+  header[class*="backdrop-blur"],
+  [class*="backdrop-blur"][class*="fixed"] { background-color: rgb(6 11 22 / 0.96); }
   /* Park the loop and release the compositor layer it was holding. */
   .aurora { animation: none; filter: blur(60px); will-change: auto; }
   /* .card-flagship::before's animation is parked in the block at the end of
@@ -309,7 +316,23 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes preloader-retire {
   to { opacity: 0; visibility: hidden; }
 }
-.preloader-failsafe { animation: preloader-retire 0.6s ease 5s forwards; }
+.preloader-failsafe { animation: preloader-retire 0.5s ease 4.5s forwards; }
+
+/* ── Intro-gate failsafe — the other half of the pair above ──
+      Everything above the fold is gated on useIntroDone(), and framer
+      serialises the hidden `initial` state into the SSR HTML. If the bundle
+      never runs, that content would stay invisible even after the curtain
+      retires. This reveals it in pure CSS.
+
+      INVARIANT: this delay must stay LATER than .preloader-failsafe's, or the
+      curtain lifts onto a hero that is still hidden — a shorter version of the
+      very bug it exists to prevent. Tune the two together, never one alone.
+      React drops the class as soon as the gate opens, so on a healthy page this
+      animation never fires. */
+@keyframes intro-failsafe {
+  to { opacity: 1; transform: none; }
+}
+.intro-gate { animation: intro-failsafe 0.4s ease 4.8s forwards; }
 
 /* ── Shine sweep — light passes across on hover ── */
 .shine { position: relative; overflow: hidden; }
@@ -337,8 +360,16 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Lenis is skipped for these users, which means the UA's own smooth scroll is
+     what runs — so an in-page anchor animated the viewport through six screens
+     of content, exactly the vestibular trigger the OS setting exists to stop. */
+  html { scroll-behavior: auto !important; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    /* Without this the two failsafes above still sat on multi-second delays for
+       users who asked for no motion. Zeroing it makes both fire at once, which
+       is the intended fast path: no curtain, hero visible immediately. */
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }

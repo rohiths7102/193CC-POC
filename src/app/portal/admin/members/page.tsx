@@ -44,17 +44,22 @@ export default async function AdminMembers({ searchParams }: {
           <h1 className="font-display text-3xl text-ivory-50">Members</h1>
           <p className="mt-1.5 text-sm text-mist">Search by name, email or company — click through for the full 360°.</p>
         </div>
+        {/* Widths must carry the lg: prefix. inputCls already starts with
+            `w-full`, and Tailwind emits .w-full AFTER .w-36/.w-44/.w-56 — equal
+            specificity, so the bare widths lost and every control stayed 100%
+            wide, wrapping the filter bar into five ~780px stacked rows on a
+            laptop. Media-query variants are emitted later, so lg: wins. */}
         <form className="flex w-full flex-wrap items-center gap-2 lg:w-auto">
-          <input name="q" defaultValue={q} placeholder="Search members…" className={`${inputCls} w-56`} />
-          <select name="tier" defaultValue={tier ?? ""} className={`${inputCls} w-44`}>
+          <input name="q" defaultValue={q} placeholder="Search members…" className={`${inputCls} lg:w-56`} />
+          <select name="tier" defaultValue={tier ?? ""} className={`${inputCls} lg:w-44`}>
             <option value="">All tiers</option>
             {products.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}
           </select>
-          <select name="status" defaultValue={status ?? ""} className={`${inputCls} w-36`}>
+          <select name="status" defaultValue={status ?? ""} className={`${inputCls} lg:w-36`}>
             <option value="">Any status</option>
             <option value="ACTIVE">Active</option><option value="PENDING">Pending</option><option value="SUSPENDED">Suspended</option>
           </select>
-          <select name="health" defaultValue={health ?? ""} className={`${inputCls} w-44`}>
+          <select name="health" defaultValue={health ?? ""} className={`${inputCls} lg:w-44`}>
             <option value="">Any payment health</option>
             <option value="dd">On Direct Debit</option>
             <option value="at_risk">At-risk plans</option>

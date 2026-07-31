@@ -58,7 +58,7 @@ export default async function MentoringPage() {
                   <Td>{ukDate(s.scheduledAt, true)}</Td>
                   <Td>{s.durationMin} min</Td>
                   <Td><Badge tone={STATUS_TONE[s.status] ?? "grey"}>{titleCase(s.status)}</Badge></Td>
-                  <Td className="max-w-72 truncate">{s.notes ?? "—"}</Td>
+                  <Td><span className="block max-w-72 truncate" title={s.notes ?? undefined}>{s.notes ?? "—"}</span></Td>
                 </tr>
               ))}
             </Table>

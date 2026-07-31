@@ -142,21 +142,11 @@ body {
      texture altogether made mobile read flat. The texture is folded into the
      body background stack below instead — already painted, so free. */
   .grain::before { display: none; }
-
-  /* ── Richness restored without hover or GPU cost ──
-     Every card cue was :hover-only, so a phone saw plain rectangles. These
-     give a fixed light source instead: a static top-left sheen on spotlight
-     cards and a permanent gradient edge on the flagship ring. */
-  .spotlight::after {
-    opacity: 0.75;
-    background: radial-gradient(340px circle at 15% 0%, rgba(232, 207, 154, 0.085), transparent 62%);
-  }
-  .card-lux::before { opacity: 0.85; }
-  .card-flagship::before {
-    background: linear-gradient(150deg, rgba(198,161,91,0.85), rgba(232,207,154,0.12) 42%, rgba(15,155,215,0.14) 72%, rgba(198,161,91,0.6));
-    opacity: 1;
-  }
 }
+/* NOTE: the touch "richness restored" rules for .spotlight/.card-lux/
+   .card-flagship deliberately live AFTER those selectors are declared, near
+   the end of this file. Media queries add no specificity, so keeping them
+   here — above the base rules — made them dead code at equal specificity. */
 
 /* ── Gold text + hairlines ──────────────────────────── */
 .text-gold-grad {
@@ -280,6 +270,26 @@ html.lenis, html.lenis body { height: auto; }
 /* Touch devices: static ring — no perpetual style/paint loop on battery. */
 @media (hover: none) {
   .card-flagship::before { animation: none; }
+}
+
+/* ── Richness restored on touch, without hover or GPU cost ──
+   Every card cue above is :hover-only, so a phone saw plain rectangles. These
+   give a fixed light source instead: a static top-left sheen on spotlight
+   cards and a permanent gradient edge on the flagship ring.
+
+   These MUST stay below the base rules they override. A media query carries no
+   specificity, so when this block sat higher in the file the base
+   `.spotlight::after { opacity: 0 }` won and phones got no glow at all. */
+@media (max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse) {
+  .spotlight::after {
+    opacity: 0.75;
+    background: radial-gradient(340px circle at 15% 0%, rgba(232, 207, 154, 0.085), transparent 62%);
+  }
+  .card-lux::before { opacity: 0.85; }
+  .card-flagship::before {
+    background: linear-gradient(150deg, rgba(198,161,91,0.85), rgba(232,207,154,0.12) 42%, rgba(15,155,215,0.14) 72%, rgba(198,161,91,0.6));
+    opacity: 1;
+  }
 }
 
 /* ── Hero scroll cue — a breath of gold cycling down a hairline ── */

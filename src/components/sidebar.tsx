@@ -158,6 +158,13 @@ export function PortalShell({
     if (/Mac|iP(hone|ad|od)/.test(navigator.platform)) setModKey("⌘");
   }, []);
 
+  // Device tiering for the console too — same flag the public shell sets.
+  useEffect(() => {
+    if ((navigator.hardwareConcurrency ?? 8) <= 4) {
+      document.documentElement.classList.add("low-power");
+    }
+  }, []);
+
   // ⌘K / Ctrl+K opens the palette from anywhere in the portal.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

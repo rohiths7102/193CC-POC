@@ -73,9 +73,12 @@ export default async function Landing() {
       {/* Brand-reveal curtain — plays once per session, hero waits for it */}
       <PreloaderGate />
 
-      {/* Aurora field */}
-      {/* Liquid light ribbons — fixed behind every section; scroll drives the flow */}
-      <LiquidRibbons className="pointer-events-none fixed inset-0 z-0" />
+      {/* Ambience. With the film hero present, the aurora field alone
+          carries it — a full-page animated canvas underneath glass cards
+          forces every backdrop blur to recompute every frame, which is a
+          frame-budget tax the film version doesn't need. The ribbons run
+          only in the no-film fallback. */}
+      {!hasFilm && <LiquidRibbons className="pointer-events-none fixed inset-0 z-0" />}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="aurora animate-aurora left-[8%] top-[-6rem] h-[30rem] w-[30rem] bg-ink-600" />
         <div className="aurora animate-aurora left-[55%] top-[4rem] h-[26rem] w-[26rem] bg-gold-700/50 [animation-delay:-6s]" />

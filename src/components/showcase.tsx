@@ -10,6 +10,14 @@ export function NetworkCanvas({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Touch/low-core devices skip the constellation entirely — an animated
+    // canvas is pure overhead on a phone, and on a throttled device it steals
+    // frames from scrolling.
+    if (
+      (navigator.hardwareConcurrency ?? 8) <= 4 ||
+      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
     let raf = 0;
@@ -94,10 +102,18 @@ export function LiquidRibbons({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Low-power / touch / reduced-motion devices skip the canvas entirely —
+    // the aurora field carries the ambience alone.
+    if (
+      (navigator.hardwareConcurrency ?? 8) <= 4 ||
+      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
-    const DPR = Math.min(2, window.devicePixelRatio || 1);
-    let W = 0, H = 0, raf = 0, t = 0;
+    // DPR 1: this is a soft out-of-focus glow — extra pixels are pure waste.
+    const DPR = 1;
+    let W = 0, H = 0, raf = 0, t = 0, tick = 0;
     let scrollTarget = 0, scroll = 0, mouseY = 0.5;
 
     const RIBBONS = [
@@ -129,8 +145,13 @@ export function LiquidRibbons({ className }: { className?: string }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const frame = () => {
-      t += 1;
-      scroll += (scrollTarget - scroll) * 0.06; // buttery lag — streaks chase the scroll
+      // Ambience runs at 30fps — imperceptible for a soft background drift,
+      // halves the paint cost AND how often glass backdrops must re-blur.
+      tick++;
+      if (tick % 2 === 0) { raf = requestAnimationFrame(frame); return; }
+
+      t += 2;
+      scroll += (scrollTarget - scroll) * 0.1; // buttery lag — streaks chase the scroll
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = "lighter";
 
@@ -140,23 +161,30 @@ export function LiquidRibbons({ className }: { className?: string }) {
         const phase = t * r.speed + scroll * r.drift * 6;
         const baseY = r.y * H + (mouseY - 0.5) * 26 - (scroll * r.drift * 40) % H * 0.08;
 
-        // volume: many thin parallel strands build one luminous ribbon
-        for (let s = 0; s < 12; s++) {
-          const off = (s - 6) * (r.w / 12);
-          const alpha = 0.075 * (1 - Math.abs(s - 6) / 7);
+        // Fewer, wider strands + NO shadowBlur (a per-stroke gaussian blur
+        // every frame was the single biggest cost on the page). The soft
+        // glow now comes from one wide low-alpha under-stroke — near-free.
+        for (let s = 0; s < 7; s++) {
+          const off = (s - 3) * (r.w / 7);
+          const centre = s === 3;
+          const alpha = 0.085 * (1 - Math.abs(s - 3) / 4);
           ctx.strokeStyle = grad;
           ctx.globalAlpha = reduced ? alpha * 0.7 : alpha;
-          ctx.lineWidth = s === 6 ? 3 : 2;
-          ctx.shadowBlur = s === 6 ? 22 : 0;
-          ctx.shadowColor = "rgba(152,120,182,0.8)";
+          ctx.lineWidth = centre ? 3 : 2;
           ctx.beginPath();
-          for (let x = -40; x <= W + 40; x += 10) {
+          for (let x = -40; x <= W + 40; x += 14) {
             const y = baseY + off
-              + Math.sin(x * r.freq + phase + s * 0.09) * r.amp * H
+              + Math.sin(x * r.freq + phase + s * 0.16) * r.amp * H
               + Math.sin(x * r.freq * 2.7 - phase * 1.6) * r.amp * H * 0.3;
             x === -40 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
           }
           ctx.stroke();
+          if (centre) {
+            // glow pass: same path, wide + faint
+            ctx.globalAlpha = (reduced ? 0.7 : 1) * 0.05;
+            ctx.lineWidth = 14;
+            ctx.stroke();
+          }
         }
       }
       ctx.globalAlpha = 1;
@@ -264,9 +292,39 @@ export function TiltCard({ children, className }: { children: React.ReactNode; c
   );
 }
 
-/* ── Event film block — plays real footage when the client supplies it ── */
+/* ── Event film block — plays real footage when the client supplies it.
+      Desktop only: a looping autoplay video behind 20+ glass surfaces is the
+      single largest battery/GPU cost on a phone, and on a throttled device it
+      competes with the compositor for the frame budget. Small/touch screens
+      get the graded still instead, which is indistinguishable at that size.
+      Mount-gated (not CSS-hidden) so the bytes are never even fetched. ── */
 export function EventFilm({ src, poster, className }: { src?: string; poster?: string; className?: string }) {
+  const [playFilm, setPlayFilm] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const apply = () => setPlayFilm(mq.matches && !reduced);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
   if (!src) return null;
+  if (!playFilm) {
+    // Static stand-in: the poster if the client has supplied one, otherwise a
+    // brand gradient that matches the film's tonal grade.
+    return (
+      <div
+        aria-hidden="true"
+        className={className ?? "h-full w-full rounded-3xl"}
+        style={
+          poster
+            ? { backgroundImage: `url(${poster})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { backgroundImage: "radial-gradient(120% 90% at 70% 10%, #132244 0%, #0A1428 45%, #060B16 100%)" }
+        }
+      />
+    );
+  }
   return (
     <video
       className={className ?? "h-full w-full rounded-3xl object-cover"}

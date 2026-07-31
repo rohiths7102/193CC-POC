@@ -71,8 +71,23 @@ function useReducedSafe(): boolean {
 /* ── Lenis smooth scroll — public pages only ──────────────────────────── */
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
+  // Device tiering: ≤4 cores → flag the document so CSS can drop the
+  // expensive layers (backdrop blur, ambient loops) while keeping the look.
+  useEffect(() => {
+    // Low-power tier: few cores, OR a coarse pointer (phone/tablet), OR the
+    // browser reporting battery saver via reduced-motion. Any of these means
+    // shed the GPU-expensive layers rather than drop frames.
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    if ((navigator.hardwareConcurrency ?? 8) <= 4 || coarse) {
+      document.documentElement.classList.add("low-power");
+    }
+  }, []);
   useEffect(() => {
     if (reduced) return;
+    // Native touch scrolling is already smooth and hardware-accelerated;
+    // running a JS scroll loop on top of it is a well-known source of mobile
+    // jank and fights the browser's own fling physics. Desktop only.
+    if (window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

@@ -137,7 +137,8 @@ body {
   .glass-strong { background: linear-gradient(160deg, rgba(19, 34, 68, 0.92), rgba(8, 15, 31, 0.96)); }
   /* Park the loop and release the compositor layer it was holding. */
   .aurora { animation: none; filter: blur(60px); will-change: auto; }
-  .card-flagship::before { animation: none; }
+  /* .card-flagship::before's animation is parked in the block at the end of
+     this file, not here — here it would be dead code (see the note below). */
   /* The fixed grain pseudo-element genuinely costs compositing, but removing
      texture altogether made mobile read flat. The texture is folded into the
      body background stack below instead — already painted, so free. */
@@ -289,6 +290,10 @@ html.lenis, html.lenis body { height: auto; }
   .card-flagship::before {
     background: linear-gradient(150deg, rgba(198,161,91,0.85), rgba(232,207,154,0.12) 42%, rgba(15,155,215,0.14) 72%, rgba(198,161,91,0.6));
     opacity: 1;
+    /* Parks the conic spin. The `@media (hover: none)` backstop above covers
+       only that arm — a touchscreen laptop reporting `pointer: coarse` with
+       `hover: hover` would otherwise keep a perpetual paint loop on battery. */
+    animation: none;
   }
 }
 

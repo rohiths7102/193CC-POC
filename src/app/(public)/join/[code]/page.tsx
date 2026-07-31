@@ -54,7 +54,7 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
     <div className="flex min-h-svh flex-col">
     <PublicHeader />
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
-      <Link href="/join" className="inline-flex items-center gap-2 text-sm text-mist hover:text-ivory-100">
+      <Link href="/join" className="-mx-2 inline-flex min-h-11 items-center gap-2 px-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
         <ArrowLeft className="h-4 w-4" /> All memberships
       </Link>
       <div className="mx-auto mt-8 w-full max-w-3xl">

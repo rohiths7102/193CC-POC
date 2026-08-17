@@ -74,14 +74,16 @@ function CommandPalette({ nav, open, onClose }: { nav: NavItem[]; open: boolean;
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[80] bg-ink-950/70 backdrop-blur-sm"
+          // A scrim must DARKEN the page behind it. `ink-950` is a light grey
+          // on the new palette, so the old token would have dimmed nothing.
+          className="fixed inset-0 z-[80] bg-navy-deep/45 backdrop-blur-sm"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
           onClick={onClose}
         >
           <motion.div
             role="dialog" aria-modal="true" aria-label="Command palette"
-            className="glass-strong mx-auto mt-[16vh] w-[min(560px,92vw)] overflow-hidden rounded-2xl shadow-lift ring-1 ring-gold-500/25"
+            className="glass-strong mx-auto mt-[16vh] w-[min(560px,92vw)] overflow-hidden rounded-2xl shadow-lift ring-1 ring-line"
             initial={{ opacity: 0, y: 14, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.985 }}
@@ -109,7 +111,7 @@ function CommandPalette({ nav, open, onClose }: { nav: NavItem[]; open: boolean;
                   if (e.key === "Enter" && items[sel]) go(items[sel].href);
                 }}
                 placeholder="Where to?"
-                className="w-full bg-transparent text-sm text-ivory-100 placeholder:text-mist/60 focus:outline-none"
+                className="w-full bg-transparent text-sm text-ivory-100 placeholder:text-mist focus:outline-none"
               />
               <kbd className="rounded-md border hairline px-1.5 py-0.5 text-[10px] text-mist">esc</kbd>
             </div>
@@ -123,7 +125,7 @@ function CommandPalette({ nav, open, onClose }: { nav: NavItem[]; open: boolean;
                     onMouseEnter={() => setSel(i)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors",
-                      i === sel ? "bg-gold-500/12 text-ivory-50 ring-1 ring-gold-500/30" : "text-mist"
+                      i === sel ? "bg-gold-500/12 text-ivory-50 ring-1 ring-line" : "text-mist"
                     )}
                   >
                     <span className={cn(i === sel ? "text-gold-400" : "text-mist")}>{ICONS[item.icon]}</span>
@@ -136,7 +138,7 @@ function CommandPalette({ nav, open, onClose }: { nav: NavItem[]; open: boolean;
             <p className="sr-only" aria-live="polite">
               {items.length === 0 ? "No results" : `${items.length} result${items.length === 1 ? "" : "s"}, ${items[sel]?.label ?? ""} selected`}
             </p>
-            <div className="flex items-center gap-4 border-t hairline px-5 py-2.5 text-[10px] uppercase tracking-widest text-mist/60">
+            <div className="flex items-center gap-4 border-t hairline px-5 py-2.5 text-[10px] uppercase tracking-widest text-mist">
               <span>↑↓ navigate</span><span>↵ open</span><span className="ml-auto">193CC Console</span>
             </div>
           </motion.div>
@@ -225,7 +227,7 @@ export function PortalShell({
               active ? "text-ivory-50" : "text-mist hover:text-ivory-100 hover:bg-ink-700/40"
             )}>
             {active && (
-              <motion.span layoutId="nav-active" className="absolute inset-0 rounded-xl bg-gold-500/12 ring-1 ring-gold-500/30"
+              <motion.span layoutId="nav-active" className="absolute inset-0 rounded-xl bg-gold-500/12 ring-1 ring-line"
                 transition={{ type: "spring", stiffness: 380, damping: 32 }} />
             )}
             <span className={cn("relative z-10", active && "text-gold-400")}>{ICONS[item.icon]}</span>
@@ -264,7 +266,7 @@ export function PortalShell({
         <div className="px-3 pb-1">
           <button
             onClick={() => setPaletteOpen(true)}
-            className="flex min-h-11 w-full items-center gap-2.5 rounded-xl border hairline bg-ink-800/50 px-3.5 py-2 text-left text-xs text-mist transition-colors hover:border-gold-500/40 hover:text-ivory-100 lg:min-h-0"
+            className="flex min-h-11 w-full items-center gap-2.5 rounded-xl border hairline bg-ink-800/50 px-3.5 py-2 text-left text-xs text-mist transition-colors hover:border-line hover:text-ivory-100 lg:min-h-0"
           >
             <Search className="h-3.5 w-3.5" />
             <span className="flex-1">Jump to…</span>
@@ -287,7 +289,7 @@ export function PortalShell({
           {/* z-[45] deliberately covers the z-40 topbar, so the whole page
               behind the drawer is inert; the drawer's own X is the close path. */}
           <div
-            className="fixed inset-0 z-[45] bg-ink-950/60 lg:hidden"
+            className="fixed inset-0 z-[45] bg-navy-deep/40 lg:hidden"
             onClick={() => setOpen(false)}
             aria-hidden
           />

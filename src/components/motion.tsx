@@ -94,8 +94,8 @@ export function ProgressRing({
         />
         <defs>
           <linearGradient id="goldgrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E8CF9A" />
-            <stop offset="100%" stopColor="#C6A15B" />
+            <stop offset="0%" stopColor="#F4776D" />
+            <stop offset="100%" stopColor="#EF463B" />
           </linearGradient>
         </defs>
       </svg>

@@ -27,32 +27,32 @@ export default async function OgImage({ params }: { params: { slug: string } }) 
     (
       <div style={{
         width: "100%", height: "100%", display: "flex", flexDirection: "column",
-        backgroundColor: "#080F1F", padding: 64, justifyContent: "space-between",
-        fontFamily: "Georgia, serif",
+        backgroundColor: "#FFFFFF", padding: 64, justifyContent: "space-between",
+        fontFamily: "Arial, sans-serif",
       }}>
         <div style={{ display: "flex", height: 10, width: "100%", borderRadius: 5,
           backgroundImage: "linear-gradient(90deg, #BA60A4, #9878B6, #0F9BD7)" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ display: "flex", color: "#C6A15B", fontSize: 26, letterSpacing: 8, textTransform: "uppercase" }}>
+          <div style={{ display: "flex", color: "#EF463B", fontSize: 26, letterSpacing: 8, textTransform: "uppercase" }}>
             193 Countries Consortium
           </div>
-          <div style={{ display: "flex", color: "#F7F3EA", fontSize: 76, fontWeight: 700, lineHeight: 1.05 }}>
+          <div style={{ display: "flex", color: "#2C3550", fontSize: 76, fontWeight: 700, lineHeight: 1.05 }}>
             {name}
           </div>
           <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
             {tier && (
-              <div style={{ display: "flex", color: "#E8CF9A", fontSize: 26, border: "2px solid rgba(198,161,91,0.5)",
-                borderRadius: 999, padding: "10px 26px" }}>{tier}</div>
+              <div style={{ display: "flex", color: "#EF463B", fontSize: 26, border: "2px solid rgba(239,70,59,0.45)",
+                borderRadius: 3, padding: "10px 26px" }}>{tier}</div>
             )}
             {award && (
-              <div style={{ display: "flex", color: "#080F1F", fontSize: 26, backgroundColor: "#C6A15B",
-                borderRadius: 999, padding: "10px 26px" }}>
+              <div style={{ display: "flex", color: "#FFFFFF", fontSize: 26, backgroundColor: "#EF463B",
+                borderRadius: 3, padding: "10px 26px" }}>
                 Business Award {award.status === "CONFIRMED" ? "— Confirmed" : "— Nominated"}
               </div>
             )}
           </div>
         </div>
-        <div style={{ display: "flex", color: "#8FA3C8", fontSize: 24 }}>
+        <div style={{ display: "flex", color: "#7B8397", fontSize: 24 }}>
           Summits at the House of Lords, UK Parliament · London
         </div>
       </div>

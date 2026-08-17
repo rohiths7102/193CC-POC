@@ -45,7 +45,7 @@ export default function LoginPage() {
       {/* Demo credentials are shown ONLY on local machines. On any deployed
           host they stay hidden so a public URL doesn't hand out admin access. */}
       {process.env.SHOW_DEMO_LOGINS === "true" && (
-        <p className="relative z-10 mt-6 text-center text-xs leading-5 text-mist/70">
+        <p className="relative z-10 mt-6 text-center text-xs leading-5 text-mist">
           Demo logins · password <code className="text-gold-300">Demo123!</code><br />
           admin@platform.demo · sales@platform.demo · mentor@platform.demo<br />
           investor@platform.demo · consultant@platform.demo · alice@member.demo · bruno@acme.demo

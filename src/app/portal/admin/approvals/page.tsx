@@ -43,7 +43,7 @@ export default async function Approvals() {
               <Badge tone={STATUS_TONE[a.status] ?? "grey"}>{titleCase(a.status)}</Badge>
               <span className="text-xs text-mist">by {a.member.name} · {a.wordCount.toLocaleString()} words · {ukDate(a.updatedAt, true)}</span>
             </div>
-            <p className="mt-3 line-clamp-3 text-sm leading-6 text-ivory-200/75">{a.body}</p>
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-ivory-200">{a.body}</p>
             <form action={reviewArticleAction} className="mt-5 flex flex-wrap items-end gap-2">
               <input type="hidden" name="id" value={a.id} />
               <label className="block flex-1 min-w-56">
@@ -76,7 +76,7 @@ export default async function Approvals() {
                   <span className="text-sm text-ivory-50">{v.member.name}</span>
                   <span className="text-xs text-mist">{v.member.company}</span>
                 </div>
-                <p className="mt-2 line-clamp-2 text-sm text-ivory-200/75">{v.brief}</p>
+                <p className="mt-2 line-clamp-2 text-sm text-ivory-200">{v.brief}</p>
               </div>
               {next && (
                 <form action={advanceVideoAction} className="flex flex-wrap items-end gap-2">

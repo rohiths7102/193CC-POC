@@ -41,11 +41,11 @@ export default async function InvestorDealflow() {
                 </div>
                 {p.interests.length > 0 && <Badge tone="green" className="ml-auto">Interest recorded</Badge>}
               </div>
-              <p className="mt-4 flex-1 text-sm leading-7 text-ivory-200/85">{p.summary}</p>
+              <p className="mt-4 flex-1 text-sm leading-7 text-ivory-200">{p.summary}</p>
               {((p.materials as string[]) ?? []).length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(p.materials as string[]).map((m, i) => (
-                    <a key={m} href={`/api/files/${m}`} className="rounded-full border border-gold-500/30 px-3 py-1 text-xs text-gold-300 hover:bg-gold-500/10">
+                    <a key={m} href={`/api/files/${m}`} className="rounded-full border border-line px-3 py-1 text-xs text-gold-300 hover:bg-gold-500/10">
                       Material {i + 1}
                     </a>
                   ))}

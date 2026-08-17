@@ -51,7 +51,7 @@ export default async function SummitConsole() {
                 </div>
                 <p className="mt-1 text-sm text-mist">{s.event.venue} · event {ukDate(s.event.startsAt)}</p>
               </div>
-              <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm ${deadlinePassed ? "border-red-400/30 text-red-300" : "border-gold-500/30 text-gold-300"}`}>
+              <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm ${deadlinePassed ? "border-red-400/30 text-red-300" : "border-line text-gold-300"}`}>
                 <Clock className="h-4 w-4" />
                 {deadlinePassed ? `Closed ${ukDate(s.deadlineAt, true)}` : <>Deadline {ukDate(s.deadlineAt, true)} — auto-closes</>}
               </div>

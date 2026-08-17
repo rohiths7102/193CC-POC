@@ -53,7 +53,7 @@ export default async function PitchPage() {
                     <div>
                       <p className="text-sm font-medium text-ivory-50">{i.investor.name}</p>
                       <p className="mt-0.5 text-xs text-mist">{ukDate(i.createdAt, true)}</p>
-                      {i.note && <p className="mt-2 text-sm text-ivory-200/85">"{i.note}"</p>}
+                      {i.note && <p className="mt-2 text-sm text-ivory-200">"{i.note}"</p>}
                     </div>
                   </li>
                 ))}

@@ -128,7 +128,7 @@ export default async function MemberDashboard() {
             <StaggerItem key={b.key}>
               {has ? (
                 <Link href={b.href}>
-                  <GlassCard className="group h-full p-5 transition-colors hover:border-gold-500/50">
+                  <GlassCard className="group h-full p-5 transition-colors hover:border-line">
                     <span className="inline-flex rounded-lg bg-gold-500/12 p-2 text-gold-400">{b.icon}</span>
                     <p className="mt-3 font-medium text-ivory-50">{b.t}</p>
                     <p className="mt-1 text-xs text-mist">{b.d}</p>

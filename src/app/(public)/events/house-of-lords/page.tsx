@@ -51,7 +51,7 @@ export default async function HouseOfLordsGuide() {
 
       {nextEvent && (
         <Reveal>
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-500/25 bg-gold-500/8 px-6 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-gold-500/8 px-6 py-5">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-gold-500">Next consortium event</p>
               <p className="mt-1 font-display text-lg text-ivory-50">{nextEvent.name}</p>

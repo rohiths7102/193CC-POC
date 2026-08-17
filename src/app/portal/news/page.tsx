@@ -47,7 +47,7 @@ export default async function NewsPage() {
                     </div>
                     <span className="ml-auto text-xs text-mist">{ukDate(a.publishedAt)}</span>
                   </div>
-                  <p className="mt-4 line-clamp-4 text-sm leading-7 text-ivory-200/85">{a.body}</p>
+                  <p className="mt-4 line-clamp-4 text-sm leading-7 text-ivory-200">{a.body}</p>
                 </GlassCard>
               </StaggerItem>
             ))}

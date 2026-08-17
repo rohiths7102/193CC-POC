@@ -64,7 +64,7 @@ export default async function AdminMembers({ searchParams }: {
             <option value="dd">On Direct Debit</option>
             <option value="at_risk">At-risk plans</option>
           </select>
-          <button className="rounded-full border border-gold-500/30 px-5 py-2.5 text-sm text-ivory-100 hover:bg-gold-500/10">Filter</button>
+          <button className="rounded-full border border-line px-5 py-2.5 text-sm text-ivory-100 hover:bg-gold-500/10">Filter</button>
         </form>
       </div>
 

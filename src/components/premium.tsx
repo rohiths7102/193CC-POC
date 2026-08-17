@@ -175,7 +175,7 @@ export function Preloader() {
   return (
     <motion.div
       data-cc-preloader
-      className="preloader-failsafe fixed inset-0 z-[100] flex items-center justify-center bg-ink-950"
+      className="preloader-failsafe fixed inset-0 z-[100] flex items-center justify-center bg-white"
       initial={false}
       animate={leaving ? { y: "-100%" } : { y: 0 }}
       transition={{ duration: mode === "fast" ? 0.45 : 0.9, ease: EASE }}
@@ -190,7 +190,7 @@ export function Preloader() {
       </noscript>
       {/* `mode` is null until the effect picks full-vs-fast, so the SSR curtain
           was an empty opaque rectangle. On a slow phone that is several seconds
-          of featureless navy; paint the brand mark so the wait is branded. */}
+          of featureless white; paint the brand mark so the wait is branded. */}
       {mode === null && (
         <div className="flex flex-col items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -231,7 +231,7 @@ export function Preloader() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="mt-4 text-[10px] uppercase tracking-[0.5em] text-mist/70"
+                className="mt-4 text-[10px] uppercase tracking-[0.5em] text-mist"
               >
                 Membership · London
               </motion.p>
@@ -327,14 +327,16 @@ export function CustomCursor() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[119] rounded-full border border-gold-400/70"
+      // The structural `line` token is far too faint to track against white —
+      // the ring needs the brand hue to stay legible on a light ground.
+      className="pointer-events-none fixed left-0 top-0 z-[119] rounded-full border border-gold-500/50"
       style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
       animate={{
         width: hovering ? 46 : 30,
         height: hovering ? 46 : 30,
         opacity: overInput ? 0 : pressed ? 0.4 : hovering ? 0.95 : 0.5,
         scale: pressed ? 0.82 : 1,
-        backgroundColor: hovering ? "rgba(198,161,91,0.08)" : "rgba(198,161,91,0)",
+        backgroundColor: hovering ? "rgba(239,70,59,0.10)" : "rgba(239,70,59,0)",
       }}
       transition={{ duration: 0.25, ease: EASE }}
     />

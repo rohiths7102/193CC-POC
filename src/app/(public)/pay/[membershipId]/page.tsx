@@ -46,7 +46,7 @@ export default async function PayPage({ params }: { params: Promise<{ membership
           </GlassCard>
         </div>
       </Reveal>
-      <p className="mt-5 flex items-center gap-2 text-xs text-mist/80">
+      <p className="mt-5 flex items-center gap-2 text-xs text-mist">
         <Lock className="h-3.5 w-3.5" /> Card data is tokenised by the payment provider — this platform never stores raw card numbers (PCI-DSS SAQ-A model). Every payment credits your £2,600 Major-Event wallet.
       </p>
     </main>

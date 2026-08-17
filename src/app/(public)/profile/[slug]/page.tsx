@@ -92,12 +92,12 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
                 </div>
                 {member.photoPath && (
                   <img src={`/api/public-assets/${member.photoPath}`} alt={member.name}
-                    className="h-24 w-24 rounded-full border-2 border-gold-500/40 object-cover" />
+                    className="h-24 w-24 rounded-full border-2 border-line object-cover" />
                 )}
               </div>
 
               {member.profileBio && (
-                <p className="mt-7 max-w-2xl text-base leading-8 text-ivory-200/85">{member.profileBio}</p>
+                <p className="mt-7 max-w-2xl text-base leading-8 text-ivory-200">{member.profileBio}</p>
               )}
 
               <div className={`mt-8 grid gap-4 ${awardApp ? "sm:grid-cols-2" : ""}`}>
@@ -106,7 +106,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
                     <div className="flex items-center gap-2 text-gold-400"><Award className="h-4 w-4" />
                       <p className="text-xs font-semibold uppercase tracking-widest">UK Investors Summit</p>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-ivory-200/85">
+                    <p className="mt-2 text-sm leading-6 text-ivory-200">
                       {awardApp.status === "CONFIRMED" ? "Confirmed for the Business Award at " : "Nominated for the Business Award at "}
                       <span className="text-ivory-50">{awardApp.category.summit.event.name}</span> — {ukDate(awardApp.category.summit.event.startsAt)}.
                     </p>
@@ -116,7 +116,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
                   <div className="flex items-center gap-2 text-gold-400"><Landmark className="h-4 w-4" />
                     <p className="text-xs font-semibold uppercase tracking-widest">The Consortium</p>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-ivory-200/85">
+                  <p className="mt-2 text-sm leading-6 text-ivory-200">
                     A collaborative business partner platform — enterprises from 193 countries standing together for
                     international growth, with summits held at the House of Lords, UK Parliament.
                   </p>
@@ -129,7 +129,7 @@ export default async function PublicProfile({ params }: { params: Promise<{ slug
                     <p className="text-xs font-semibold uppercase tracking-widest">Featured story</p>
                   </div>
                   <h2 className="mt-2 font-display text-xl text-ivory-50">{article.title}</h2>
-                  <p className="mt-2 line-clamp-3 text-sm leading-7 text-ivory-200/75">{article.body}</p>
+                  <p className="mt-2 line-clamp-3 text-sm leading-7 text-ivory-200">{article.body}</p>
                 </div>
               )}
             </div>

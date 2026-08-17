@@ -74,7 +74,7 @@ export default async function JoinTier({ params }: { params: Promise<{ code: str
             </p>
             <ul className="mt-8 space-y-3">
               {product.entitlements.map((e) => (
-                <li key={e.id} className="flex items-start gap-3 text-sm text-ivory-200/90">
+                <li key={e.id} className="flex items-start gap-3 text-sm text-ivory-200">
                   <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold-500" />
                   {entitlementLabel(e.key, e.params as Record<string, unknown> | null)}
                 </li>

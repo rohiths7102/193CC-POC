@@ -29,15 +29,15 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
                 animate={{ scale: active ? 1.12 : 1 }}
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold",
-                  done && "border-gold-500 bg-gold-500 text-ink-950",
-                  active && "border-gold-400 bg-gold-500/15 text-gold-300 shadow-glow",
-                  !done && !active && "border-gold-500/20 text-mist"
+                  done && "border-line bg-gold-500 text-ink-950",
+                  active && "border-line bg-gold-500/15 text-gold-300 shadow-glow",
+                  !done && !active && "border-line text-mist"
                 )}
               >
                 <span className="font-display">{done ? "✓" : NUMERALS[i]}</span>
               </motion.span>
               <span className={cn("hidden text-[10px] uppercase tracking-widest sm:block", active ? "text-gold-300" : "text-mist")}>{label}</span>
-              {HINTS[i] && <span className="hidden text-[10px] text-mist/80 sm:block">{HINTS[i]}</span>}
+              {HINTS[i] && <span className="hidden text-[10px] text-mist sm:block">{HINTS[i]}</span>}
             </div>
             {n < STEPS.length && (
               <div className="relative mx-2 mt-4 h-px flex-1 bg-gold-500/15">
@@ -53,7 +53,7 @@ export function Steps({ current }: { current: 1 | 2 | 3 | 4 | 5 }) {
         );
       })}
     </div>
-    <p className="mt-3 text-center text-[11px] uppercase tracking-[0.24em] text-mist/80">
+    <p className="mt-3 text-center text-[11px] uppercase tracking-[0.24em] text-mist">
       No paperwork · about 20 minutes end to end
     </p>
     </div>
@@ -80,8 +80,8 @@ export function VerificationTimeline() {
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-semibold",
                 n.state === "done" && "border-emerald-400 bg-emerald-400/15 text-emerald-300",
-                n.state === "active" && "border-gold-400 bg-gold-500/15 text-gold-300 shadow-glow",
-                n.state === "todo" && "border-gold-500/20 text-mist/60"
+                n.state === "active" && "border-line bg-gold-500/15 text-gold-300 shadow-glow",
+                n.state === "todo" && "border-line text-mist"
               )}
             >
               {n.state === "done" ? "✓" : i + 1}
@@ -89,7 +89,7 @@ export function VerificationTimeline() {
             {i < nodes.length - 1 && <span className="my-1 h-7 w-px bg-gold-500/20" />}
           </div>
           <div className="pb-4 pt-1">
-            <p className={cn("text-sm", n.state === "todo" ? "text-mist/70" : "text-ivory-100")}>{n.label}</p>
+            <p className={cn("text-sm", n.state === "todo" ? "text-mist" : "text-ivory-100")}>{n.label}</p>
             {n.state === "active" && (
               <p className="mt-0.5 text-xs text-mist">Our team is checking your organisation documents — usually completed the same day.</p>
             )}

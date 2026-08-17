@@ -4,6 +4,145 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useIntroDone, EASE } from "@/components/premium";
 
+/* ── Ambient field — the whole-page atmospheric ground. ─────────────────────
+      This is the reference site's WebGL ShaderMaterial (noise-driven ambient
+      motion under a fixed full-viewport canvas), rebuilt WITHOUT Three.js.
+      The shader was ~40 lines of domain-warped noise sampled per pixel; that
+      same field is computed here on a 64×36 grid and upscaled by the browser's
+      bilinear filter, which for a field this smooth is visually identical and
+      costs about a thousandth of a fragment shader — no 600KB dependency, no
+      WebGL context, no GPU memory pinned for the life of the page.
+
+      Palette is the LSI trio at very low alpha, composited with `multiply`
+      over the white ground so it deepens toward each hue instead of washing.
+      Pointer offsets the sample origin (parallax); scroll drifts it (the
+      field travels with the page). 30fps cap; skipped entirely on low-power,
+      touch and reduced-motion — the still white ground is the correct
+      fallback, not a frozen frame of noise. ── */
+export function AmbientField({ className }: { className?: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    if (
+      (navigator.hardwareConcurrency ?? 8) <= 4 ||
+      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
+    setOn(true);
+  }, []);
+
+  useEffect(() => {
+    if (!on) return;
+    const canvas = ref.current!;
+    const ctx = canvas.getContext("2d", { alpha: true })!;
+    // The field is computed at this resolution and let the browser upscale.
+    // 64×36 keeps a 16:9 aspect; the browser's bilinear filter does the rest.
+    const GW = 64, GH = 36;
+    const off = document.createElement("canvas");
+    off.width = GW; off.height = GH;
+    const octx = off.getContext("2d")!;
+    const img = octx.createImageData(GW, GH);
+    const px = img.data;
+
+    // ── Value noise with a tiny permutation table — the shader's hash() ──
+    const P = new Uint8Array(512);
+    const perm = Array.from({ length: 256 }, (_, i) => i);
+    for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [perm[i], perm[j]] = [perm[j], perm[i]]; }
+    for (let i = 0; i < 512; i++) P[i] = perm[i & 255];
+    const fade = (t: number) => t * t * (3 - 2 * t);
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const grad = (h: number, x: number, y: number) => ((h & 1) ? -x : x) + ((h & 2) ? -y : y);
+    const noise = (x: number, y: number) => {
+      const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
+      x -= Math.floor(x); y -= Math.floor(y);
+      const u = fade(x), v = fade(y);
+      const a = P[X] + Y, b = P[X + 1] + Y;
+      return lerp(
+        lerp(grad(P[a], x, y), grad(P[b], x - 1, y), u),
+        lerp(grad(P[a + 1], x, y - 1), grad(P[b + 1], x - 1, y - 1), u),
+        v,
+      ) * 0.5 + 0.5;
+    };
+    // fbm + one round of domain warp — the "sophisticated" part of the shader
+    const fbm = (x: number, y: number) => {
+      let v = 0, a = 0.5, f = 1;
+      for (let i = 0; i < 4; i++) { v += a * noise(x * f, y * f); f *= 2.02; a *= 0.5; }
+      return v;
+    };
+
+    // Palette as premultiplied "ink" amounts — how much of each hue to pull the
+    // white ground toward. red / navy / amber, in that order of dominance.
+    const RED = [239, 70, 59], NAVY = [49, 60, 89], AMB = [255, 174, 41];
+
+    let W = 0, H = 0, raf = 0, t = 0, tick = 0;
+    let mx = 0.5, my = 0.5, tmx = 0.5, tmy = 0.5, scroll = 0, tscroll = 0;
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      W = r.width; H = r.height;
+      canvas.width = W; canvas.height = H; // DPR 1 — this is a blur, not type
+    };
+    resize();
+    const ro = new ResizeObserver(resize); ro.observe(canvas);
+    const onMove = (e: PointerEvent) => { tmx = e.clientX / W; tmy = e.clientY / H; };
+    const onScroll = () => { tscroll = window.scrollY; };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    const frame = () => {
+      tick++;
+      if (tick % 2 === 0) { raf = requestAnimationFrame(frame); return; } // 30fps
+      t += 0.0035;
+      mx += (tmx - mx) * 0.04; my += (tmy - my) * 0.04;
+      scroll += (tscroll - scroll) * 0.06;
+      const ox = (mx - 0.5) * 0.6, oy = (my - 0.5) * 0.6 + scroll * 0.00035;
+
+      let i = 0;
+      for (let y = 0; y < GH; y++) {
+        for (let x = 0; x < GW; x++) {
+          // Larger scale (2.2 × 1.3 cycles across the viewport) so the lobes
+          // are weather, not speckle.
+          const nx = x / GW * 2.2 + ox, ny = y / GH * 1.3 + oy;
+          // domain warp: sample the field through itself
+          const wx = fbm(nx + t, ny - t * 0.6);
+          const wy = fbm(nx - t * 0.7 + 5.2, ny + t + 1.3);
+          const f = fbm(nx + wx * 1.6, ny + wy * 1.6);
+          const g = fbm(nx * 0.7 - wy + 9.1, ny * 0.7 + wx - 4.4);
+          // three soft lobes: red where f is high, navy where g is high, a
+          // faint amber where both are mid. Alphas are the whole design —
+          // the first pass at ~5% peak was invisible on white; these land
+          // ~18% at the heart of a lobe, felt through /70 bands as ~8%.
+          const ar = Math.max(0, f - 0.47) * 0.85;
+          const an = Math.max(0, g - 0.45) * 1.15;
+          const aa = Math.max(0, 0.16 - Math.abs(f - g)) * 0.55;
+          // composite the three inks over white in linear-ish space
+          let r = 255, gg = 255, b = 255;
+          r = r * (1 - ar) + RED[0] * ar;  gg = gg * (1 - ar) + RED[1] * ar;  b = b * (1 - ar) + RED[2] * ar;
+          r = r * (1 - an) + NAVY[0] * an; gg = gg * (1 - an) + NAVY[1] * an; b = b * (1 - an) + NAVY[2] * an;
+          r = r * (1 - aa) + AMB[0] * aa;  gg = gg * (1 - aa) + AMB[1] * aa;  b = b * (1 - aa) + AMB[2] * aa;
+          px[i++] = r; px[i++] = gg; px[i++] = b; px[i++] = 255;
+        }
+      }
+      octx.putImageData(img, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "multiply";
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(off, 0, 0, W, H);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf); ro.disconnect();
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [on]);
+
+  if (!on) return null;
+  return <canvas ref={ref} className={className} aria-hidden="true" />;
+}
+
 /* ── Living constellation — the organisation's network-globe motif, animated.
       Brand gradient nodes drift and link; pointer adds gentle parallax. ── */
 export function NetworkCanvas({ className }: { className?: string }) {
@@ -31,7 +170,9 @@ export function NetworkCanvas({ className }: { className?: string }) {
     const ctx = canvas.getContext("2d")!;
     let raf = 0;
     const DPR = Math.min(2, window.devicePixelRatio || 1);
-    const COLORS = ["#BA60A4", "#9878B6", "#0F9BD7"];
+    // LSI palette: brand red, navy, and the muted slate that carries its body
+    // copy — the old violet/azure trio was tuned for a near-black canvas.
+    const COLORS = ["#EF463B", "#313C59", "#7B8397"];
     let W = 0, H = 0;
     const mouse = { x: 0.5, y: 0.5 };
 
@@ -77,7 +218,7 @@ export function NetworkCanvas({ className }: { className?: string }) {
           const dx = (a.x - b.x) * W, dy = (a.y - b.y) * H;
           const d = Math.hypot(dx, dy);
           if (d < 130) {
-            ctx.strokeStyle = `rgba(152, 120, 182, ${(1 - d / 130) * 0.35})`;
+            ctx.strokeStyle = `rgba(68, 79, 108, ${(1 - d / 130) * 0.3})`;
             ctx.lineWidth = 0.7;
             ctx.beginPath();
             ctx.moveTo(a.x * W + px, a.y * H + py);
@@ -133,13 +274,16 @@ export function LiquidRibbons({ className }: { className?: string }) {
     let W = 0, H = 0, raf = 0, t = 0, tick = 0;
     let scrollTarget = 0, scroll = 0, mouseY = 0.5;
 
+    // Repainted for the light ground in the LSI palette (red / navy / amber).
+    // On white these are drawn with `multiply`, not `lighter` — see the frame
+    // loop below for why the blend mode had to change with the background.
     const RIBBONS = [
       { y: 0.24, amp: 0.10, freq: 0.0016, speed: 0.012, drift: 0.00045, w: 90,
-        stops: ["rgba(232,207,154,0)", "rgba(198,161,91,0.55)", "rgba(232,207,154,0.9)", "rgba(131,101,47,0)"] },
+        stops: ["rgba(239,70,59,0)", "rgba(239,70,59,0.55)", "rgba(194,38,38,0.9)", "rgba(239,70,59,0)"] },
       { y: 0.58, amp: 0.14, freq: 0.0012, speed: -0.009, drift: 0.00075, w: 120,
-        stops: ["rgba(15,155,215,0)", "rgba(15,155,215,0.6)", "rgba(152,120,182,0.8)", "rgba(15,155,215,0)"] },
+        stops: ["rgba(49,60,89,0)", "rgba(49,60,89,0.6)", "rgba(68,79,108,0.8)", "rgba(49,60,89,0)"] },
       { y: 0.82, amp: 0.08, freq: 0.0020, speed: 0.007, drift: 0.0006, w: 70,
-        stops: ["rgba(186,96,164,0)", "rgba(186,96,164,0.45)", "rgba(152,120,182,0.6)", "rgba(186,96,164,0)"] },
+        stops: ["rgba(255,174,41,0)", "rgba(255,174,41,0.45)", "rgba(224,148,21,0.6)", "rgba(255,174,41,0)"] },
     ];
 
     const resize = () => {
@@ -170,7 +314,11 @@ export function LiquidRibbons({ className }: { className?: string }) {
       t += 2;
       scroll += (scrollTarget - scroll) * 0.1; // buttery lag — streaks chase the scroll
       ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "lighter";
+      // `lighter` (additive) only produces light ON a dark ground — over white
+      // it saturates to white and the ribbons vanish entirely, burning a full
+      // canvas repaint per frame to draw nothing. `multiply` is the light-ground
+      // equivalent: it darkens toward each ribbon's hue instead.
+      ctx.globalCompositeOperation = "multiply";
 
       for (const r of RIBBONS) {
         const grad = ctx.createLinearGradient(0, 0, W, 0);
@@ -257,7 +405,8 @@ export function Countdown({ target, label }: { target: string; label: string }) 
               className="font-display text-3xl text-ivory-50 tabular-nums">
               {String(v).padStart(2, "0")}
             </motion.p>
-            <p className="mt-1 text-[10px] uppercase tracking-widest text-gold-400">{unit}</p>
+            {/* gold-500, not 400: at 10px this label needs the AA-passing red */}
+            <p className="mt-1 text-[10px] uppercase tracking-widest text-gold-500">{unit}</p>
           </div>
         ))}
       </div>

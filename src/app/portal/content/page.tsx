@@ -60,7 +60,7 @@ export default async function ContentPage() {
                           <Badge tone={STATUS_TONE[v.status] ?? "grey"}>{titleCase(v.status)}</Badge>
                           <span className="text-xs text-mist">{ukDate(v.createdAt)}</span>
                         </div>
-                        <p className="mt-2 line-clamp-2 text-sm text-ivory-200/85">{v.brief}</p>
+                        <p className="mt-2 line-clamp-2 text-sm text-ivory-200">{v.brief}</p>
                         {v.shootDate && <p className="mt-1 text-xs text-gold-300">Shoot: {ukDate(v.shootDate)}</p>}
                       </li>
                     ))}
@@ -81,7 +81,7 @@ export default async function ContentPage() {
               <ul className="space-y-2">
                 {articles.slice(1).map((a) => (
                   <li key={a.id} className="flex items-center justify-between text-sm">
-                    <span className="truncate text-ivory-200/85">{a.title}</span>
+                    <span className="truncate text-ivory-200">{a.title}</span>
                     <Badge tone={STATUS_TONE[a.status] ?? "grey"}>{titleCase(a.status)}</Badge>
                   </li>
                 ))}

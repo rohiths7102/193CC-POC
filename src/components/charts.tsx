@@ -12,7 +12,7 @@ export function Bars({ data, prefix = "", suffix = "" }: { data: { label: string
       {data.map((d, i) => (
         <div key={d.label}>
           <div className="mb-1.5 flex items-baseline justify-between text-sm">
-            <span className="text-ivory-200/90">{d.label}</span>
+            <span className="text-ivory-200">{d.label}</span>
             <span className="font-medium text-gold-300">{prefix}{d.value.toLocaleString("en-GB")}{suffix}</span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-ink-700">
@@ -24,7 +24,7 @@ export function Bars({ data, prefix = "", suffix = "" }: { data: { label: string
               transition={{ duration: 1, delay: i * 0.08, ease: [0.22, 0.8, 0.25, 1] }}
             />
           </div>
-          {d.hint && <p className="mt-1 text-[11px] text-mist/70">{d.hint}</p>}
+          {d.hint && <p className="mt-1 text-[11px] text-mist">{d.hint}</p>}
         </div>
       ))}
     </div>
@@ -48,7 +48,7 @@ export function Donut({ fraction, label, sub, size = 110 }: { fraction: number; 
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} className="stroke-ink-700" />
           <motion.circle
             cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} strokeLinecap="round"
-            stroke="#C6A15B" strokeDasharray={c}
+            stroke="#EF463B" strokeDasharray={c}
             initial={{ strokeDashoffset: c }}
             whileInView={{ strokeDashoffset: c * (1 - f) }}
             viewport={{ once: true }}

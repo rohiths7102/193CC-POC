@@ -1,10 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Roboto, Roboto_Condensed, JetBrains_Mono } from "next/font/google";
 import { appUrl } from "@/lib/app-url";
 import "./globals.css";
 
-const display = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+// LSI's two families carry the identity. Roboto Condensed needs the full
+// 100–700 span: 700 for the uppercase hero, and the hairline 100 that its
+// 40px section titles are set in. JetBrains Mono is ours, not LSI's — a
+// micro-label register (kickers, stat plates, spec chips) that lifts the
+// page from themed to crafted without touching the headline identity.
+const display = Roboto_Condensed({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "700"],
+  variable: "--font-display",
+});
+const sans = Roboto({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-sans",
+});
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   // Absolute URL resolution for canonicals + OG images on any host.
@@ -23,18 +41,18 @@ export const metadata: Metadata = {
   },
 };
 
-// Paints the mobile browser toolbar/status area navy instead of default light
-// chrome above a #080F1F page — the single most visible "native app" cue.
+// The page ground is now white, so the toolbar must follow it. Leaving this on
+// navy would band the top of every mobile screen against a white hero.
 export const viewport: Viewport = {
-  themeColor: "#080F1F",
-  colorScheme: "dark",
+  themeColor: "#FFFFFF",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${display.variable} ${sans.variable}`}>
+    <html lang="en-GB" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="grain font-sans min-h-svh">{children}</body>
     </html>
   );

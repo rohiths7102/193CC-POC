@@ -26,7 +26,7 @@ export function PublicHeader() {
 export function PublicFooter() {
   return (
     <footer className="mt-auto border-t hairline">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-mist/80">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-mist">
         <span>© 2026 193 Countries Consortium · Companies House 14499310</span>
         <Link href="/privacy" className="inline-flex min-h-11 items-center underline decoration-gold-500/40 underline-offset-2 transition-colors hover:text-ivory-100">
           Privacy Policy

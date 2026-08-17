@@ -42,7 +42,7 @@ export default async function AdminDealflow() {
                 ? <Badge tone="green"><Eye className="h-3 w-3" /> Investor-visible</Badge>
                 : <Badge tone="grey"><EyeOff className="h-3 w-3" /> Consent withheld</Badge>}
             </div>
-            <p className="mt-3 text-sm leading-6 text-ivory-200/80">{p.summary}</p>
+            <p className="mt-3 text-sm leading-6 text-ivory-200">{p.summary}</p>
             {p.interests.length > 0 && (
               <div className="mt-4 border-t hairline pt-4">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-mist">Investor interest</p>

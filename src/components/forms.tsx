@@ -134,7 +134,7 @@ function LiveCompanyCheck({ number, name, applicant }: { number: string; name: s
       {!checking && result?.status === "not_found" && (
         <p className="flex items-center gap-1.5 text-mist"><XCircle className="h-3.5 w-3.5" /> No company found with that number — you can still submit; our team will verify from your documents.</p>
       )}
-      {!checking && result?.simulated && <span className="block text-[10px] text-mist/60">Demo data — live once a Companies House API key is configured.</span>}
+      {!checking && result?.simulated && <span className="block text-[10px] text-mist">Demo data — live once a Companies House API key is configured.</span>}
     </div>
   );
 }
@@ -189,7 +189,7 @@ export function EnrolForm({ productCode, summitCategories, org = false }: {
     <form action={action} className="space-y-4">
       <input type="hidden" name="productCode" value={productCode} />
       {org && (
-        <div className="rounded-xl border border-gold-500/25 bg-gold-500/8 px-4 py-3 text-sm leading-6 text-ivory-200/90">
+        <div className="rounded-xl border border-line bg-gold-500/8 px-4 py-3 text-sm leading-6 text-ivory-200">
           Upload your documents and sign your agreement online — around{" "}
           <span className="text-ivory-50">20 minutes</span> end to end, with
           <span className="text-ivory-50"> same-day verification</span> by our team.
@@ -301,8 +301,8 @@ export function ProfileForm({ profile }: {
             className="block w-full text-sm text-mist file:mr-3 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-4 file:py-3 file:text-xs file:text-gold-300" />
         </Field>
       </div>
-      <label className="flex items-start gap-3 rounded-xl border border-gold-500/20 bg-ink-800/50 px-4 py-3 text-sm text-ivory-200/85">
-        <input type="checkbox" name="public" defaultChecked={profile.isPublic} className="mt-0.5 h-4 w-4 accent-[#C6A15B]" />
+      <label className="flex items-start gap-3 rounded-xl border border-line bg-ink-800/50 px-4 py-3 text-sm text-ivory-200">
+        <input type="checkbox" name="public" defaultChecked={profile.isPublic} className="mt-0.5 h-4 w-4 accent-[#EF463B]" />
         <span><strong className="text-ivory-50">Make my profile public.</strong> Anyone with your link can view it — no login needed. Untick any time to take it offline instantly.</span>
       </label>
       <FormError error={state?.error} />
@@ -321,13 +321,13 @@ export function SignForm({ membershipId }: { membershipId: string }) {
         <input name="signerName" value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} placeholder="Jane Whitfield" />
       </Field>
       {name.trim().length > 1 && (
-        <div className="rounded-xl border border-gold-500/25 bg-ink-800/60 px-6 py-4">
+        <div className="rounded-xl border border-line bg-ink-800/60 px-6 py-4">
           <p className="text-[10px] uppercase tracking-[0.3em] text-mist">Signature preview</p>
           <p className="mt-1 font-display text-3xl italic text-gold-grad">{name}</p>
         </div>
       )}
-      <label className="flex items-start gap-3 text-sm text-ivory-200/80">
-        <input type="checkbox" name="agreed" className="mt-1 h-4 w-4 accent-[#C6A15B]" />
+      <label className="flex items-start gap-3 text-sm text-ivory-200">
+        <input type="checkbox" name="agreed" className="mt-1 h-4 w-4 accent-[#EF463B]" />
         I confirm I have read the agreement and intend my typed name to be my legally binding electronic signature.
       </label>
       <FormError error={state?.error} />
@@ -353,12 +353,12 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
           not exist and AT announced "tab 1 of 2" against nothing. */}
       <div role="group" aria-label="Payment method" className="mb-6 flex flex-wrap gap-2">
         <button type="button" onClick={() => setTab("card")}
-          aria-pressed={tab === "card"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+          aria-pressed={tab === "card"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "card" ? "bg-gold-500/20 text-gold-300 border border-line" : "border border-transparent text-mist hover:text-ivory-100"}`}>
           Pay by card
         </button>
         {allowsDirectDebit && (
           <button type="button" onClick={() => setTab("dd")}
-            aria-pressed={tab === "dd"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-gold-500/40" : "border border-transparent text-mist hover:text-ivory-100"}`}>
+            aria-pressed={tab === "dd"} className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-5 text-sm transition-colors ${tab === "dd" ? "bg-gold-500/20 text-gold-300 border border-line" : "border border-transparent text-mist hover:text-ivory-100"}`}>
             Direct Debit instalments
           </button>
         )}
@@ -390,7 +390,7 @@ export function PayForms({ membershipId, priceMinor, allowsDirectDebit }: { memb
             {[3, 6].map((m) => (
               <button key={m} type="button" onClick={() => setMonths(m as 3 | 6)}
                 aria-pressed={months === m}
-                className={`rounded-xl border px-4 py-4 text-left transition-colors ${months === m ? "border-gold-500/60 bg-gold-500/10" : "border-gold-500/15 hover:border-gold-500/40"}`}>
+                className={`rounded-xl border px-4 py-4 text-left transition-colors ${months === m ? "border-line bg-gold-500/10" : "border-line hover:border-line"}`}>
                 <p className="font-display text-xl text-ivory-50">{m} months</p>
                 <p className="mt-1 text-sm text-mist">£{Math.ceil(priceMinor / m / 100).toLocaleString("en-GB")}/month</p>
               </button>
@@ -486,7 +486,7 @@ export function ArticleEditor({ article, maxWords }: {
       <FormError error={state?.error} />
       {!locked && (
         <div className="flex flex-wrap gap-3">
-          <button type="submit" name="submit" value="false" className="inline-flex min-h-11 items-center rounded-full border border-gold-500/30 px-6 text-sm text-ivory-100 hover:bg-gold-500/10">Save draft</button>
+          <button type="submit" name="submit" value="false" className="inline-flex min-h-11 items-center rounded-full border border-line px-6 text-sm text-ivory-100 hover:bg-gold-500/10">Save draft</button>
           <button type="submit" name="submit" value="true" disabled={over} className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-r from-gold-400 to-gold-600 px-6 text-sm font-medium text-ink-950 hover:shadow-glow disabled:opacity-50">Submit for review</button>
         </div>
       )}
@@ -518,8 +518,8 @@ export function PitchForm({ pitch }: { pitch?: { id: string; title: string; summ
         <input name="materials" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx" multiple
           className="block w-full text-sm text-mist file:mr-4 file:rounded-full file:border-0 file:bg-gold-500/20 file:px-5 file:py-3 file:text-sm file:text-gold-300" />
       </Field>
-      <label className="flex items-start gap-3 rounded-xl border border-gold-500/20 bg-ink-800/50 px-4 py-3 text-sm text-ivory-200/85">
-        <input type="checkbox" name="consent" defaultChecked={pitch?.visibilityConsent} className="mt-0.5 h-4 w-4 accent-[#C6A15B]" />
+      <label className="flex items-start gap-3 rounded-xl border border-line bg-ink-800/50 px-4 py-3 text-sm text-ivory-200">
+        <input type="checkbox" name="consent" defaultChecked={pitch?.visibilityConsent} className="mt-0.5 h-4 w-4 accent-[#EF463B]" />
         <span><strong className="text-ivory-50">Investor visibility consent.</strong> Make this opportunity visible to accredited Investor accounts ahead of the Summit. You can withdraw consent at any time.</span>
       </label>
       <FormError error={state?.error} />

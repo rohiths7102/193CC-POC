@@ -37,7 +37,7 @@ export default function PrivacyPage() {
       </p>
       {/* At 375px the card is ~327px around a 640px-min table, so retention
           periods — the core legal disclosure — sat off-screen with no cue. */}
-      <p className="mt-3 text-xs text-mist/70 sm:hidden">
+      <p className="mt-3 text-xs text-mist sm:hidden">
         Swipe the table sideways for lawful basis and retention &rarr;
       </p>
       <GlassCard
@@ -52,9 +52,9 @@ export default function PrivacyPage() {
               <th key={h} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-mist">{h}</th>
             ))}
           </tr></thead>
-          <tbody className="divide-y divide-gold-500/8">
+          <tbody className="divide-y divide-line">
             {rows.map((r) => (
-              <tr key={r[0]}>{r.map((c, i) => <td key={i} className="px-4 py-3 align-top text-ivory-200/85">{c}</td>)}</tr>
+              <tr key={r[0]}>{r.map((c, i) => <td key={i} className="px-4 py-3 align-top text-ivory-200">{c}</td>)}</tr>
             ))}
           </tbody>
         </table>

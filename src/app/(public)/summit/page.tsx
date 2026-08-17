@@ -197,7 +197,7 @@ export default async function SummitHub() {
         label="Apply for a Summit slot"
       />
 
-      <p className="text-center text-xs text-mist/70">
+      <p className="text-center text-xs text-mist">
         Comparing options? <Link href="/join" className="text-gold-300 underline decoration-gold-500/40 underline-offset-2">See all membership tiers</Link>.
       </p>
     </GuideShell>

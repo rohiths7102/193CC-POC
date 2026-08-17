@@ -13,7 +13,7 @@ export function ShareTools({ url, name }: { url: string; name: string }) {
   useEffect(() => {
     QRCode.toDataURL(url, {
       width: 480, margin: 2,
-      color: { dark: "#131233", light: "#F7F3EA" },
+      color: { dark: "#131233", light: "#FFFFFF" },
     }).then(setQr).catch(() => setQr(null));
   }, [url]);
 
@@ -39,11 +39,11 @@ export function ShareTools({ url, name }: { url: string; name: string }) {
           {copied ? "Copied!" : "Copy link"}
         </button>
         <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`} target="_blank" rel="noopener"
-          className="inline-flex items-center gap-2 rounded-full border border-gold-500/30 px-4 py-2 text-sm text-ivory-100 hover:bg-gold-500/10">
+          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-ivory-100 hover:bg-gold-500/10">
           <Linkedin className="h-4 w-4" /> LinkedIn
         </a>
         <a href={`https://wa.me/?text=${text}%20${encoded}`} target="_blank" rel="noopener"
-          className="inline-flex items-center gap-2 rounded-full border border-gold-500/30 px-4 py-2 text-sm text-ivory-100 hover:bg-gold-500/10">
+          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-ivory-100 hover:bg-gold-500/10">
           <MessageCircle className="h-4 w-4" /> WhatsApp
         </a>
       </div>

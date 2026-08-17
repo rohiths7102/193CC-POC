@@ -81,7 +81,7 @@ export function MobileNav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[70] bg-ink-950 sm:hidden"
+            className="fixed inset-0 z-[70] bg-white sm:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -106,7 +106,7 @@ export function MobileNav() {
               </div>
 
               <nav className="flex-1 overflow-y-auto px-6 pt-4">
-                <ul className="divide-y divide-gold-500/12">
+                <ul className="divide-y divide-line">
                   {LINKS.map((l, i) => (
                     <motion.li
                       key={l.href}
@@ -141,11 +141,11 @@ export function MobileNav() {
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="flex min-h-[52px] w-full items-center justify-center rounded-full border border-gold-500/30 px-6 text-sm text-ivory-100"
+                  className="flex min-h-[52px] w-full items-center justify-center rounded-full border border-line px-6 text-sm text-ivory-100"
                 >
                   Member sign in
                 </Link>
-                <p className="pt-1 text-center text-[10px] uppercase tracking-[0.3em] text-mist/70">
+                <p className="pt-1 text-center text-[10px] uppercase tracking-[0.3em] text-mist">
                   Membership is by application
                 </p>
               </div>

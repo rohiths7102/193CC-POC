@@ -64,7 +64,7 @@ export default async function VerificationQueue() {
             <div className="mt-4 flex flex-wrap gap-2">
               {((m.orgDocs as string[]) ?? []).map((d, i) => (
                 <a key={d} href={`/api/files/${d}`} target="_blank"
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-gold-500/30 px-3.5 py-1.5 text-xs text-gold-300 hover:bg-gold-500/10 lg:min-h-0">
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs text-gold-300 hover:bg-gold-500/10 lg:min-h-0">
                   <FileText className="h-3.5 w-3.5" /> Document {i + 1}
                 </a>
               ))}
@@ -130,7 +130,7 @@ export default async function VerificationQueue() {
                   )}
                   {((m.chOfficers as string[]) ?? []).length > 0 && (
                     <p className="text-xs text-mist">
-                      Officers on record: <span className="text-ivory-200/80">{(m.chOfficers as string[]).join(" · ")}</span>
+                      Officers on record: <span className="text-ivory-200">{(m.chOfficers as string[]).join(" · ")}</span>
                     </p>
                   )}
                   {m.chIncorporatedAt && (

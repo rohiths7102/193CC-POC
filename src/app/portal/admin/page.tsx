@@ -58,7 +58,7 @@ export default async function AdminOverview() {
           { href: "/portal/admin/approvals", icon: <ClipboardCheck className="h-4 w-4" />, t: "Content approvals" },
         ].map((q) => (
           <Link key={q.href} href={q.href}>
-            <GlassCard className="group flex items-center justify-between p-5 transition-colors hover:border-gold-500/50">
+            <GlassCard className="group flex items-center justify-between p-5 transition-colors hover:border-line">
               <span className="flex items-center gap-3 text-sm text-ivory-100"><span className="rounded-lg bg-gold-500/12 p-2 text-gold-400">{q.icon}</span>{q.t}</span>
               <ArrowRight className="h-4 w-4 text-mist transition-transform group-hover:translate-x-1 group-hover:text-gold-400" />
             </GlassCard>
@@ -71,10 +71,10 @@ export default async function AdminOverview() {
         {recentAudit.map((a) => (
           <GlassCard key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
             <Badge tone="grey">{a.action}</Badge>
-            <span className="text-ivory-200/85">{a.actorName ?? "system"}</span>
+            <span className="text-ivory-200">{a.actorName ?? "system"}</span>
             <span className="text-mist">· {a.entityType}</span>
             {a.reason && <span className="italic text-mist">"{a.reason}"</span>}
-            <span className="ml-auto text-xs text-mist/70">{ukDate(a.createdAt, true)}</span>
+            <span className="ml-auto text-xs text-mist">{ukDate(a.createdAt, true)}</span>
           </GlassCard>
         ))}
       </div>

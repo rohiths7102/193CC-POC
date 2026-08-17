@@ -32,7 +32,7 @@ export default async function ConsultantArticles() {
               <Badge tone={STATUS_TONE[a.status] ?? "grey"}>{titleCase(a.status)}</Badge>
               <span className="text-xs text-mist">{a.member.name} · {a.wordCount.toLocaleString()} words · updated {ukDate(a.updatedAt)}</span>
             </div>
-            <p className="mt-3 line-clamp-4 text-sm leading-6 text-ivory-200/75">{a.body}</p>
+            <p className="mt-3 line-clamp-4 text-sm leading-6 text-ivory-200">{a.body}</p>
           </GlassCard>
         ))}
       </div>

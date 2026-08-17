@@ -28,7 +28,7 @@ export default async function EmailLog() {
                 <p className="text-xs text-mist">to {e.toEmail} · {ukDate(e.createdAt, true)}</p>
               </div>
             </div>
-            <p className="mt-3 border-t hairline pt-3 text-sm leading-6 text-ivory-200/75">{e.body}</p>
+            <p className="mt-3 border-t hairline pt-3 text-sm leading-6 text-ivory-200">{e.body}</p>
           </GlassCard>
         ))}
       </div>

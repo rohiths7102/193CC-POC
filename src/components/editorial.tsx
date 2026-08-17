@@ -46,7 +46,7 @@ export function GuideShell({
           </p>
           <h1 className="mt-4 font-display text-4xl leading-[1.1] text-ivory-50 md:text-5xl">{title}</h1>
           <p className="mt-5 text-lg leading-8 text-mist">{dek}</p>
-          {updated && <p className="mt-4 text-[11px] uppercase tracking-[0.22em] text-mist/70">Updated {updated}</p>}
+          {updated && <p className="mt-4 text-[11px] uppercase tracking-[0.22em] text-mist">Updated {updated}</p>}
         </Reveal>
         <div className="mt-12 space-y-14">{children}</div>
       </main>
@@ -60,7 +60,7 @@ export function GuideSection({ title, children }: { title: string; children: Rea
     <Reveal>
       <section>
         <h2 className="font-display text-2xl leading-snug text-ivory-50 md:text-3xl">{title}</h2>
-        <div className="prose-guide mt-5 space-y-4 text-base leading-7 md:text-[15px] md:leading-8 text-ivory-200/85">{children}</div>
+        <div className="prose-guide mt-5 space-y-4 text-base leading-7 md:text-[15px] md:leading-8 text-ivory-200">{children}</div>
       </section>
     </Reveal>
   );
@@ -71,7 +71,7 @@ export function Callout({ children, tone = "gold" }: { children: React.ReactNode
     <div
       className={
         tone === "gold"
-          ? "rounded-xl border border-gold-500/25 bg-gold-500/8 px-5 py-4 text-sm leading-7 text-ivory-200/90"
+          ? "rounded-xl border border-line bg-gold-500/8 px-5 py-4 text-sm leading-7 text-ivory-200"
           : "rounded-xl border hairline bg-ink-800/40 px-5 py-4 text-sm leading-7 text-mist"
       }
     >
@@ -117,8 +117,8 @@ export function FaqBlock({ title = "Frequently asked questions", faqs }: { title
 
 export function CheckItem({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex gap-3 rounded-xl border hairline bg-ink-800/40 px-4 py-3 text-sm leading-6 text-ivory-200/85">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gold-500/40 text-[11px] text-gold-400">✓</span>
+    <li className="flex gap-3 rounded-xl border hairline bg-ink-800/40 px-4 py-3 text-sm leading-6 text-ivory-200">
+      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line text-[11px] text-gold-400">✓</span>
       <span>{children}</span>
     </li>
   );

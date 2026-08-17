@@ -83,6 +83,11 @@ export function FlagshipCard({
               playsInline
               aria-hidden
               tabIndex={-1}
+              // Browser extensions (e.g. WebBoost) inject attributes into
+              // <video> before React hydrates — harmless, scoped to this
+              // element only, so don't fail hydration over it. Same
+              // treatment as EventFilm in showcase.tsx.
+              suppressHydrationWarning
             />
           ) : (
             <div className="animate-slow-pulse absolute inset-0 bg-[radial-gradient(120%_90%_at_70%_10%,#3a4664_0%,#232a42_45%,#161b2c_100%)]" />

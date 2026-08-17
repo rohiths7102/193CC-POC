@@ -409,7 +409,9 @@ export default async function Landing() {
             band reads as the room itself rather than a form about it. */}
         {hasFilm && (
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <video className="absolute inset-0 h-full w-full scale-110 object-cover opacity-[0.22] [filter:blur(18px)_saturate(0.6)]" src="/videos/summit-teaser.mp4#t=6" poster="/videos/summit-poster-2.jpg" preload="metadata" muted playsInline tabIndex={-1} />
+            {/* suppressHydrationWarning: extensions such as WebBoost stamp
+                attributes on <video> before hydration — see EventFilm. */}
+            <video className="absolute inset-0 h-full w-full scale-110 object-cover opacity-[0.22] [filter:blur(18px)_saturate(0.6)]" src="/videos/summit-teaser.mp4#t=6" poster="/videos/summit-poster-2.jpg" preload="metadata" muted playsInline tabIndex={-1} suppressHydrationWarning />
             <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_70%_20%,rgba(214,57,47,0.16),transparent_60%),linear-gradient(180deg,rgba(35,42,66,0.4),rgba(35,42,66,0.85))]" />
           </div>
         )}

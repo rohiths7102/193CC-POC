@@ -22,7 +22,7 @@ export default async function MentorHome() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">My members</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">My members</h1>
       <p className="mt-1.5 text-sm text-mist">Only members formally assigned to you are visible. Log delivered hours against each — allowances are 2 hrs (Individual) / 5 hrs (Enterprise) per month.</p>
 
       {assignments.length === 0 && <div className="mt-8"><Empty title="No members assigned yet" /></div>}

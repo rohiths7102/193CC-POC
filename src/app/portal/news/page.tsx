@@ -29,7 +29,7 @@ export default async function NewsPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">News & networking</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">News & networking</h1>
       <p className="mt-1.5 text-sm text-mist">Member stories published by the Consortium, and everything coming up in the calendar.</p>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.6fr_1fr]">

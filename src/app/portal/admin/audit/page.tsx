@@ -26,7 +26,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
     <PageFx>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Audit log</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Audit log</h1>
           <p className="mt-1.5 text-sm text-mist">Append-only. Who changed what, and when — contracts, payments, permissions, overrides, slots, publishing.</p>
         </div>
         <form className="w-full max-w-xs"><input name="q" defaultValue={q} placeholder="Filter actions…" className={inputCls} /></form>

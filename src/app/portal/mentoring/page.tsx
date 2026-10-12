@@ -25,7 +25,7 @@ export default async function MentoringPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Mentoring</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Mentoring</h1>
       <p className="mt-1.5 text-sm text-mist">
         Your allowance: <strong className="text-gold-300">{ent.mentoringHours} hrs/month</strong>
         {ent.mentorKinds.length > 0 && <> ({ent.mentorKinds.join(", ")})</>} ·

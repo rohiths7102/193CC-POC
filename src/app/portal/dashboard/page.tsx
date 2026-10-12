@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Crown, Landmark, CalendarClock, PenSquare, Newspaper, Lock } from "lucide-react";
 import { requireUser } from "@/server/auth";
@@ -42,12 +43,17 @@ export default async function MemberDashboard() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">
-        Good to see you, <span className="text-gold-grad">{user.name.split(" ")[0]}</span>
-      </h1>
-      <p className="mt-1.5 text-sm text-mist">
-        {active.length ? active.map((m) => m.product.name).join(" + ") : "No active membership"} · everything below is driven by your live entitlements.
-      </p>
+      {/* Welcome band — the Palace at dusk under the greeting. */}
+      <header className="relative isolate overflow-hidden rounded-2xl border border-gilt/30 px-7 py-10 sm:px-10 sm:py-14">
+        <Image src="/images/westminster-dusk.jpg" alt="" fill priority sizes="(min-width: 1024px) 70vw, 100vw" className="-z-20 object-cover" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-r from-night/95 via-night/75 to-chamber/30" />
+        <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">
+          Good to see you, <em className="text-gilt">{user.name.split(" ")[0]}</em>
+        </h1>
+        <p className="mt-3 max-w-xl text-sm text-ivory-200">
+          {active.length ? active.map((m) => m.product.name).join(" + ") : "No active membership"} · everything below is driven by your live entitlements.
+        </p>
+      </header>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         {/* Wallet card */}

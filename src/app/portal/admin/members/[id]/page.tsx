@@ -36,7 +36,7 @@ export default async function MemberDetail({ params }: { params: Promise<{ id: s
       <div className="flex flex-wrap items-center gap-4">
         <Avatar name={u.name} className="h-14 w-14 text-base" />
         <div className="flex-1">
-          <h1 className="font-display text-3xl text-ivory-50">{u.name}</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">{u.name}</h1>
           <p className="text-sm text-mist">{u.email}{u.company && <> · {u.company}</>}</p>
         </div>
         <Badge tone={STATUS_TONE[u.status] ?? "grey"}>{u.status}</Badge>

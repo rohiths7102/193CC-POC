@@ -22,7 +22,7 @@ export default async function MembershipPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Membership & wallet</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Membership & wallet</h1>
       <p className="mt-1.5 text-sm text-mist">Contracts, payments and your Major-Event credit position — the full record.</p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">

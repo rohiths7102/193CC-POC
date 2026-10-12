@@ -23,7 +23,7 @@ export default async function AdminPayments() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Payments & wallet</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Payments & wallet</h1>
       <p className="mt-1.5 text-sm text-mist">The append-only ledger and every Direct Debit plan — collection health at a glance.</p>
 
       <h2 className="mt-8 font-display text-xl text-ivory-50">Direct Debit plans</h2>

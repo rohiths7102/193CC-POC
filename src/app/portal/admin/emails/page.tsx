@@ -14,7 +14,7 @@ export default async function EmailLog() {
   return (
     <PageFx>
       <div className="flex items-center gap-3">
-        <h1 className="font-display text-3xl text-ivory-50">Email log</h1>
+        <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Email log</h1>
         <DemoTag>Demo outbox — swap to Postmark at go-live</DemoTag>
       </div>
       <p className="mt-1.5 text-sm text-mist">Every notification the platform sends: contracts, payments, unlocks, deadlines, waitlist promotions.</p>

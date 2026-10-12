@@ -22,7 +22,7 @@ export default async function SettingsPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Settings</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Settings</h1>
       <p className="mt-1.5 text-sm text-mist">Business rules as configuration — fees, thresholds and policies change here, never in code. Every change is audited.</p>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-2">

@@ -449,9 +449,9 @@
 }
 
 /* ── Contract document ──────────────────────────────── */
-.contract-doc h2 { @apply font-display text-2xl font-light text-ivory-50 mb-4; }
+.contract-doc h2 { @apply font-headline text-3xl text-ivory-50 mb-4; }
 .contract-doc p { @apply text-sm leading-6 text-ivory-200 mb-3; }
-.contract-doc em { @apply text-gold-500 not-italic font-medium; }
+.contract-doc em { @apply text-amber not-italic font-medium; }
 
 /* ── Print: contract PDF via browser ────────────────── */
 @media print {

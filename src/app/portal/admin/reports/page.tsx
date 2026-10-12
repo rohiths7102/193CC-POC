@@ -52,7 +52,7 @@ export default async function Reports() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Reports</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Reports</h1>
       <p className="mt-1.5 text-sm text-mist">Revenue, Direct Debit health, Major-Event eligibility pipeline, Summit fill rates and mentoring utilisation.</p>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-2">

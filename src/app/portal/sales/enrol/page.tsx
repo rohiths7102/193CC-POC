@@ -16,7 +16,7 @@ export default async function ManualEnrol() {
       <div className="flex items-center gap-3">
         <span className="rounded-xl bg-gold-500/12 p-2.5 text-gold-400"><UserPlus className="h-5 w-5" /></span>
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Manual enrolment</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Manual enrolment</h1>
           <p className="mt-1 text-sm text-mist">For phone and offline sign-ups. Identical gates to online: the member still e-signs and pays before anything activates — no side doors.</p>
         </div>
       </div>

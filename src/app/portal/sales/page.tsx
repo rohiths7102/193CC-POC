@@ -25,7 +25,7 @@ export default async function SalesPipeline() {
     <PageFx>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Sales pipeline</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Sales pipeline</h1>
           <p className="mt-1.5 text-sm text-mist">Your leads only — commission data and other reps’ pipelines are never visible.</p>
         </div>
         <LinkButton href="/portal/sales/enrol" size="sm">Manual enrolment →</LinkButton>

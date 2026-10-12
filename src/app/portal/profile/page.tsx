@@ -22,7 +22,7 @@ export default async function MyProfile() {
   if (!ent.has("investor_visibility")) {
     return (
       <PageFx>
-        <h1 className="font-display text-3xl text-ivory-50">Public profile</h1>
+        <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Public profile</h1>
         <div className="mt-8"><Empty title="The public profile is an Enterprise benefit" sub="Upgrade to Enterprise Standard or Investor Ready to publish your organisation's page." /></div>
       </PageFx>
     );
@@ -44,7 +44,7 @@ export default async function MyProfile() {
     <PageFx>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Public profile</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Public profile</h1>
           <p className="mt-1.5 text-sm text-mist">Your shareable page — logo, photo, bio and your live award status. You control whether it’s public.</p>
         </div>
         {link && me.profilePublic && (

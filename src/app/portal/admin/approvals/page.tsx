@@ -30,7 +30,7 @@ export default async function Approvals() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Content approvals</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Content approvals</h1>
       <p className="mt-1.5 text-sm text-mist">Nothing publishes to the public site without an administrator decision — every action is audited and the member is notified.</p>
 
       <h2 className="mt-8 flex items-center gap-2 font-display text-xl text-ivory-50"><Newspaper className="h-5 w-5 text-gold-400" /> Articles</h2>

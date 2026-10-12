@@ -28,7 +28,7 @@ export default async function VerificationQueue() {
       <div className="flex items-center gap-3">
         <span className="rounded-xl bg-gold-500/12 p-2.5 text-gold-400"><ShieldCheck className="h-5 w-5" /></span>
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Verification queue</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Verification queue</h1>
           <p className="mt-1 text-sm text-mist">
             {pending.length} organisation{pending.length === 1 ? "" : "s"} awaiting document review — the promise on the
             enrolment page is same-day verification, so keep this queue moving.

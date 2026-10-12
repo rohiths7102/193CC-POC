@@ -29,7 +29,7 @@ export default async function SummitConsole() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Summit console</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Summit console</h1>
       <p className="mt-1.5 text-sm text-mist">Slot grids, intent letters, deadline and the waitlist — cancellations promote the next applicant automatically.</p>
 
       {actor.role === "ADMIN" && (

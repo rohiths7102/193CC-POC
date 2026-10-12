@@ -41,7 +41,7 @@ export default async function AdminMembers({ searchParams }: {
     <PageFx>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-ivory-50">Members</h1>
+          <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Members</h1>
           <p className="mt-1.5 text-sm text-mist">Search by name, email or company — click through for the full 360°.</p>
         </div>
         {/* Widths must carry the lg: prefix. inputCls already starts with

@@ -19,7 +19,7 @@ export default async function ConsultantArticles() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Article drafts</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Article drafts</h1>
       <p className="mt-1.5 text-sm text-mist">Co-author enterprise articles for your assigned members. Administrator approval is always required before anything publishes.</p>
 
       {articles.length === 0 && <div className="mt-8"><Empty title="No drafts from your members yet" /></div>}

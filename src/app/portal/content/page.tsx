@@ -20,7 +20,7 @@ export default async function ContentPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">Article & branding video</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Article & branding video</h1>
       <p className="mt-1.5 text-sm text-mist">Enterprise publishing benefits — reviewed and approved before anything goes public.</p>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">

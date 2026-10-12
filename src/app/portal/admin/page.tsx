@@ -24,7 +24,7 @@ export default async function AdminOverview() {
   return (
     <PageFx>
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl text-ivory-50">Command centre</h1>
+        <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">Command centre</h1>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
           <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-emerald-300" /> Live
         </span>

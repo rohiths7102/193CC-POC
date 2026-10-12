@@ -1,9 +1,10 @@
+import Image from "next/image";
 import { Landmark, Clock, CheckCircle2 } from "lucide-react";
 import { requireUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { resolveEntitlements } from "@/server/entitlements";
 import { ukDate, titleCase } from "@/lib/utils";
-import { GlassCard, Badge, STATUS_TONE, Empty, Button } from "@/components/ui";
+import { GlassCard, Badge, STATUS_TONE, Empty, Button, LinkButton } from "@/components/ui";
 import { PageFx } from "@/components/motion";
 import { IntentUploadForm } from "@/components/forms";
 import { acceptOfferAction } from "@/server/actions/member";
@@ -21,13 +22,24 @@ export default async function SummitPage() {
 
   return (
     <PageFx>
-      <h1 className="font-display text-3xl text-ivory-50">UK Investors Summit</h1>
+      <h1 className="font-headline text-4xl text-ivory-50 md:text-5xl">UK Investors Summit</h1>
       <p className="mt-1.5 text-sm text-mist">
         Intent letters, deadlines and slot status — the process that used to run over email, now live.
       </p>
 
       {!ent.has("summit_slot") && (
-        <div className="mt-8"><Empty title="Summit access is an Enterprise / Temporary benefit" sub="Upgrade your membership to pitch, launch or receive an award at the Summit." /></div>
+        <section className="relative isolate mt-8 overflow-hidden rounded-2xl border border-gilt/30">
+          <Image src="/images/193cc-launch-sportto-reveal.jpg" alt="A member brand unveiled at the House of Lords" fill sizes="(min-width: 1024px) 70vw, 100vw" className="-z-20 object-cover" />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-r from-night/95 via-night/80 to-night/20" />
+          <div className="max-w-md px-7 py-12 sm:px-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold-400">Enterprise · Temporary benefit</p>
+            <h2 className="mt-3 font-headline text-3xl text-ivory-50">Pitch, launch or be recognised at the House of Lords.</h2>
+            <p className="mt-3 text-sm leading-6 text-ivory-200">
+              Summit slots come with Enterprise and Temporary memberships. Upgrade to apply with an intent letter.
+            </p>
+            <LinkButton href="/join" className="shine mt-6">See memberships</LinkButton>
+          </div>
+        </section>
       )}
 
       {apps.map((a) => {

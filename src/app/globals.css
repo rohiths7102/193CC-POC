@@ -800,3 +800,69 @@ html.lenis, html.lenis body { height: auto; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===========================================================================
+   EDITORIAL SYSTEM (ADR-0030) — the redesign's tokens, in the starter's
+   three-tier convention (obsidian/frontend/design-system.md → Token naming).
+   Lives beside the ported 193 CC scales above until every page is converted;
+   names are chosen not to collide with them (no `ink`, `ivory`, `gold`).
+   =========================================================================== */
+
+/* TIER 1 — primitives. The only place a literal may appear. */
+:root {
+  --raw-color-paper-50: #f6f3ec;
+  --raw-color-paper-100: #ede8dd;
+  --raw-color-paper-200: #ddd6c7;
+  --raw-color-carbon-950: #111317;
+  --raw-color-carbon-900: #171a20;
+  --raw-color-carbon-700: #3a3f4a;
+  --raw-color-carbon-500: #626875;
+  --raw-color-oxblood-600: #b3261e;
+  --raw-color-oxblood-500: #d6392f;
+  --raw-color-oxblood-300: #f2a39d;
+  --raw-color-night-950: #0d1220;
+  --raw-color-night-900: #141b2e;
+  --raw-color-white: #ffffff;
+
+  --raw-duration-quick: 180ms;
+  --raw-duration-measured: 900ms;
+}
+
+/* TIER 2 — semantic roles. Purpose, never appearance. */
+:root {
+  --paper: var(--raw-color-paper-50);
+  --paper-deep: var(--raw-color-paper-100);
+  --hairline: var(--raw-color-paper-200);
+  --copy: var(--raw-color-carbon-950);
+  --copy-soft: var(--raw-color-carbon-700);
+  --copy-muted: var(--raw-color-carbon-500);
+  --accent: var(--raw-color-oxblood-600);
+  --accent-bright: var(--raw-color-oxblood-500);
+  --accent-on-night: var(--raw-color-oxblood-300);
+  --night: var(--raw-color-night-950);
+  --night-raised: var(--raw-color-night-900);
+  --night-copy: var(--raw-color-white);
+  --headline: var(--font-instrument-serif), Georgia, serif;
+  --body: var(--font-geist), system-ui, sans-serif;
+  --duration-quick: var(--raw-duration-quick);
+  --duration-measured: var(--raw-duration-measured);
+}
+
+/* THEME BINDINGS — exactly --<namespace>-<role>: var(--<role>). */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-hairline: var(--hairline);
+  --color-copy: var(--copy);
+  --color-copy-soft: var(--copy-soft);
+  --color-copy-muted: var(--copy-muted);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-on-night: var(--accent-on-night);
+  --color-night: var(--night);
+  --color-night-raised: var(--night-raised);
+  --color-night-copy: var(--night-copy);
+  --font-headline: var(--headline);
+  --font-body: var(--body);
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+}

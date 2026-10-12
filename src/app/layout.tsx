@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto, Roboto_Condensed, JetBrains_Mono } from "next/font/google";
+import { Roboto, Roboto_Condensed, JetBrains_Mono, Instrument_Serif, Geist } from "next/font/google";
 import { appUrl } from "@/lib/app-url";
 import "./globals.css";
 
@@ -22,6 +22,20 @@ const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-jetbrains-mono",
+});
+
+// Editorial redesign (ADR-0030): a high-contrast display serif for headlines
+// and a neutral grotesk for reading. Instrument Serif ships one weight — its
+// drama comes from size and the italic, not from boldness.
+const headline = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+});
+const body = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
 });
 
 export const metadata: Metadata = {
@@ -52,7 +66,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en-GB" className={`${display.variable} ${sans.variable} ${mono.variable} ${headline.variable} ${body.variable}`}>
       <body className="grain font-sans min-h-svh">{children}</body>
     </html>
   );

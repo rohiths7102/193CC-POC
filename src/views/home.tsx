@@ -15,8 +15,31 @@ import {
   ImageReveal,
   ParallaxImage,
   Counter,
+  ScrollReel,
+  ReadingRule,
+  type ReelFrame,
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
+
+const LAUNCHED_BRANDS = [
+  "Sportto",
+  "Columbus International",
+  "Tisser Technologies",
+  "Sicher Mayor Tech",
+  "Matha Medi Care Nursing UK",
+  "DN Global Tec",
+] as const;
+
+const ROMAN = ["i", "ii", "iii", "iv", "v", "vi"] as const;
+
+const LAUNCH_REEL: ReelFrame[] = [
+  { src: "/images/193cc-launch-sportto-unveil.jpg", alt: "The Sportto brand being unveiled at the House of Lords", caption: "The unveiling · Sportto" },
+  { src: "/images/193cc-launch-sportto-reveal.jpg", alt: "The Sportto mark held up to camera at the House of Lords", caption: "The reveal · Sportto" },
+  { src: "/images/summit-2023-brand-launch.jpg", alt: "Crystal London presented on stage at the UK Investors Summit", caption: "Crystal London · UK Investors Summit 2023" },
+  { src: "/images/summit-2023-award.jpg", alt: "An award presented at the UK Investors Summit", caption: "The awards · UK Investors Summit 2023" },
+  { src: "/images/summit-2023-roundtable.jpg", alt: "Delegates in discussion at a Summit table", caption: "Investor tables · UK Investors Summit 2023" },
+  { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests gathered on the steps of Westminster Hall", caption: "Westminster Hall · the full delegation" },
+];
 
 /**
  * Home — the editorial edition (ADR-0030).
@@ -72,6 +95,7 @@ export async function HomeView() {
       <main className="relative overflow-x-clip bg-paper font-body text-copy">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
         <SiteHeader />
+        <ReadingRule />
 
         {/* ─── COVER ─────────────────────────────────────────────── */}
         <section className="on-dark relative -mt-18 flex min-h-svh flex-col justify-end overflow-hidden bg-night text-night-copy">
@@ -222,8 +246,8 @@ export async function HomeView() {
               <div className="grid grid-cols-6 gap-3 lg:col-span-7">
                 <figure className="col-span-6">
                   <ImageReveal
-                    src="/images/summit-2023-lectern.jpg"
-                    alt="A speaker at the lectern beneath the UK Parliament, House of Lords banner"
+                    src="/images/summit-2023-address.jpg"
+                    alt="A speaker addresses the UK Investors Summit beneath the UK Parliament, House of Lords banner"
                     sizes="(min-width: 1024px) 55vw, 100vw"
                     className="aspect-video w-full"
                   />
@@ -279,7 +303,58 @@ export async function HomeView() {
           </div>
         </section>
 
-        {/* ─── № 03 THE CIRCLE — LSI at the House of Lords ──────── */}
+        {/* ─── № 03 LAUNCHED AT PARLIAMENT ───────────────────────── */}
+        {/* 193 CC's own film and photographs (public/images/CREDITS.md). */}
+        <section className="pt-24 sm:pt-32">
+          <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <Reveal>
+                <Chapter n="03" title="Launched at Parliament" />
+              </Reveal>
+              <MaskedLines
+                className={`mt-8 ${display}`}
+                lines={["Six brands,", "launched in", <em key="l" className="text-accent">the House of Lords.</em>]}
+              />
+              <Reveal delay={0.2}>
+                <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
+                  Members launch in front of investors, peers and press. These six member brands were unveiled at the
+                  House of Lords through 193 CC — the drape coming off on the right is Sportto&rsquo;s.
+                </p>
+              </Reveal>
+              <Reveal delay={0.3}>
+                <ol className="mt-10 border-t border-hairline">
+                  {LAUNCHED_BRANDS.map((name, i) => (
+                    <li key={name} className="flex items-baseline gap-5 border-b border-hairline py-3">
+                      <span className="w-8 font-mono text-[10px] uppercase tracking-[0.18em] text-accent">
+                        {ROMAN[i]}
+                      </span>
+                      <span className="font-headline text-xl">{name}</span>
+                    </li>
+                  ))}
+                </ol>
+              </Reveal>
+            </div>
+            <figure className="lg:col-span-7">
+              <Reveal>
+                <div className="relative aspect-video w-full overflow-hidden bg-night">
+                  <EventFilm
+                    src="/videos/193cc-brand-launch-sportto.mp4"
+                    poster="/videos/193cc-brand-launch-sportto-poster.jpg"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </div>
+              </Reveal>
+              <figcaption className="mt-4 border-t border-hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
+                Film: 193 Countries Consortium · Sportto brand launch · House of Lords
+              </figcaption>
+            </figure>
+          </div>
+          <div className="mt-20 sm:mt-28">
+            <ScrollReel frames={LAUNCH_REEL} />
+          </div>
+        </section>
+
+        {/* ─── № 04 THE CIRCLE — LSI at the House of Lords ──────── */}
         {/* London School of Investors footage, used at 193 CC's request. LSI's
             watermark stays in frame and every caption names it as LSI's event
             (public/images/CREDITS.md). */}
@@ -287,7 +362,7 @@ export async function HomeView() {
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
-                <Chapter n="03" title="The circle" />
+                <Chapter n="04" title="The circle" />
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
@@ -328,7 +403,7 @@ export async function HomeView() {
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
-                <Chapter n="04" title="Membership" />
+                <Chapter n="05" title="Membership" />
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
@@ -427,7 +502,7 @@ export async function HomeView() {
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-24 sm:py-32 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
-                <Chapter n="05" title="Reach" onNight />
+                <Chapter n="06" title="Reach" onNight />
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}

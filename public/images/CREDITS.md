@@ -39,3 +39,11 @@ Ask LSI for the original, unwatermarked masters for higher quality.
 | lsi-summit-2026-long-table.jpg | ~74 s |
 | lsi-summit-2026-westminster-hall.jpg | ~94 s |
 | ../videos/lsi-summit-2026-reel.mp4 | 9.8 s silent loop: 9 whole banner-free shots, light denoise + sharpen + grade, 0.4 s crossfades |
+
+## 193 Countries Consortium — own material
+
+| File | Source |
+| --- | --- |
+| summit-2023-reception.jpg, summit-2023-roundtable.jpg, summit-2023-address.jpg, summit-2023-handshake.jpg, summit-2023-award.jpg, summit-2023-brand-launch.jpg, summit-2023-audience.jpg | Full-resolution originals from 193countriesconsortium.com (wp-content/uploads/2024/02), UK Investors Summit 2023, resized to 2400px |
+| 193cc-launch-sportto-unveil.jpg, 193cc-launch-sportto-reveal.jpg, 193cc-launch-westminster-hall-group.jpg | Stills (58.0 s, 65.2 s, 68.6 s) from 193 CC's LinkedIn video post on Sportto's House of Lords launch (14 Sep 2023), light denoise and grade |
+| ../videos/193cc-brand-launch-sportto.mp4 (+ poster) | 57–67.5 s of the same video, 1.15× speed, graded, no audio |

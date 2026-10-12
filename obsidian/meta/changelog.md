@@ -16,6 +16,16 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (evening)
+
+**№03 Launched at Parliament + 193 CC's own media.** New homepage chapter
+built from 193 CC's LinkedIn film (Sportto unveiling, House of Lords) and the
+full-resolution Summit 2023 originals from 193countriesconsortium.com; later
+chapters renumbered 04–06. New motion primitives: `ScrollReel` (pinned
+filmstrip driven by vertical scroll, desktop only, off under reduced motion)
+and `ReadingRule` (top progress hairline). Provenance in
+`public/images/CREDITS.md`.
+
 ## 2026-10-12 (later)
 
 **Editorial homepage + admin automation.** `/` rebuilt to ADR-0030 (cover,

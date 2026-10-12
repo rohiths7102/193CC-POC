@@ -211,3 +211,75 @@ export function Counter({
     </span>
   );
 }
+
+export type ReelFrame = { src: string; alt: string; caption: string };
+
+/**
+ * Filmstrip that travels sideways while the page scrolls past it.
+ *
+ * Wide screens only, and never under reduced motion: there the section pins
+ * and vertical scroll drives the strip. Everywhere else it is a plain
+ * swipeable row, which is also the server render.
+ */
+export function ScrollReel({ frames }: { frames: ReelFrame[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const [pinned, setPinned] = useState(false);
+  const [shift, setShift] = useState(0);
+
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => {
+      setPinned(wide.matches && !reduced.matches);
+      if (track.current) setShift(Math.max(0, track.current.scrollWidth - window.innerWidth));
+    };
+    apply();
+    wide.addEventListener("change", apply);
+    window.addEventListener("resize", apply);
+    return () => {
+      wide.removeEventListener("change", apply);
+      window.removeEventListener("resize", apply);
+    };
+  }, []);
+
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const x = useTransform(scrollYProgress, [0, 1], [0, -shift]);
+
+  return (
+    <div ref={ref} className={pinned ? "relative h-[240vh]" : "relative"}>
+      <div className={pinned ? "sticky top-0 flex h-svh flex-col justify-center overflow-hidden" : "overflow-x-auto pb-4"}>
+        <motion.div ref={track} style={pinned ? { x } : undefined} className="flex w-max gap-4 px-6 lg:gap-6">
+          {frames.map((f, i) => (
+            <figure key={f.src} className="shrink-0">
+              <div className="relative aspect-[3/2] h-[38vh] overflow-hidden bg-night lg:h-[60vh]">
+                <Image src={f.src} alt={f.alt} fill sizes="(min-width: 1024px) 60vw, 80vw" className="object-cover" />
+              </div>
+              <figcaption className="mt-3 flex gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
+                <span className="text-accent">{String(i + 1).padStart(2, "0")}</span>
+                <span>{f.caption}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </motion.div>
+        {pinned && (
+          <div className="mx-6 mt-8 h-px bg-hairline">
+            <motion.div className="h-px origin-left bg-accent" style={{ scaleX: scrollYProgress }} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Hairline across the top of the viewport that fills as the page is read. */
+export function ReadingRule() {
+  const { scrollYProgress } = useScroll();
+  return (
+    <motion.div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-accent"
+      style={{ scaleX: scrollYProgress }}
+    />
+  );
+}

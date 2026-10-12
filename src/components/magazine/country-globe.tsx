@@ -9,12 +9,19 @@
  * it runs to 193 and arcs reach out from the London hub. Drag to turn it;
  * hover a pin for its name; search for a country and the globe turns to it.
  *
- * Reduced motion: everything is lit at once, no auto-rotation, and turning to
- * a searched country is instant. The loop pauses whenever the globe is off
+ * Once lit, the globe tours 193 CC's own stories: it turns to a country and a
+ * photograph pops out of that country's pin on a gilt leader line (London,
+ * Dubai, India — every caption is from 193 CC's published posts). Dragging or
+ * searching pauses the tour; searching for a story country opens its card.
+ *
+ * Reduced motion: everything is lit at once, no auto-rotation or tour, and
+ * turning to a searched country is instant. The loop pauses whenever the globe is off
  * screen.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { LAND_DOTS, UN_MEMBER_STATES } from "@/lib/globe-data";
 
 type V3 = [number, number, number];
@@ -48,12 +55,46 @@ const angDiff = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b
 
 type State = { name: string; v: V3; lat: number; lon: number; order: number };
 
+type Photo = { src: string; alt: string };
+type Story = { country: string; place: string; line: string; photos: Photo[] };
+
+/** 193 CC's own material only — see public/images/CREDITS.md. */
+const STORIES: Story[] = [
+  {
+    country: "United Kingdom",
+    place: "London · House of Lords",
+    line: "The consortium's stage since 2023 — summits, launches and awards inside the Palace of Westminster.",
+    photos: [
+      { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests on the steps of Westminster Hall" },
+      { src: "/images/summit-2023-address.jpg", alt: "A speaker addresses the UK Investors Summit at the House of Lords" },
+      { src: "/videos/193cc-gss-awards-2025-poster.jpg", alt: "The GSS Safety Awards evening at the House of Lords, October 2025" },
+    ],
+  },
+  {
+    country: "United Arab Emirates",
+    place: "Dubai → London",
+    line: "Sportto, the sports brand from Dubai, unveiled at the House of Lords · 21 July 2023.",
+    photos: [{ src: "/images/193cc-launch-sportto-reveal.jpg", alt: "The Sportto mark held up at the House of Lords" }],
+  },
+  {
+    country: "India",
+    place: "India → London",
+    line: "Six companies from India launched in the UK at the House of Lords through 193 CC · 21 July 2023.",
+    photos: [
+      { src: "/images/193cc-launch-columbus-reveal.jpg", alt: "Columbus International's mark presented at the House of Lords" },
+      { src: "/images/193cc-launch-sicher-mayor-reveal.jpg", alt: "Sicher Mayor Tech's mark presented at the House of Lords" },
+    ],
+  },
+];
+
 export function CountryGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lit, setLit] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const selectRef = useRef<(name: string) => void>(() => {});
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [card, setCard] = useState<{ story: Story; photo: Photo } | null>(null);
 
   // Ignition order: nearest to London first.
   const states = useMemo<State[]>(() => {
@@ -87,6 +128,13 @@ export function CountryGlobe() {
     let dragging = false, lastX = 0, lastY = 0, downX = 0, downY = 0, idleUntil = 0;
     let litF = reduced ? states.length : 0, igniting = false, igniteStart = 0;
     let hover: State | null = null, sel: State | null = null;
+    // Story tour: wait → fly → show → drift → next.
+    let tourI = 0, tourPhase: "wait" | "fly" | "show" | "drift" = "wait", phaseUntil = 0, visits = 0;
+    let cardAt: State | null = null;
+    const storyState = (st: Story) => states.find((x) => x.name === st.country)!;
+    const goalFor = (x: State) => ({ yaw: -x.lon * DEG, pitch: Math.max(-1.1, Math.min(1.1, x.lat * DEG)) });
+    const openCard = (st: Story, photo: Photo) => { cardAt = storyState(st); setCard({ story: st, photo }); };
+    const closeCard = () => { cardAt = null; setCard(null); };
     let W = 0, H = 0, R = 0, cx = 0, cy = 0, raf = 0, visible = false, t0 = performance.now();
 
     const resize = () => {
@@ -197,6 +245,25 @@ export function CountryGlobe() {
       };
       if (hover && hover !== sel) label(hover, false);
       if (sel) label(sel, true);
+
+      // Pin the story card to its country's pin.
+      const el = cardRef.current;
+      if (el && cardAt) {
+        const { sx, sy, z } = project(cardAt.v);
+        const right = sx < W * 0.6;
+        const cw = el.offsetWidth, ch = el.offsetHeight;
+        const x = right ? sx + 22 : sx - 22 - cw;
+        const y = Math.max(0, Math.min(H - ch, sy - ch / 2));
+        el.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+        el.style.opacity = z > 0.15 ? "1" : "0";
+        el.dataset.side = right ? "r" : "l";
+        el.style.setProperty("--pin-y", `${Math.round(sy - y)}px`);
+        // gilt ring on the pin itself
+        if (z > 0.15) {
+          ctx.strokeStyle = GOLD_HI; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(sx, sy, 7, 0, Math.PI * 2); ctx.stroke();
+        }
+      } else if (el) el.style.opacity = "0";
     };
 
     const step = (now: number) => {
@@ -206,11 +273,26 @@ export function CountryGlobe() {
         if (litF >= states.length) igniting = false;
         setLit(Math.floor(litF));
       }
+      const free = !dragging && !reduced && now > idleUntil && !igniting && litF >= states.length;
+      if (free) {
+        const st = STORIES[tourI];
+        if (tourPhase === "wait") { target = goalFor(storyState(st)); tourPhase = "fly"; }
+        else if (tourPhase === "fly" && !target) {
+          openCard(st, st.photos[visits % st.photos.length]);
+          tourPhase = "show"; phaseUntil = now + 5200;
+        } else if (tourPhase === "show" && now > phaseUntil) {
+          closeCard(); tourPhase = "drift"; phaseUntil = now + 2200;
+        } else if (tourPhase === "drift" && now > phaseUntil) {
+          tourI = (tourI + 1) % STORIES.length;
+          if (tourI === 0) visits++;
+          tourPhase = "wait";
+        }
+      }
       if (target) {
         const dy = angDiff(yaw, target.yaw), dp = target.pitch - pitch;
-        yaw += dy * 0.08; pitch += dp * 0.08;
+        yaw += dy * 0.06; pitch += dp * 0.06;
         if (Math.abs(dy) < 0.002 && Math.abs(dp) < 0.002) target = null;
-      } else if (!dragging && !reduced && now > idleUntil) {
+      } else if (!dragging && !reduced && now > idleUntil && tourPhase !== "show") {
         yaw += 0.0016;
       }
       draw(now);
@@ -235,6 +317,7 @@ export function CountryGlobe() {
     };
     const onDown = (e: PointerEvent) => {
       dragging = true; target = null; [lastX, lastY] = [downX, downY] = [e.clientX, e.clientY];
+      if (tourPhase !== "wait") { closeCard(); tourPhase = "wait"; }
       canvas.setPointerCapture(e.pointerId);
     };
     const onMove = (e: PointerEvent) => {
@@ -252,7 +335,7 @@ export function CountryGlobe() {
     };
     const onUp = (e: PointerEvent) => {
       if (!dragging) return;
-      dragging = false; idleUntil = performance.now() + 2500;
+      dragging = false; idleUntil = performance.now() + 7000;
       const [x, y] = local(e);
       const hit = pick(x, y);
       if (hit && Math.hypot(e.clientX - downX, e.clientY - downY) < 5) selectRef.current(hit.name);
@@ -268,6 +351,12 @@ export function CountryGlobe() {
       else target = goal;
       idleUntil = performance.now() + 6000;
       setSelected(name);
+      const story = STORIES.find((x) => x.country === name);
+      if (story) {
+        openCard(story, story.photos[0]);
+        tourPhase = "show"; phaseUntil = performance.now() + 9000;
+        tourI = STORIES.indexOf(story);
+      } else { closeCard(); tourPhase = "wait"; }
     };
 
     resize();
@@ -367,6 +456,31 @@ export function CountryGlobe() {
           aria-label="Globe with the 193 UN member states lit, centred on London"
           className="absolute inset-0 h-full w-full cursor-grab touch-pan-y"
         />
+        {/* The story card — moved every frame by the draw loop, not by React. */}
+        <div ref={cardRef} className="group pointer-events-none absolute left-0 top-0 z-10 w-48 opacity-0 transition-opacity duration-300 sm:w-60">
+          <span aria-hidden="true" className="absolute right-full hidden h-px w-[22px] bg-gilt group-data-[side=r]:block" style={{ top: "var(--pin-y)" }} />
+          <span aria-hidden="true" className="absolute left-full hidden h-px w-[22px] bg-gilt group-data-[side=l]:block" style={{ top: "var(--pin-y)" }} />
+          <AnimatePresence mode="wait">
+            {card && (
+              <motion.figure
+                key={card.photo.src}
+                initial={{ opacity: 0, scale: 0.55, filter: "blur(8px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.85, filter: "blur(6px)" }}
+                transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                className="border border-gilt/50 bg-night/90 p-2 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-sm group-data-[side=l]:origin-right group-data-[side=r]:origin-left"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image src={card.photo.src} alt={card.photo.alt} fill sizes="240px" className="object-cover" />
+                </div>
+                <figcaption className="px-1 pb-1 pt-2.5">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-accent-on-night">{card.story.place}</p>
+                  <p className="mt-1.5 text-[11px] leading-[1.5] text-night-copy/80">{card.story.line}</p>
+                </figcaption>
+              </motion.figure>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

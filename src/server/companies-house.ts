@@ -177,3 +177,37 @@ export function emailDomainKind(email: string): "corporate" | "free" | "unknown"
 
 export const companiesHousePublicUrl = (number: string) =>
   `https://find-and-update.company-information.service.gov.uk/company/${encodeURIComponent(number.replace(/\s+/g, ""))}`;
+
+/**
+ * The automatic-verification rule. A check is a CLEAN MATCH only when every
+ * signal is positive and came from the live register: company found and
+ * active, registered name matches, and the applicant is a current listed
+ * officer. Anything else is returned with human-readable reasons so it can
+ * sit in the staff queue as an exception. Demo fixtures (no API key) never
+ * auto-approve — simulated data must not activate a real membership.
+ */
+export function evaluateCleanMatch(check: CompanyCheck, applicantName: string): { clean: boolean; reasons: string[] } {
+  const reasons: string[] = [];
+  if (check.simulated) reasons.push("Companies House API not configured — demo data cannot auto-approve");
+  switch (check.status) {
+    case "active": break;
+    case "dissolved": reasons.push("company is not active on the register"); break;
+    case "not_found": reasons.push("company number not found at Companies House"); break;
+    case "invalid_format": reasons.push("company number is not a valid UK format"); break;
+    case "not_configured": reasons.push("Companies House check not configured"); break;
+    case "error": reasons.push("Companies House lookup failed — re-check from the queue"); break;
+  }
+  if (check.status === "active") {
+    if (check.nameMatches !== true) {
+      reasons.push(`registered name "${check.officialName ?? "?"}" does not match the name given`);
+    }
+    if (check.directorMatch === null) reasons.push("no current officers listed to match the applicant against");
+    else if (!check.directorMatch) reasons.push("applicant is not a listed current officer");
+    // The officer match is a substring test; a one-word name is too weak to
+    // carry an automatic approval on its own.
+    if (applicantName.trim().split(/\s+/).filter((p) => p.length > 1).length < 2) {
+      reasons.push("applicant gave a single-word name — officer match too weak to auto-approve");
+    }
+  }
+  return { clean: reasons.length === 0, reasons };
+}

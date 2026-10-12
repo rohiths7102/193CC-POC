@@ -5,7 +5,9 @@ import { audit } from "./audit";
 import { sendMail } from "./mail";
 import { credit } from "./wallet";
 import { hashPassword } from "./auth";
-import { checkCompany } from "./companies-house";
+import { checkCompany, evaluateCleanMatch } from "./companies-house";
+import { autoAssignMentor } from "./mentoring";
+import { AUTOMATION, AUTOMATION_ACTOR, automationEnabled } from "./settings";
 
 const YEAR_MS = 365 * 24 * 3600 * 1000;
 
@@ -144,6 +146,9 @@ async function activate(membershipId: string) {
       action: "membership.pending_verification", entityType: "Membership", entityId: membershipId,
       after: { product: m.product.name, member: m.user.name, orgName: m.orgName, docs: (m.orgDocs as string[]).length },
     });
+    // Rule-based verification first: a clean live Companies House match
+    // activates straight away (and sends the welcome email instead).
+    if ((await autoVerifyOrganisation(membershipId)) === "approved") return;
     await sendMail(m.user.email, "Documents received — verification in progress",
       `Hello ${m.user.name}, your agreement is signed and payment confirmed. Your organisation documents are now with our verification team — this is usually completed the same day, and your membership activates the moment it clears.`);
     return;
@@ -188,6 +193,96 @@ async function activate(membershipId: string) {
   });
   await sendMail(m.user.email, `Welcome — your ${m.product.name} is active`,
     `Hello ${m.user.name}, your membership is now active. Sign in to your dashboard to explore your benefits.`);
+
+  // Mentoring tiers get a mentor without waiting for staff (manual override:
+  // assignMentorAction). Never let an assignment problem undo an activation.
+  try {
+    await autoAssignMentor(membershipId);
+  } catch (e) {
+    console.error("[mentoring] auto-assign failed", e);
+  }
+}
+
+export type AutoVerifyOutcome = "approved" | "exception" | "skipped";
+
+/**
+ * Automatic organisation verification. Re-runs the LIVE Companies House check
+ * at decision time and approves only a clean match (see evaluateCleanMatch).
+ * Anything else stays PENDING_VERIFICATION for staff with the reason stored
+ * on the membership (autoVerifyReason) and in the audit log.
+ *
+ * Idempotent and race-safe: the membership is claimed by stamping
+ * autoVerifyAt in a conditional update, so it is evaluated at most once no
+ * matter how often the tick sweep runs. Returns "skipped" when switched off,
+ * already evaluated, or no longer pending.
+ */
+export async function autoVerifyOrganisation(membershipId: string): Promise<AutoVerifyOutcome> {
+  if (!(await automationEnabled(AUTOMATION.orgVerify))) return "skipped";
+
+  const now = new Date();
+  const claim = await db.membership.updateMany({
+    where: { id: membershipId, status: "PENDING_VERIFICATION", autoVerifyAt: null, verifiedAt: null },
+    data: { autoVerifyAt: now },
+  });
+  if (claim.count === 0) return "skipped";
+
+  const m = await db.membership.findUniqueOrThrow({
+    where: { id: membershipId }, include: { user: true, product: true },
+  });
+
+  const exception = async (reasons: string[], extra: Record<string, string | boolean | null> = {}) => {
+    const reason = reasons.join("; ");
+    await db.membership.update({
+      where: { id: membershipId },
+      data: { autoVerifyOutcome: "exception", autoVerifyReason: reason },
+    });
+    await audit({
+      actorName: AUTOMATION_ACTOR, action: "verification.auto_exception",
+      entityType: "Membership", entityId: membershipId,
+      after: { member: m.user.name, orgName: m.orgName, orgNumber: m.orgNumber, ...extra },
+      reason: `Left for staff review: ${reason}`,
+    });
+    return "exception" as const;
+  };
+
+  if (m.rejectedReason) return exception(["staff previously requested corrections on this application"]);
+  if (!m.orgNumber || !m.orgName) return exception(["no company name/number supplied"]);
+
+  const check = await checkCompany(m.orgNumber, m.orgName, m.user.name);
+  await db.membership.update({
+    where: { id: membershipId },
+    data: {
+      chStatus: check.status, chOfficialName: check.officialName,
+      chIncorporatedAt: check.incorporatedAt, chNameMatches: check.nameMatches,
+      chCheckedAt: now, chSimulated: check.simulated,
+      chOfficers: check.officers, chDirectorMatch: check.directorMatch,
+    },
+  });
+  const { clean, reasons } = evaluateCleanMatch(check, m.user.name);
+  const evidence = {
+    chStatus: check.status, officialName: check.officialName,
+    nameMatches: check.nameMatches, directorMatch: check.directorMatch, simulated: check.simulated,
+  };
+  if (!clean) return exception(reasons, evidence);
+
+  const reason =
+    `Automatic: Companies House ${m.orgNumber} is active, registered name "${check.officialName}" matches, ` +
+    `and ${m.user.name} is a listed current officer.`;
+  await db.membership.update({
+    where: { id: membershipId },
+    data: {
+      verifiedAt: now, verifiedById: null,
+      autoVerifyOutcome: "approved", autoVerifyReason: reason,
+    },
+  });
+  await audit({
+    actorName: AUTOMATION_ACTOR, action: "verification.auto_approve",
+    entityType: "Membership", entityId: membershipId,
+    after: { member: m.user.name, orgName: m.orgName, orgNumber: m.orgNumber, automatic: true, ...evidence },
+    reason,
+  });
+  await activate(membershipId); // gate now passes → activation + welcome email
+  return "approved";
 }
 
 /** Admin decision on an organisation's uploaded documents (§verification queue).

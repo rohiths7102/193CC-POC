@@ -133,14 +133,27 @@ export async function assignMentorAction(_prev: { error?: string } | undefined, 
   if (!mentor || !["MENTOR", "CONSULTANT"].includes(mentor.role)) {
     return { error: "Pick a Mentor or Consultant account." };
   }
-  await db.mentorAssignment.upsert({
-    where: { mentorId_memberId: { mentorId, memberId } },
-    create: { mentorId, memberId, kind, active: true },
-    update: { kind, active: true },
+  // Manual override of the automatic assignment (src/server/mentoring.ts):
+  // the staff choice replaces any other active mentor of the same kind.
+  const replaced = await db.mentorAssignment.findMany({
+    where: { memberId, kind, active: true, mentorId: { not: mentorId } },
+    include: { mentor: { select: { name: true } } },
   });
+  await db.$transaction([
+    db.mentorAssignment.updateMany({
+      where: { id: { in: replaced.map((r) => r.id) } },
+      data: { active: false },
+    }),
+    db.mentorAssignment.upsert({
+      where: { mentorId_memberId: { mentorId, memberId } },
+      create: { mentorId, memberId, kind, active: true },
+      update: { kind, active: true },
+    }),
+  ]);
   await audit({
     actorId: admin.id, actorName: admin.name, action: "mentoring.assign",
-    entityType: "User", entityId: memberId, after: { mentor: mentor.name, kind },
+    entityType: "User", entityId: memberId,
+    after: { mentor: mentor.name, kind, replaced: replaced.map((r) => r.mentor.name) },
   });
   revalidatePath(`/portal/admin/members/${memberId}`);
   return {};

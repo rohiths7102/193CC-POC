@@ -176,6 +176,17 @@ model Membership {
   chOfficers       Json      @default("[]") // director/officer names on the register
   chDirectorMatch  Boolean? // is the applicant named among those officers?
 
+  // Automatic organisation verification (rule: live Companies House record is
+  // active, name matches, applicant is a listed officer). Set once per
+  // evaluation so the hourly sweep never re-decides the same membership.
+  autoVerifyAt      DateTime? // when the rule evaluated this membership
+  autoVerifyOutcome String? // approved | exception
+  autoVerifyReason  String? // why — shown to staff for exceptions
+
+  // Renewal reminders — stamped when sent so each is sent exactly once.
+  renewalReminder30At DateTime?
+  renewalReminder7At  DateTime?
+
   user          User          @relation(fields: [userId], references: [id])
   product       Product       @relation(fields: [productId], references: [id])
   discount      Discount?     @relation(fields: [discountId], references: [id])

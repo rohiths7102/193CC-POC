@@ -2,13 +2,17 @@ import { NextResponse } from "next/server";
 import { runTick } from "@/server/tick";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// Pro plan: the Companies House sweep can make up to 100 outbound calls.
+export const maxDuration = 300;
 
 /**
  * Housekeeping entrypoint for serverless hosts (Vercel Cron), which cannot
  * run the always-on 60-second interval used on a long-lived server. Does the
  * same work: close passed Summit deadlines, expire waitlist offers, lapse
- * overdue memberships, collect due Direct Debit instalments.
+ * overdue memberships, collect due Direct Debit instalments, auto-verify
+ * clean Companies House matches, send renewal and content-review reminders.
+ * Scheduled hourly (vercel.json); every job is idempotent, so a duplicate
+ * delivery or a manual re-run is harmless.
  *
  * Protected two ways:
  *  - Vercel signs its own cron calls with CRON_SECRET (Authorization header)
@@ -32,8 +36,8 @@ export async function GET(req: Request) {
   }
 
   try {
-    await runTick();
-    return NextResponse.json({ ok: true, ranAt: new Date().toISOString() });
+    const report = await runTick();
+    return NextResponse.json({ ok: true, ranAt: new Date().toISOString(), report });
   } catch (e) {
     console.error("[cron/tick]", e);
     return NextResponse.json(

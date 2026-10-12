@@ -117,18 +117,22 @@ export async function promoteNext(categoryId: string) {
   });
   if (!next) return;
 
+  // Conditional update = claim: if a concurrent run already promoted this
+  // applicant, nothing matches and we stop (no duplicate offer email).
   if (hours <= 0) {
-    await db.slotApplication.update({
-      where: { id: next.id },
+    const claim = await db.slotApplication.updateMany({
+      where: { id: next.id, status: "WAITLISTED" },
       data: { status: "CONFIRMED", waitlistPos: null },
     });
+    if (claim.count === 0) return;
     await sendMail(next.user.email, "A slot opened up — you're confirmed",
       `Good news ${next.user.name}: a ${next.category.kind.replace("_", " ").toLowerCase()} slot became available and your place is now confirmed.`);
   } else {
-    await db.slotApplication.update({
-      where: { id: next.id },
+    const claim = await db.slotApplication.updateMany({
+      where: { id: next.id, status: "WAITLISTED" },
       data: { status: "OFFERED", offerExpiresAt: new Date(Date.now() + hours * 3600 * 1000) },
     });
+    if (claim.count === 0) return;
     await sendMail(next.user.email, `A slot opened up — respond within ${hours} hours`,
       `Good news ${next.user.name}: a slot became available in your category. Accept it from your dashboard within ${hours} hours, after which it passes to the next applicant.`);
   }

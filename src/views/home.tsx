@@ -5,7 +5,6 @@ import { gbp, ukDate } from "@/lib/utils";
 import { entitlementLabel, SLOT_KIND_LABEL } from "@/lib/labels";
 import { appUrl } from "@/lib/app-url";
 import { SiteHeader } from "@/components/site-header";
-import { Globe } from "@/components/globe";
 import { Logo } from "@/components/logo";
 import { Countdown, EventFilm } from "@/components/showcase";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
 import { CountryBand } from "@/components/magazine/country-band";
+import { CountryGlobe } from "@/components/magazine/country-globe";
 
 const LAUNCHED_BRANDS = [
   "Sportto",
@@ -536,8 +536,9 @@ export async function HomeView() {
 
         {/* ─── № 05 REACH ────────────────────────────────────────── */}
         <section className="on-dark overflow-hidden bg-night text-night-copy">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-24 sm:py-32 lg:grid-cols-12">
-            <div className="lg:col-span-5">
+          <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
+            <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7">
               <Reveal>
                 <Chapter n="06" title="Reach" onNight />
               </Reveal>
@@ -545,15 +546,16 @@ export async function HomeView() {
                 className={`mt-8 ${display}`}
                 lines={["One London hub.", <em key="c" className="text-gilt">193 countries.</em>]}
               />
-              <Reveal delay={0.2}>
-                <p className="mt-8 max-w-md text-lg leading-[1.75] text-night-copy/75">
+            </div>
+              <Reveal delay={0.2} className="lg:col-span-5">
+                <p className="max-w-md text-lg leading-[1.75] text-night-copy/75">
                   A collaborative business partner platform — enterprises standing together for international growth,
                   convened from the City of London.
                 </p>
               </Reveal>
             </div>
-            <div className="relative mx-auto aspect-square w-full max-w-xl lg:col-span-7">
-              <Globe className="absolute inset-0 h-full w-full" />
+            <div className="mt-16">
+              <CountryGlobe />
             </div>
           </div>
           <div className="border-t border-night-copy/10 pb-20 pt-10">

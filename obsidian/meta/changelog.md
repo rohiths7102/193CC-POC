@@ -16,6 +16,16 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (late)
+
+**Reach globe rebuilt (`CountryGlobe`).** Real continents as a gold dot-matrix
+and all 193 UN member states as pins (Natural Earth via world-atlas, baked into
+`src/lib/globe-data.ts` by `yarn geo:build` — geo libraries are dev-only).
+Countries ignite outward from London while a counter runs to 193; drag to turn,
+hover for names, "Find your country" turns the globe to it. Old `globe.tsx`
+removed. The 193 is the UN member states the consortium is open to — there is
+no per-member country data to show yet.
+
 ## 2026-10-12 (night)
 
 **Lords palette (ADR-0031).** Site-wide dark maroon / black / gold-leaf scheme

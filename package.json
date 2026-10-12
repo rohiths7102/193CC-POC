@@ -26,7 +26,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "geo:build": "node scripts/build-globe-data.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6",
@@ -53,12 +54,15 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "d3-geo": "3.1.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.3.7",
     "prisma": "^6",
     "tailwindcss": "^4.3.3",
+    "topojson-client": "3.1.0",
     "tsx": "^4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "world-atlas": "2.0.2"
   },
   "engines": {
     "node": ">=20.19.0"

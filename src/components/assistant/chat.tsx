@@ -26,6 +26,13 @@ const SUGGESTIONS = [
   "How do I attend an event at the House of Lords?",
 ];
 
+/** The sources the answer actually cites ([n] or 【n…】), one per page, at most four. */
+function citedSources(text: string, sources: Source[]): Source[] {
+  const cited = new Set([...text.matchAll(/\[(\d+)\]|【(\d+)/g)].map((m) => Number(m[1] ?? m[2])));
+  const pool = cited.size ? sources.filter((s) => cited.has(s.n)) : sources.slice(0, 3);
+  return pool.filter((s, i, all) => all.findIndex((y) => y.url === s.url) === i).slice(0, 4);
+}
+
 /** Light formatting: paragraphs, "- " bullets, **bold**, and [n] citations as links. */
 function Rich({ text: raw, sources }: { text: string; sources?: Source[] }) {
   // Normalise model quirks: hidden reasoning, and 【1†L1-L3】-style citations.
@@ -193,7 +200,7 @@ export function ChatPanel({ onClose, inline = false }: { onClose?: () => void; i
               )}
               {!m.pending && m.sources && m.sources.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {m.sources.filter((s, idx, all) => all.findIndex((y) => y.url === s.url) === idx).slice(0, 4).map((s) =>
+                  {citedSources(m.content, m.sources).map((s) =>
                     s.url ? (
                       <Link key={s.n} href={s.url} className="border border-gilt/25 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-copy-muted hover:border-accent hover:text-copy">
                         {s.n} · {s.title.replace(/ —.*$| \|.*$/, "").slice(0, 34)}

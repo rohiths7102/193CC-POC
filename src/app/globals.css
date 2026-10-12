@@ -1,155 +1,802 @@
-/* `source("../")` limits class detection to `src/` (this file lives in src/app).
-   Without it Tailwind v4 scans the whole repo — including obsidian/ and .claude/,
-   where documented class *patterns* like duration-[var(--duration-*)] parse as
-   real candidates and emit CSS warnings. Docs are not a source of utilities. */
-@import "tailwindcss" source("../");
+@import 'tailwindcss' source("../"); /* scan src/ only — see the starter's note: the vault's docs must not become utilities */
 
-/* ---------------------------------------------------------------------------
-   TIER 1 — PRIMITIVES  (`--raw-*`)
-   Raw literal values. The only tier allowed to contain a hex/px/ms literal.
-   Never referenced in markup, never bound into @theme. Rename freely.
-   Grammar: --raw-<category>-<name>[-<shade>]
-   See obsidian/frontend/design-system.md → "Token naming convention".
-   --------------------------------------------------------------------------- */
-:root {
-  --raw-color-white: #ffffff;
-  --raw-color-neutral-100: #ededed;
-  --raw-color-neutral-900: #171717;
-  --raw-color-neutral-950: #0a0a0a;
+@theme {
+  --color-ink-600: #e3e6ee;
+  --color-ink-700: #edeff4;
+  --color-ink-800: #f4f5f9;
+  --color-ink-900: #ffffff;
+  --color-ink-950: #e9ecf2;
 
-  --raw-radius-sm: 0.5rem;
-  --raw-radius-md: 0.75rem;
+  --color-ivory-50: #1b2238;
+  --color-ivory-100: #2e3852;
+  --color-ivory-200: #4a5470;
+  --color-ivory-300: #6a7286;
 
-  --raw-duration-fast: 150ms;
-  --raw-duration-normal: 250ms;
-}
+  --color-gold-300: #f4776d;
+  --color-gold-400: #ef463b;
+  --color-gold-500: #d6392f;
+  --color-gold-600: #c22626;
+  --color-gold-700: #a01d1d;
 
-/* ---------------------------------------------------------------------------
-   TIER 2 — SEMANTIC  (role names, no namespace prefix)
-   Purpose, not appearance. Always `var(--raw-*)` — never a literal.
-   This is the themeable layer: dark mode overrides happen HERE, which is why
-   these are separate from the @theme bindings below (see the note there).
-   Grammar: --<role>[-<variant>][-<state>]
-   --------------------------------------------------------------------------- */
-:root {
-  --background: var(--raw-color-white);
-  --foreground: var(--raw-color-neutral-900);
+  --color-mist: #6a7286;
+  --color-line: #e4e7ed;
 
-  --duration-fast: var(--raw-duration-fast);
-  --duration-normal: var(--raw-duration-normal);
+  --color-brand: #ef463b;
+  --color-brand-deep: #c22626;
+  --color-brand-soft: #f4776d;
 
-  /* Consent UI (cookie banner + preferences modal) — its own roles so it can be
-     dressed in the project's brand without touching the page theme. Re-point
-     these at the project's tokens when the site gets its palette — see
-     obsidian/frontend/components/common.md → "Brand the consent UI". */
-  --consent-surface: var(--background);
-  --consent-text: var(--foreground);
-  --consent-action: var(--foreground);
-  --consent-action-text: var(--background);
-  --consent-radius: var(--raw-radius-md);
-  --consent-radius-control: var(--raw-radius-sm);
-}
+  --color-navy: #313c59;
+  --color-navy-deep: #232a42;
+  --color-navy-soft: #444f6c;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--raw-color-neutral-950);
-    --foreground: var(--raw-color-neutral-100);
+  --color-amber: #ffae29;
+  --color-amber-deep: #e09415;
+
+  --font-display: var(--font-roboto-condensed), Arial Narrow, sans-serif;
+  --font-sans: var(--font-roboto), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius: 3px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+
+  --shadow-glass:
+    0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-lift: 0 12px 32px rgba(16, 24, 40, 0.1);
+  --shadow-glow: 0 8px 24px rgba(239, 70, 59, 0.28);
+  --shadow-band: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  --spacing-band: 96px;
+  --spacing-band-sm: 56px;
+  --spacing-hero: 228px;
+
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+  --animate-marquee: marquee 48s linear infinite;
+  --animate-shimmer: shimmer 1.8s linear infinite;
+  --animate-pulse-soft: pulseSoft 3s ease-in-out infinite;
+  --animate-slow-pulse: slowPulse 15s ease-in-out infinite alternate;
+
+  @keyframes aurora {
+    0% {
+      transform: translate(-8%, -6%) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate(6%, 4%) rotate(12deg) scale(1.12);
+    }
+    100% {
+      transform: translate(-4%, 8%) rotate(-8deg) scale(1.05);
+    }
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+    100% {
+      background-position: 400px 0;
+    }
+  }
+  @keyframes pulseSoft {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes slowPulse {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.035);
+    }
   }
 }
 
-/* ---------------------------------------------------------------------------
-   THEME BINDINGS — map semantic tokens into Tailwind namespaces.
-   Every entry is exactly `--<tw-namespace>-<role>: var(--<role>)`.
-   `inline` is required: it inlines the var() into each utility, so the
-   dark-mode overrides on the Tier 2 tokens above cascade. Binding a literal
-   here instead would freeze the value and break theming.
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-   Only these namespaces generate utilities (verified against tailwindcss
-   v4.3.3): --color-* --spacing-* --radius-* --leading-* --tracking-* --text-*
-   --font-* --ease-* --breakpoint-* --container-* --shadow-* --blur-* --animate-*
-   NOTE: there is NO --duration-* namespace in v4 — `duration-fast` compiles to
-   nothing. Durations stay Tier 2 only and are used as duration-[var(--duration-fast)].
-   --------------------------------------------------------------------------- */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-consent-surface: var(--consent-surface);
-  --color-consent-text: var(--consent-text);
-  --color-consent-action: var(--consent-action);
-  --color-consent-action-text: var(--consent-action-text);
-  --radius-consent: var(--consent-radius);
-  --radius-consent-control: var(--consent-radius-control);
-  --font-sans: var(--font-onest);
-
-  /* Leading floor for clipped TextEngine reveals — see
-     obsidian/frontend/text-engine.md → "Alignment & line-height". */
-  --leading-display: 1.1;
-
-  --ease-entrance: cubic-bezier(0.2, 0, 0, 1);
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* `safe center`: a page taller than the viewport starts at the top instead of
-     being centred past the scroll origin (a long page — a privacy policy — lost
-     its back link and title above the top edge with plain `center`). One-screen
-     pages and the 404 stay centred. */
-  justify-content: safe center;
-  height: 100vh;
-  width: 100vw;
-}
-
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
 @layer base {
-  /* Adaptive scaling grid — scales the root font-size with the viewport so a
-     rem-based layout stays proportional. Each breakpoint divides FONT_BASE
-     (16px) by the design base width its range was laid out at:
-       font-size: 16 * 100 / baseWidth  (vw)
-     Above 1920px the AdaptiveGrid component takes over (scale-up).
-     Keep in sync with src/components/common/grid/grid.config.ts. */
-  html {
-    font-size: 16px;
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
   }
+}
 
-  @media (max-width: 1920px) {
-    html {
-      font-size: 0.833333vw; /* 16 * 100 / 1920 */
-    }
+@utility hairline {
+  border-color: var(--line);
+  .on-dark & {
+    border-color: rgba(255, 255, 255, 0.14);
   }
+}
 
-  @media (max-width: 1440px) {
-    html {
-      font-size: 1.111111vw; /* 16 * 100 / 1440 */
-    }
-  }
-
-  @media (max-width: 1024px) {
-    html {
-      font-size: 1.5625vw; /* 16 * 100 / 1024 */
-    }
-  }
-
-  @media (max-width: 640px) {
-    html {
-      font-size: 4.444444vw; /* 16 * 100 / 360 */
-    }
+@utility on-dark {
+  & .hairline {
+    border-color: rgba(255, 255, 255, 0.14);
   }
 }
 
 @layer utilities {
+  :root {
+    --brand: #ef463b;
+    --brand-deep: #c22626;
+    --navy: #313c59;
+    --amber: #ffae29;
+    --line: rgba(16, 24, 40, 0.08);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Clears the sticky header so #tiers / #summit jumps do not bury the heading. */
+    scroll-padding-top: 5.5rem;
+    /* Was `dark`, for a #080F1F ground. The ground is now white, and leaving this
+     on dark makes Chrome/Safari paint their own UA surfaces (form controls,
+     scrollbars, autofill) against a dark assumption on a light page. */
+    color-scheme: light;
+    /* Paint the base colour on <html> as WELL as <body> so a throttled mobile
+     browser that drops body's composited background layer still lands on the
+     intended ground rather than the canvas default. */
+    @apply bg-ink-900;
+  }
+
+  body {
+    @apply bg-ink-900 text-ivory-100 antialiased;
+    /* LSI's ground is flat white. These two washes are far below the threshold
+     where they read as gradient — they exist so full-bleed white sections do
+     not band against each other on wide monitors. */
+    background-image:
+      radial-gradient(
+        1100px 700px at 82% -12%,
+        rgba(239, 70, 59, 0.035),
+        transparent 62%
+      ),
+      radial-gradient(
+        900px 600px at -10% 108%,
+        rgba(49, 60, 89, 0.045),
+        transparent 58%
+      );
+  }
+
+  /* Small screens lose the fixed .grain overlay (it costs compositing), so the
+   same texture is folded into the already-painted body background — the grain
+   stays, the extra layer does not. */
+  @media (max-width: 1023px) and (hover: none),
+    (max-width: 1023px) and (pointer: coarse) {
+    body {
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E"),
+        radial-gradient(
+          1100px 700px at 82% -12%,
+          rgba(239, 70, 59, 0.035),
+          transparent 62%
+        ),
+        radial-gradient(
+          900px 600px at -10% 108%,
+          rgba(49, 60, 89, 0.045),
+          transparent 58%
+        );
+      background-size:
+        200px 200px,
+        auto,
+        auto;
+    }
+  }
+
+  /* background-attachment: fixed is desktop-only. On mobile Chrome/Safari it is
+   either ignored or forces a full-page repaint on every scroll frame — a
+   documented cause of both scroll jank and dropped background paints. */
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    body {
+      background-attachment: fixed;
+    }
+  }
+
+  ::selection {
+    background: rgba(239, 70, 59, 0.22);
+    color: #1b2238;
+  }
+
+  /* ── Scrollbar ─────────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(68, 79, 108, 0.22);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 70, 59, 0.45);
+  }
+
+  /* ── Paper grain overlay ────────────────────────────
+   Kept from the previous design but taken down to a whisper. On a dark ground
+   grain reads as film; on white it reads as paper stock, which is the one
+   texture cue that survives the move to a light palette without fighting the
+   flat LSI ground. */
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Card surfaces ───────────────────────────────────────
+   `.glass` keeps its name (31 call sites) but is no longer glass: on a white
+   ground a translucent blur has nothing to separate itself from. LSI's card is
+   an opaque white panel on a hairline border, so that is what these paint.
+   Dropping backdrop-filter here also removes the single biggest compositing
+   cost the old design carried. */
+  /* Cards are OBJECTS, not outlines. Three shadow layers — contact, ambient,
+   and a long soft cast — plus a top-light inset so the edge reads as catching
+   the light. A hairline alone on a white ground was the single biggest reason
+   the tier grid read as blank. */
+  .glass {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+    border: 1px solid rgba(16, 24, 40, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 1px 2px rgba(16, 24, 40, 0.05),
+      0 10px 24px -10px rgba(16, 24, 40, 0.14),
+      0 32px 56px -32px rgba(16, 24, 40, 0.2);
+    transition:
+      box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-strong {
+    background: linear-gradient(180deg, #ffffff 0%, #f9f9fc 100%);
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 2px 4px rgba(16, 24, 40, 0.05),
+      0 16px 32px -12px rgba(16, 24, 40, 0.18),
+      0 48px 80px -40px rgba(16, 24, 40, 0.28);
+  }
+  .glass:hover,
+  .glass-strong:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 2px 4px rgba(16, 24, 40, 0.06),
+      0 20px 40px -14px rgba(16, 24, 40, 0.22),
+      0 64px 96px -48px rgba(16, 24, 40, 0.3);
+  }
+
+  /* Dark bands (navy trust strip, footer) still host cards, and a white panel
+   inside them would glare. This inverts the pair inside any `.on-dark` scope. */
+  .on-dark .glass {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+  }
+  .on-dark .glass-strong {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+  }
+
+  /* ── Landing nav: transparent over the hero, solid once scrolled ──
+      Colour comes from the `.on-dark` scope the component adds while
+      transparent; these only handle the link tint and the settle. */
+  .nav-hero .nav-link {
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .nav-hero .nav-link:hover {
+    color: #ffffff;
+  }
+  .nav-hero.is-scrolled .nav-link {
+    color: #6a7286;
+  }
+  .nav-hero.is-scrolled .nav-link:hover {
+    color: #1b2238;
+  }
+
+  /* ── Section-title accent — LSI's hero move (one word in red) carried down
+      the page as thin ink + BOLD red in one line. Thin alone on white was
+      reading as underweight; the weight contrast is what gives it authority. */
+  .title-accent {
+    font-weight: 700;
+    color: #d6392f;
+  }
+  .on-dark .title-accent {
+    color: #f88e86;
+  }
+  /* Title rule draws left→right once its section reveals. Reveal components
+   set opacity/transform on their wrapper; the rule keys off that wrapper
+   reaching full opacity via a plain CSS transition on scaleX. */
+  .title-rule {
+    transform: scaleX(0);
+    transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+  }
+  [style*='opacity: 1'] .title-rule,
+  .title-rule.is-in {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .title-rule {
+      transform: none;
+    }
+  }
+
+  /* ── Low-power tier — set on <html> for machines with ≤4 cores. The glass
+      rules above no longer use backdrop-filter, so this now only needs to
+      park the ambient loops. The blur clause is kept because Tailwind
+      `backdrop-blur-*` utilities are still used directly by the header. ── */
+  .low-power [class*='backdrop-blur'] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .low-power .aurora {
+    animation: none;
+    will-change: auto;
+  }
+  .low-power .card-flagship::before {
+    animation: none;
+  }
+
+  /* ── Aurora field (hero) ─────────────────────────────────
+   Declared HERE, above the small-screen overrides. It used to live further
+   down the file, which meant the mobile `filter: blur(60px)` override was
+   dead code — same specificity, later rule won — and `will-change:transform`
+   stayed pinned on two large layers even where the animation was parked.
+
+   Opacity is roughly a third of the dark-ground value: a blurred colour field
+   that read as atmospheric over #080F1F reads as a stain over white. */
+  .aurora {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    opacity: 0.17;
+    will-change: transform;
+  }
+
+  /* ── Small touch screens: shed the GPU-expensive layers ────────────────────
+   The max-width guard matters: `(pointer: coarse)` alone also matches an iPad
+   Pro in landscape and Surface devices in tablet mode, which have ample GPU
+   and should keep the full treatment. Written as two comma-separated queries
+   rather than L4 `and ((a) or (b))` for compatibility. */
+  @media (max-width: 1023px) and (hover: none),
+    (max-width: 1023px) and (pointer: coarse) {
+    /* Covers every Tailwind backdrop-blur-* utility (sticky header, mobile
+     drawer, palette overlay). The header is the worst offender despite its
+     size: it re-composites on every scroll frame. */
+    [class*='backdrop-blur'] {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    /* With the blur stripped, the header needs an opaque ground of its own or
+     hero type ghosts straight through it while scrolling. */
+    header[class*='backdrop-blur'],
+    [class*='backdrop-blur'][class*='fixed'] {
+      background-color: rgb(255 255 255 / 0.97);
+    }
+    /* Park the loop and release the compositor layer it was holding. */
+    .aurora {
+      animation: none;
+      filter: blur(60px);
+      will-change: auto;
+    }
+    /* .card-flagship::before's animation is parked in the block at the end of
+     this file, not here — here it would be dead code (see the note below). */
+    /* The fixed grain pseudo-element genuinely costs compositing; the texture is
+     folded into the body background stack above instead — already painted. */
+    .grain::before {
+      display: none;
+    }
+  }
+  /* NOTE: the touch "richness restored" rules for .spotlight/.card-lux/
+   .card-flagship deliberately live AFTER those selectors are declared, near
+   the end of this file. Media queries add no specificity, so keeping them
+   here — above the base rules — made them dead code at equal specificity. */
+
+  /* ── Brand emphasis text + hairlines ─────────────────
+   LSI sets its emphasis word ("SUCCESS" in the hero) in flat #EF463B, not a
+   gradient. The stops here are deliberately close together so this reads as
+   solid red with only the faintest vertical shift — the 26 call sites keep
+   working, without importing a gradient idiom the reference does not use. */
+  .text-gold-grad {
+    background: linear-gradient(120deg, #ef463b 0%, #e03a30 55%, #c22626 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* In @layer utilities so Tailwind generates variants — `md:hairline` was
+   previously a dead class and stat dividers rendered preflight grey. */
 }
 
-@layer components {
+/* ── Shimmer skeleton ───────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, rgba(16,24,40,0.04) 25%, rgba(16,24,40,0.08) 50%, rgba(16,24,40,0.04) 75%);
+  background-size: 800px 100%;
+  @apply animate-shimmer;
 }
 
-/* The consent banner is server-rendered (it paints with the page — it is the
-   phone's LCP element). Hidden before paint for a visitor who already chose
-   (`Cookie/consent-flag.ts`) and on the robot form, which has no visitor to
-   ask. Outside any layer and selector list on purpose. */
-html[data-consent] [data-cookie-banner],
-html:has(meta[name="x-robot-view"]) [data-cookie-banner] {
-  display: none;
+/* ── Focus ring (keyboard reachability) ─────────────── */
+:focus-visible {
+  outline: 2px solid rgba(239, 70, 59, 0.85);
+  outline-offset: 2px;
+}
+
+/* ── Contract document ──────────────────────────────── */
+.contract-doc h2 { @apply font-display text-2xl font-light text-ivory-50 mb-4; }
+.contract-doc p { @apply text-sm leading-6 text-ivory-200 mb-3; }
+.contract-doc em { @apply text-gold-500 not-italic font-medium; }
+
+/* ── Print: contract PDF via browser ────────────────── */
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .no-print { display: none !important; }
+  .contract-doc h2, .contract-doc p, .contract-doc em { color: #111 !important; }
+}
+
+/* ── Lenis smooth scroll ────────────────────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Custom cursor keeps the NATIVE pointer visible — the trailing ring is an
+   accent, not a replacement (form ergonomics + accessibility). */
+
+/* ── Spotlight — pointer-tracked sheen (vars set by <Spotlight/>) ──
+   Inverted for a light ground. A white sheen is invisible on white, so the
+   pointer now carries a soft brand-tinted shade instead of a highlight. */
+.spotlight { position: relative; }
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(239, 70, 59, 0.07),
+    transparent 65%
+  );
+}
+.spotlight:hover::after { opacity: 1; }
+
+/* ── Luxe card border — gradient hairline that ignites on hover ── */
+.card-lux {
+  position: relative;
+  border-radius: 6px;
+}
+.card-lux::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, rgba(239,70,59,0.38), rgba(16,24,40,0.07) 38%, rgba(49,60,89,0.12) 72%, rgba(239,70,59,0.24));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0.5;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.card-lux:hover::before { opacity: 1; }
+
+/* ── Flagship conic ring — slowly revolving brand border ── */
+@property --lux-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes lux-spin { to { --lux-angle: 360deg; } }
+.card-flagship {
+  position: relative;
+  border-radius: 6px;
+}
+.card-flagship::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--lux-angle),
+    rgba(239,70,59,0.95), rgba(239,70,59,0.12) 25%,
+    rgba(194,38,38,0.6) 50%, rgba(239,70,59,0.10) 75%,
+    rgba(239,70,59,0.95)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: lux-spin 7s linear infinite;
+  pointer-events: none;
+}
+/* Touch devices: static ring — no perpetual style/paint loop on battery. */
+@media (hover: none) {
+  .card-flagship::before { animation: none; }
+}
+
+/* ── Richness restored on touch, without hover or GPU cost ──
+   Every card cue above is :hover-only, so a phone saw plain rectangles. These
+   give a fixed light source instead: a static top-left tint on spotlight cards
+   and a permanent gradient edge on the flagship ring.
+
+   These MUST stay below the base rules they override. A media query carries no
+   specificity, so when this block sat higher in the file the base
+   `.spotlight::after { opacity: 0 }` won and phones got no glow at all. */
+@media (max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse) {
+  .spotlight::after {
+    opacity: 0.75;
+    background: radial-gradient(340px circle at 15% 0%, rgba(239, 70, 59, 0.055), transparent 62%);
+  }
+  .card-lux::before { opacity: 0.8; }
+  .card-flagship::before {
+    background: linear-gradient(150deg, rgba(239,70,59,0.8), rgba(239,70,59,0.10) 42%, rgba(49,60,89,0.14) 72%, rgba(194,38,38,0.55));
+    opacity: 1;
+    /* Parks the conic spin. The `@media (hover: none)` backstop above covers
+       only that arm — a touchscreen laptop reporting `pointer: coarse` with
+       `hover: hover` would otherwise keep a perpetual paint loop on battery. */
+    animation: none;
+  }
+}
+
+/* ── Hero scroll cue — a breath of brand cycling down a hairline ── */
+@keyframes marquee-y {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+/* ── Preloader failsafe — if hydration never happens (blocked/failed JS),
+      pure CSS retires the curtain so the SSR page is always reachable.
+      The JS path unmounts the element well before this fires. ── */
+@keyframes preloader-retire {
+  to { opacity: 0; visibility: hidden; }
+}
+.preloader-failsafe { animation: preloader-retire 0.5s ease 4.5s forwards; }
+
+/* ── Intro-gate failsafe — the other half of the pair above ──
+      Everything above the fold is gated on useIntroDone(), and framer
+      serialises the hidden `initial` state into the SSR HTML. If the bundle
+      never runs, that content would stay invisible even after the curtain
+      retires. This reveals it in pure CSS.
+
+      INVARIANT: this delay must stay LATER than .preloader-failsafe's, or the
+      curtain lifts onto a hero that is still hidden — a shorter version of the
+      very bug it exists to prevent. Tune the two together, never one alone.
+      React drops the class as soon as the gate opens, so on a healthy page this
+      animation never fires. */
+@keyframes intro-failsafe {
+  to { opacity: 1; transform: none; }
+}
+.intro-gate { animation: intro-failsafe 0.4s ease 4.8s forwards; }
+
+/* ── Shine sweep — light passes across on hover ──
+   On a dark ground this was a pale streak. On white the same effect has to be
+   a shadow rather than a highlight, or it is invisible. */
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -80%;
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: translateX(-180%) skewX(-18deg);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  will-change: transform;
+}
+.shine:hover::after { transform: translateX(420%) skewX(-18deg); }
+
+/* ── Marquee: pause on hover ── */
+.marquee-pause:hover .animate-marquee { animation-play-state: paused; }
+
+/* ── Giant outline wordmark (footer destination) ── */
+.text-outline-gold {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(239, 70, 59, 0.28);
+}
+.on-dark .text-outline-gold {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CRAFT LAYER — the techniques transposed from the CØFF reference, rebuilt in
+   this site's own tokens. None of these are LSI's; all of them are what turns
+   LSI's flat theme into something LSI would ring up about.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Matte noise — a whisper of grain on dark bands so a #232A42 slab reads as
+      material, not a fill. 0.03 is the reference value; it is invisible as
+      texture and visible as depth. Pseudo-element so it composites once and
+      never touches the band's own paint. ── */
+.matte-noise { position: relative; isolation: isolate; }
+.matte-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.03;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  mix-blend-mode: overlay;
+}
+
+/* ── Capped sections — the 44 → 56 → 80px top-radius stepping that makes the
+      page read as stacked cards rising out of one another instead of striped
+      bands. `overflow: clip` keeps children (images, glows) inside the curve
+      without creating a scrollport. Negative top margin lets each cap tuck
+      under the band above so the curve is drawn against that band's colour. */
+.cap-section {
+  position: relative;
+  border-top-left-radius: 44px;
+  border-top-right-radius: 44px;
+  overflow: clip;
+  margin-top: -44px;
+  padding-top: 44px;
+}
+@media (min-width: 640px) {
+  .cap-section { border-top-left-radius: 56px; border-top-right-radius: 56px; }
+}
+@media (min-width: 1024px) {
+  .cap-section {
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+    margin-top: -80px;
+    padding-top: 80px;
+  }
+}
+/* First capped section under the hero: the hero is one long scrim, so the tuck
+   is a straight overlap and needs no compensation. Explicit class rather than
+   :first-of-type — the footer is the only <footer> in its wrapper and was
+   matching first-of-type, which zeroed its tuck and left a flat seam above
+   it. */
+.cap-section.cap-first { margin-top: 0; } /* keeps its padding-top: the cap zone IS the top pad */
+
+/* Slow breath on hero/story media. Lives here rather than in the Tailwind
+   keyframes config so it survives dev-server config-reload gaps and any
+   future purge that stops seeing the utility. */
+@keyframes slow-pulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.035); }
+}
+.animate-slow-pulse { animation: slow-pulse 15s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-slow-pulse { animation: none; }
+}
+
+/* ── Curved media mask — the 180px top-right sweep on the flagship card image.
+      Below lg the card stacks and the curve would fight the container's own
+      radius, so it only draws from lg upward, exactly as the reference does. */
+.curve-media { overflow: hidden; }
+@media (min-width: 1024px) {
+  .curve-media { border-top-right-radius: 180px; }
+}
+
+/* ── Gradient-inset border — the reference's replacement for CSS borders on
+      dark cards. A CSS border sits OUTSIDE the paint and reads as a stroke; an
+      inset box-shadow sits on the paint and reads as an edge catching light. */
+.gradient-border-inset {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 24px 64px -24px rgba(16, 24, 40, 0.45);
+}
+.on-light .gradient-border-inset,
+.gradient-border-inset.is-light {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(16, 24, 40, 0.06),
+    0 24px 64px -28px rgba(16, 24, 40, 0.18);
+}
+
+/* ── Kicker — mono micro-label with a hairline lead. Reads as an instrument
+      plate, which is the register that separates crafted from themed. */
+.kicker {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d6392f;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.kicker::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+.on-dark .kicker { color: #f88e86; } /* 4.79:1 on #313C59, 6.21 on #232A42 */
+
+/* ── Clip reveal — bottom-to-top wipe for the flagship card. Driven by
+      framer's whileInView so it only fires once and respects reduced motion;
+      declared here so the initial clipped state exists in SSR HTML and the
+      card never flashes unclipped before hydration. ── */
+.clip-reveal { clip-path: inset(100% 0 0 0); }
+.clip-reveal.is-in { clip-path: inset(0 0 0 0); transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .clip-reveal { clip-path: none; }
+}
+
+/* ── LSI band scopes ─────────────────────────────────
+   The reference alternates white bands with two full-bleed colour bands. Both
+   invert the type stack wholesale, so they are scopes rather than one-off
+   utility stacks — any component dropped inside inherits correct contrast. */
+.band-navy {
+  background: var(--navy);
+  color: #ffffff;
+}
+/* LSI sets white type on this amber, which measures ~1.9:1 and fails WCAG AA.
+   Same band, navy type — ~8.6:1 and actually readable. */
+.band-amber {
+  /* Two soft radials over the flat amber: a highlight top-left, a deeper
+     red-amber shadow bottom-right. A single flat orange read as a poster. */
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, 0.22), transparent 55%),
+    radial-gradient(90% 80% at 100% 100%, rgba(194, 38, 38, 0.20), transparent 60%),
+    var(--amber);
+  color: #1b2238;
+}
+.on-dark h1, .on-dark h2, .on-dark h3, .on-dark h4, .on-dark h5, .on-dark h6 { color: #ffffff; }
+.on-dark .text-mist, .on-dark .text-ivory-300 { color: rgba(255, 255, 255, 0.72); }
+.on-dark .text-ivory-200 { color: rgba(255, 255, 255, 0.82); }
+.on-dark .text-ivory-100, .on-dark .text-ivory-50 { color: #ffffff; }
+/* A light plate INSIDE a dark scope (the flagship card's cream action bar)
+   opts back out: its ink stack returns to the light-ground values. Declared
+   after the .on-dark rules so it wins at equal specificity. */
+.on-dark .on-light, .on-dark .on-light h1, .on-dark .on-light h2, .on-dark .on-light h3 { color: #1b2238; }
+.on-dark .on-light .text-ivory-50 { color: #1b2238; }
+.on-dark .on-light .text-ivory-100 { color: #2e3852; }
+.on-dark .on-light .text-ivory-200 { color: #4a5470; }
+.on-dark .on-light .text-ivory-300, .on-dark .on-light .text-mist { color: #6a7286; }
+.on-dark .on-light .text-gold-500 { color: #d6392f; }
+.on-dark .on-light .kicker { color: #d6392f; }
+/* The AA-tuned reds are tuned for WHITE grounds — on navy they fall to ~3:1
+   (measured: #D6392F on #232A42 = 3.03). The soft coral step is the accent
+   that clears 4.5 on dark, so accent text swaps to it inside the scope. */
+.on-dark .text-gold-500, .on-dark .text-gold-600 { color: #f88e86; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Lenis is skipped for these users, which means the UA's own smooth scroll is
+     what runs — so an in-page anchor animated the viewport through six screens
+     of content, exactly the vestibular trigger the OS setting exists to stop. */
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    /* Without this the two failsafes above still sat on multi-second delays for
+       users who asked for no motion. Zeroing it makes both fire at once, which
+       is the intended fast path: no curtain, hero visible immediately. */
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

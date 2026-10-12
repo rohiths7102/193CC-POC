@@ -1,6 +1,27 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // ── From the 193 Countries Consortium platform ──
+  // Self-contained server for the production Docker image (railway/render).
+  output: "standalone",
+  // Verification documents and pitch decks are uploaded through Server Actions.
+  experimental: {
+    serverActions: { bodySizeLimit: "12mb" },
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
+
   // Drop the `X-Powered-By: Next.js` response header.
   poweredByHeader: false,
 

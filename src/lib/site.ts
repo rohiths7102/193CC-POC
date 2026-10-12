@@ -31,16 +31,17 @@ const vercelProduction = serverEnv.VERCEL_PROJECT_PRODUCTION_URL;
 
 export const siteConfig = {
   /** The brand, exactly as the logo writes it. */
-  name: `${TODO} Brand name`,
+  name: "193 Countries Consortium",
   /**
    * The home page's `<title>`: the brand + what it is, ≤ 60 characters
    * ("Acme — Industrial design studio"). Sub-pages use `%s · <name>`.
    */
-  title: `${TODO} Brand — what it is`,
+  title: "193 Countries Consortium — UK Business Membership",
   /** 120–160 characters, from the site's own copy (the hero's lead line). */
-  description: `${TODO} One or two sentences from the site's own copy, 120–160 characters.`,
+  description:
+    "Business membership body for enterprises from 193 countries. Events at the House of Lords, the UK Investors Summit, mentoring and investor access.",
   /** 5–8 phrases from the copy. */
-  keywords: [] as string[],
+  keywords: ["UK business membership", "House of Lords events", "UK Investors Summit", "enterprise mentoring", "investor access", "EIS readiness"] as string[],
   /**
    * Public origin, no trailing slash. Drives canonical URLs, OG tags, the
    * sitemap, robots.txt and JSON-LD. `NEXT_PUBLIC_SITE_URL` (set it for a
@@ -53,21 +54,21 @@ export const siteConfig = {
       ? `https://${vercelProduction}`
       : "http://localhost:3000"),
   /** Default Open Graph / Twitter share image (path under `public/`), 1200×630. */
-  ogImage: "/open-graph.png",
+  ogImage: "/opengraph-image",
   /** Describes the share image for screen readers and when it fails to load. */
-  ogImageAlt: `${TODO} What the share image shows`,
+  ogImageAlt: "193 Countries Consortium — UK business membership · House of Lords events · UK Investors Summit",
   /**
    * The site's real X/Twitter handle (`"@acme"`), or `undefined` — the
    * generator then omits the tags. Never invent one: it tags a stranger.
    */
   twitterHandle: undefined as string | undefined,
   /** Author / creator / publisher — the brand, not the agency. */
-  author: `${TODO} Brand name`,
+  author: "193 Countries Consortium",
   /** Browser theme-color (address bar / PWA) — the brand's ground. */
-  themeColor: "#000000",
+  themeColor: "#FFFFFF",
   /** The manifest and the PWA splash background. */
-  backgroundColor: "#000000",
-  locale: "en_US",
+  backgroundColor: "#FFFFFF",
+  locale: "en_GB",
 };
 
 /** The fields still holding a `TODO:` placeholder. */

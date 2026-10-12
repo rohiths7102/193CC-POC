@@ -16,6 +16,15 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (later)
+
+**Editorial homepage + admin automation.** `/` rebuilt to ADR-0030 (cover,
+figures strip, four chapters, membership index, colophon). Admin steps a rule
+can decide are now automatic with off-switches (`automation.*` Settings):
+Companies House clean-match activation, mentor assignment, renewal reminders,
+content-review digests; hourly cron. Summit slot confirmation and editorial
+approval stay manual by design. `vercel.json` restored (missing since the port).
+
 ## 2026-10-12
 
 **This repo is now the 193 Countries Consortium platform.** The whole

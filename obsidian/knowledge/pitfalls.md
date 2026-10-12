@@ -312,3 +312,14 @@ did work are in [[fix-catalog]]; how to add to either: [[knowledge/README]].
 ## Related
 
 [[fix-catalog]] · [[knowledge/README]] · [[testing-pipeline]] · [[mobile-device-qa]]
+
+
+## Self-observed reveals never fire on clipped elements (framer-motion `whileInView`)
+
+**Evidence (2026-10-12, this project):** a headline line starting at `y: 105%` inside
+an `overflow-hidden` mask, and a photo starting at `clip-path: inset(100%)`,
+both stayed hidden indefinitely — the photo had loaded (576×767) and sat in view
+for 3 s with the clip unchanged. Chrome's IntersectionObserver counts the
+target's own clip, so a fully clipped target is 0% visible and can never trigger
+itself. **Rule:** observe an unclipped wrapper and drive the clipped child
+through variants (`MaskedLines`, `ImageReveal` in `components/magazine/motion.tsx`).

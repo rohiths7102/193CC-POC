@@ -17,6 +17,31 @@ Template: [[templates/adr-note]].
 
 ---
 
+## ADR-0030 — The editorial redesign
+
+**Status:** Accepted · first page shipped: `/` (`src/views/home.tsx`)
+
+**Decision.** The site is redesigned as an editorial magazine: Instrument Serif
+(one weight — drama from size and italic) for headlines, Geist for reading,
+JetBrains Mono for chapter marks and captions; a paper / night palette with an
+oxblood accent. Pages read as an issue: cover, numbered chapters (№ 01…),
+figures labelled "Fig. n", captions on every photograph, a colophon.
+
+**Content rules.** Every number on a public page is either already published by
+193 CC or read live from the database — demo/past data is never shown as fact.
+Photography is 193 CC's own material or licensed images of *places*; no stock
+person stands in for a member (`public/images/CREDITS.md`).
+
+**Tokens.** Three-tier per ADR-0015, named so they do not collide with the ported
+`ink/ivory/gold` scales (`paper`, `copy`, `night`, `accent`…). The ported
+scales retire page by page as each page is converted.
+
+**Motion.** `src/components/magazine/motion.tsx` (framer-motion, ADR-0028).
+Any reveal whose element starts clipped (overflow mask or clip-path) must be
+observed from an unclipped wrapper — see [[pitfalls]].
+
+---
+
 ## ADR-0029 — Port the platform at parity first, conform it second
 
 **Status:** Accepted

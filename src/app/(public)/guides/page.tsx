@@ -69,7 +69,7 @@ export default function GuidesHub() {
                     src={g.image}
                     alt={g.alt}
                     sizes="(min-width: 768px) 30vw, 100vw"
-                    className="aspect-[4/5] w-full"
+                    className="aspect-[16/10] w-full md:aspect-[4/5]"
                     imageClassName="transition-transform duration-1000 ease-editorial group-hover:scale-105"
                   />
                   <Reveal delay={0.1 * i}>

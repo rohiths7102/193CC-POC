@@ -239,7 +239,7 @@ export async function HomeView() {
               src="/images/leadenhall-building-warm.jpg"
               alt="The Leadenhall Building, seen from street level"
               sizes="(min-width: 1024px) 40vw, 100vw"
-              className="aspect-[3/4] w-full"
+              className="aspect-[16/10] w-full lg:aspect-[3/4]"
             />
             <figcaption className="mt-4 flex justify-between gap-4 border-t border-hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
               <span>Level 30, The Leadenhall Building</span>

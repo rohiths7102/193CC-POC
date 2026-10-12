@@ -59,7 +59,7 @@ export default async function JoinIndex() {
       </div>
       <aside className="lg:col-span-5">
         <figure className="lg:sticky lg:top-28">
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-night">
+          <div className="relative aspect-[16/10] w-full overflow-hidden bg-night lg:aspect-[4/5]">
             <EventFilm
               src="/videos/193cc-brand-launch-sportto.mp4"
               poster="/videos/193cc-brand-launch-sportto-poster.jpg"

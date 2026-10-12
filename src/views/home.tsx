@@ -29,7 +29,6 @@ import {
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
 import { CountryBand } from "@/components/magazine/country-band";
 import { CountryGlobe } from "@/components/magazine/country-globe";
-import { LivingBackground } from "@/components/magazine/living-background";
 import { ChapterRail } from "@/components/magazine/chapter-rail";
 
 const LAUNCHED_BRANDS = [
@@ -105,7 +104,6 @@ export async function HomeView() {
   return (
     <MagazineMotion>
       <main className="relative isolate overflow-x-clip font-body text-copy">
-        <LivingBackground />
         <ChapterRail
           chapters={[
             { id: "consortium", n: "01", title: "The Consortium" },

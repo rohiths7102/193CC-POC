@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function Holding() {
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center bg-navy-deep px-6 text-center">
+    <main className="flex min-h-svh flex-col items-center justify-center px-6 text-center">
       <Roundel size={76} />
       <h1 className="mt-8 font-display text-[26px] font-thin uppercase tracking-[0.08em] text-white sm:text-[34px]">
         193 Countries Consortium

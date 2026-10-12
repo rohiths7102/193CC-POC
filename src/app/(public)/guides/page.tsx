@@ -41,7 +41,7 @@ const GUIDES = [
 export default function GuidesHub() {
   return (
     <MagazineMotion>
-      <div className="flex min-h-svh flex-col bg-paper font-body text-copy">
+      <div className="flex min-h-svh flex-col font-body text-copy">
         <SiteHeader />
         <ReadingRule />
         <main className="relative isolate mx-auto w-full max-w-7xl flex-1 px-6 pb-24 pt-16 sm:pt-24">

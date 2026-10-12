@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Roboto, Roboto_Condensed, JetBrains_Mono, Instrument_Serif, Geist } from "next/font/google";
 import { appUrl } from "@/lib/app-url";
 import "./globals.css";
+import { LivingBackground } from "@/components/magazine/living-background";
 
 // LSI's two families carry the identity. Roboto Condensed needs the full
 // 100–700 span: 700 for the uppercase hero, and the hairline 100 that its
@@ -67,7 +68,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${display.variable} ${sans.variable} ${mono.variable} ${headline.variable} ${body.variable}`}>
-      <body className="grain font-sans min-h-svh">{children}</body>
+      <body className="grain font-sans min-h-svh">
+        {/* One living background for every page (ADR-0031) — pages keep their
+            own grounds transparent so it shows through. */}
+        <LivingBackground />
+        {children}
+      </body>
     </html>
   );
 }

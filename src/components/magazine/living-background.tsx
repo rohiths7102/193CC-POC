@@ -14,7 +14,8 @@
  *  - Fine diagonal hatching (CSS) for texture.
  *
  * Canvas 2D at 30fps, paused while the tab is hidden; one static frame under
- * reduced motion. Sits at -z-10 behind transparent sections.
+ * reduced motion. Mounted once in the root layout at -z-10, behind every
+ * page's transparent grounds; hidden in print.
  */
 
 import { useEffect, useRef } from "react";
@@ -152,7 +153,7 @@ export function LivingBackground() {
   }, []);
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 print:hidden">
       <div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgba(214,180,124,0.035)_0_1px,transparent_1px_14px)]" />
       <canvas ref={ref} className="absolute inset-0 h-full w-full" />
     </div>

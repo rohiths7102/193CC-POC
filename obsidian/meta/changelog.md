@@ -16,6 +16,13 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (living background, site-wide)
+
+`LivingBackground` moved to the root layout — every public page, the portal, the
+holding page and error/404 pages share one instance (it keeps running through
+route transitions; hidden in print). Opaque page grounds removed from GuideShell,
+/guides and /holding; the /login photo drops to -z-20 so the motion plays over it.
+
 ## 2026-10-12 (living background)
 
 **Always-on motion, from screen-recorded references** (Aura: Nexara, Kairo, Sequra).

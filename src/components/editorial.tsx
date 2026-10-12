@@ -29,7 +29,7 @@ export function GuideShell({
 }) {
   return (
     <MagazineMotion>
-    <div className="flex min-h-svh flex-col bg-paper">
+    <div className="flex min-h-svh flex-col">
       <SiteHeader />
       <ReadingRule />
       {hero && (

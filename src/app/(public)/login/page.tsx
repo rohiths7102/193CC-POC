@@ -13,7 +13,7 @@ export default function LoginPage() {
   return (
     <main className="relative mx-auto flex min-h-svh max-w-md flex-col justify-center px-5 py-8 sm:px-6 sm:py-16">
       {/* The Palace at dusk behind the door, dimmed into the Lords palette. */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20">
         <Image src="/images/westminster-dusk.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-night/70 via-paper/70 to-night/95" />
         <div className="absolute inset-0 bg-[radial-gradient(60%_45%_at_50%_45%,var(--chamber)_0%,transparent_70%)] opacity-40" />

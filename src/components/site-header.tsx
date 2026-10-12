@@ -42,7 +42,7 @@ export function SiteHeader() {
             {/* min-h-11 + flex, not block: on a tablet the hamburger is gone
                 (sm:hidden) so these are the whole navigation, and a bare
                 text-sm link is only a ~20px-tall tap target. */}
-            <Link href="#tiers" className="nav-link hidden min-h-11 items-center text-sm transition-colors sm:flex">Memberships</Link>
+            <Link href="/#tiers" className="nav-link hidden min-h-11 items-center text-sm transition-colors sm:flex">Memberships</Link>
             <Link href="/summit" className="nav-link hidden min-h-11 items-center text-sm transition-colors sm:flex">Summit</Link>
             <Link href="/guides" className="nav-link hidden min-h-11 items-center text-sm transition-colors md:flex">Guides</Link>
             <Link href="/login" className="nav-link hidden min-h-11 items-center text-sm transition-colors sm:flex">Member sign in</Link>

@@ -55,12 +55,12 @@ const btnBase =
   "inline-flex items-center justify-center gap-2 rounded font-semibold tracking-[1.2px] transition-all duration-300 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none";
 const btnStyles = {
   gold: "bg-gold-500 text-white hover:bg-gold-600 hover:shadow-glow",
-  ghost: "border border-line bg-white text-ivory-100 hover:border-gold-500 hover:text-gold-500",
+  ghost: "border border-line bg-ink-800 text-ivory-100 hover:border-gold-500 hover:text-gold-500",
   dark: "bg-navy text-white hover:bg-navy-deep",
   // Now that the brand colour IS red, a filled red destructive button would
   // read as the primary action. Destructive stays outline-only so the two
   // never blur together.
-  danger: "border border-gold-600/45 bg-white text-gold-600 hover:bg-gold-600 hover:text-white",
+  danger: "border border-gold-600/45 bg-ink-800 text-gold-600 hover:bg-gold-600 hover:text-white",
 } as const;
 // Touch-target floors (WCAG 2.5.5 / Apple HIG = 44px). Previously sm rendered
 // at 28px and md at 41px, both under the minimum on a phone; min-h-* raises
@@ -100,11 +100,11 @@ export function LinkButton({
 // 600/700 step of its own hue to hold contrast against it.
 const badgeTones: Record<string, string> = {
   gold: "bg-gold-500/10 text-gold-600 border-gold-500/25",
-  green: "bg-emerald-500/10 text-emerald-700 border-emerald-500/25",
-  blue: "bg-sky-500/10 text-sky-700 border-sky-500/25",
-  red: "bg-red-500/10 text-red-700 border-red-500/25",
-  grey: "bg-slate-500/10 text-slate-600 border-slate-500/25",
-  purple: "bg-violet-500/10 text-violet-700 border-violet-500/25",
+  green: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+  blue: "bg-sky-500/15 text-sky-300 border-sky-400/30",
+  red: "bg-red-500/15 text-red-300 border-red-400/30",
+  grey: "bg-stone-500/15 text-stone-300 border-stone-400/30",
+  purple: "bg-violet-500/15 text-violet-300 border-violet-400/30",
 };
 
 export function Badge({ children, tone = "gold", className }: { children: ReactNode; tone?: keyof typeof badgeTones; className?: string }) {
@@ -138,7 +138,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
 // layout sideways mid-form. Drops to text-sm from lg: upward, so desktop
 // density is unchanged. min-h-11 gives a 44px touch target.
 export const inputCls =
-  "w-full min-h-11 rounded border border-line bg-white px-4 py-3 text-base lg:py-2.5 lg:text-sm text-ivory-100 placeholder:text-mist focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500/80 transition-colors";
+  "w-full min-h-11 rounded border border-line bg-ink-800 px-4 py-3 text-base lg:py-2.5 lg:text-sm text-ivory-100 placeholder:text-mist focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500/80 transition-colors";
 
 export function Stat({ label, value, accent }: { label: string; value: ReactNode; accent?: boolean }) {
   return (

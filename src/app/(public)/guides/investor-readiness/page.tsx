@@ -11,6 +11,7 @@ export default function InvestorReadinessGuide() {
   return (
     <GuideShell
       kicker="Investment · Roadmap"
+      hero={{ src: "/images/summit-2023-roundtable.jpg", alt: "Founders and investors in discussion at a Summit table", caption: "Investor tables · UK Investors Summit 2023" }}
       title={<>The investor-readiness roadmap: <span className="text-gold-grad">SEIS/EIS to first cheque</span></>}
       dek="Most companies don't fail to raise because the business is bad — they fail because they arrive in the room unprepared. This is the roadmap we work through with enterprise members, with the SEIS/EIS numbers current for the 2026–27 tax year."
       updated="July 2026 · figures per gov.uk guidance for the 2026–27 tax year"

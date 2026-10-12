@@ -81,7 +81,7 @@ export function MobileNav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-70 bg-white sm:hidden"
+            className="fixed inset-0 z-70 bg-ink-900 sm:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

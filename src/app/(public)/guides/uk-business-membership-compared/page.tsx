@@ -52,6 +52,7 @@ export default function MembershipComparedGuide() {
   return (
     <GuideShell
       kicker="Membership · Honest comparison"
+      hero={{ src: "/images/summit-2023-reception.jpg", alt: "Guests in conversation in a committee room at the House of Lords", caption: "UK Investors Summit 2023 · House of Lords" }}
       title={<>FSB vs IoD vs Chambers vs private clubs — <span className="text-gold-grad">compared plainly</span></>}
       dek="The organisations in this comparison do different jobs, and the right answer is often more than one of them. Here is what each actually costs and includes — our own tiers held to the same standard."
       updated="Prices as checked on official sites, 31 July 2026 — always confirm current pricing before joining anything"

@@ -4,7 +4,7 @@ import { GlassCard } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import { LoginForm } from "@/components/forms";
 import { Logo } from "@/components/logo";
-import { NetworkCanvas } from "@/components/showcase";
+import Image from "next/image";
 
 // A members-only door has no search value — keep it out of the index.
 export const metadata = { title: "Member Sign In", robots: { index: false, follow: true } };
@@ -12,11 +12,11 @@ export const metadata = { title: "Member Sign In", robots: { index: false, follo
 export default function LoginPage() {
   return (
     <main className="relative mx-auto flex min-h-svh max-w-md flex-col justify-center px-5 py-8 sm:px-6 sm:py-16">
-      {/* Living constellation — the network-globe motif, drifting behind the door */}
-      <NetworkCanvas className="pointer-events-none fixed inset-0 -z-10 h-full w-full opacity-60" />
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="aurora animate-aurora left-[10%] top-[10%] h-80 w-80 bg-ink-600" />
-        <div className="aurora animate-aurora right-[-10%] bottom-[15%] h-72 w-72 bg-gold-700/50 [animation-delay:-8s]" />
+      {/* The Palace at dusk behind the door, dimmed into the Lords palette. */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
+        <Image src="/images/westminster-dusk.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-linear-to-b from-night/70 via-paper/70 to-night/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(60%_45%_at_50%_45%,var(--chamber)_0%,transparent_70%)] opacity-40" />
       </div>
       {/* /login renders no PublicHeader, so this is the page's only exit. */}
       <Link href="/" className="relative z-10 mb-8 inline-flex min-h-11 items-center gap-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
@@ -29,7 +29,7 @@ export default function LoginPage() {
         <div className="card-flagship relative z-10 rounded-2xl">
           <GlassCard strong className="p-6 sm:p-8">
             <div className="mb-6 text-center">
-              <h1 className="font-display text-2xl text-ivory-50">Member sign in</h1>
+              <h1 className="font-headline text-4xl text-ivory-50">Member <em className="text-gilt">sign in</em></h1>
               <p className="mt-1.5 text-xs leading-5 text-mist">One door for members, admins, sales, mentors, investors and consultants.</p>
             </div>
             <LoginForm />

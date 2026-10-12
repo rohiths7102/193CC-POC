@@ -1,16 +1,18 @@
 @import 'tailwindcss' source("../"); /* scan src/ only — see the starter's note: the vault's docs must not become utilities */
 
 @theme {
-  --color-ink-600: #e3e6ee;
-  --color-ink-700: #edeff4;
-  --color-ink-800: #f4f5f9;
-  --color-ink-900: #ffffff;
-  --color-ink-950: #e9ecf2;
+  /* Lords palette (ADR-0031). The legacy scale was named for a dark theme and
+     inverted to light; it is dark again — ink = surfaces, ivory = type. */
+  --color-ink-600: #3a0e14;
+  --color-ink-700: #2e0b10;
+  --color-ink-800: #26090d;
+  --color-ink-900: #1a0709;
+  --color-ink-950: #140a0b;
 
-  --color-ivory-50: #1b2238;
-  --color-ivory-100: #2e3852;
-  --color-ivory-200: #4a5470;
-  --color-ivory-300: #6a7286;
+  --color-ivory-50: #f6eee1;
+  --color-ivory-100: #ece1cf;
+  --color-ivory-200: #d4c6b0;
+  --color-ivory-300: #a8977f;
 
   --color-gold-300: #c9555c;
   --color-gold-400: #b0242c;
@@ -18,16 +20,16 @@
   --color-gold-600: #8e1a22;
   --color-gold-700: #6e141b;
 
-  --color-mist: #6a7286;
-  --color-line: #e4e7ed;
+  --color-mist: #a8977f;
+  --color-line: #3a0e14;
 
   --color-brand: #b0242c;
   --color-brand-deep: #8e1a22;
   --color-brand-soft: #c9555c;
 
-  --color-navy: #313c59;
-  --color-navy-deep: #232a42;
-  --color-navy-soft: #444f6c;
+  --color-navy: #3a0e14;
+  --color-navy-deep: #140a0b;
+  --color-navy-soft: #5a141c;
 
   --color-amber: #d6b47c;
   --color-amber-deep: #a97b45;
@@ -46,7 +48,7 @@
 
   --shadow-glass:
     0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-lift: 0 12px 32px rgba(16, 24, 40, 0.1);
+  --shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.45);
   --shadow-glow: 0 8px 24px rgba(239, 70, 59, 0.28);
   --shadow-band: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
@@ -141,9 +143,9 @@
   :root {
     --brand: #b0242c;
     --brand-deep: #8e1a22;
-    --navy: #313c59;
+    --navy: #3a0e14;
     --amber: #d6b47c;
-    --line: rgba(16, 24, 40, 0.08);
+    --line: rgba(214, 180, 124, 0.16);
   }
 
   html {
@@ -153,7 +155,7 @@
     /* Was `dark`, for a #080F1F ground. The ground is now white, and leaving this
      on dark makes Chrome/Safari paint their own UA surfaces (form controls,
      scrollbars, autofill) against a dark assumption on a light page. */
-    color-scheme: light;
+    color-scheme: dark;
     /* Paint the base colour on <html> as WELL as <body> so a throttled mobile
      browser that drops body's composited background layer still lands on the
      intended ground rather than the canvas default. */
@@ -168,7 +170,7 @@
     background-image:
       radial-gradient(
         1100px 700px at 82% -12%,
-        rgba(239, 70, 59, 0.035),
+        rgba(176, 36, 44, 0.16),
         transparent 62%
       ),
       radial-gradient(
@@ -213,8 +215,8 @@
   }
 
   ::selection {
-    background: rgba(239, 70, 59, 0.22);
-    color: #1b2238;
+    background: rgba(214, 180, 124, 0.35);
+    color: #f6eee1;
   }
 
   /* ── Scrollbar ─────────────────────────────────────── */
@@ -258,34 +260,37 @@
    and a long soft cast — plus a top-light inset so the edge reads as catching
    the light. A hairline alone on a white ground was the single biggest reason
    the tier grid read as blank. */
+  /* Lords palette (ADR-0031): a lacquered maroon panel whose top edge catches
+     gold, like a gilt-edged board. */
   .glass {
-    background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
-    border: 1px solid rgba(16, 24, 40, 0.06);
+    background: linear-gradient(180deg, #2a0b10 0%, #1f080c 100%);
+    border: 1px solid rgba(214, 180, 124, 0.14);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      0 1px 2px rgba(16, 24, 40, 0.05),
-      0 10px 24px -10px rgba(16, 24, 40, 0.14),
-      0 32px 56px -32px rgba(16, 24, 40, 0.2);
+      inset 0 1px 0 rgba(240, 216, 168, 0.1),
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 10px 24px -10px rgba(0, 0, 0, 0.5),
+      0 32px 56px -32px rgba(0, 0, 0, 0.6);
     transition:
       box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .glass-strong {
-    background: linear-gradient(180deg, #ffffff 0%, #f9f9fc 100%);
-    border: 1px solid rgba(16, 24, 40, 0.08);
+    background: linear-gradient(180deg, #331018 0%, #22090d 100%);
+    border: 1px solid rgba(214, 180, 124, 0.22);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      0 2px 4px rgba(16, 24, 40, 0.05),
-      0 16px 32px -12px rgba(16, 24, 40, 0.18),
-      0 48px 80px -40px rgba(16, 24, 40, 0.28);
+      inset 0 1px 0 rgba(240, 216, 168, 0.14),
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 16px 32px -12px rgba(0, 0, 0, 0.55),
+      0 48px 80px -40px rgba(0, 0, 0, 0.65);
   }
   .glass:hover,
   .glass-strong:hover {
+    border-color: rgba(214, 180, 124, 0.38);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      0 2px 4px rgba(16, 24, 40, 0.06),
-      0 20px 40px -14px rgba(16, 24, 40, 0.22),
-      0 64px 96px -48px rgba(16, 24, 40, 0.3);
+      inset 0 1px 0 rgba(240, 216, 168, 0.18),
+      0 2px 4px rgba(0, 0, 0, 0.45),
+      0 20px 40px -14px rgba(0, 0, 0, 0.6),
+      0 64px 96px -48px rgba(176, 36, 44, 0.35);
   }
 
   /* Dark bands (navy trust strip, footer) still host cards, and a white panel
@@ -322,10 +327,10 @@
       reading as underweight; the weight contrast is what gives it authority. */
   .title-accent {
     font-weight: 700;
-    color: #d6392f;
+    color: #d6b47c;
   }
   .on-dark .title-accent {
-    color: #f88e86;
+    color: #f0d8a8;
   }
   /* Title rule draws left→right once its section reveals. Reveal components
    set opacity/transform on their wrapper; the rule keys off that wrapper
@@ -421,7 +426,7 @@
    solid red with only the faintest vertical shift — the 26 call sites keep
    working, without importing a gradient idiom the reference does not use. */
   .text-gold-grad {
-    background: linear-gradient(120deg, #ef463b 0%, #e03a30 55%, #c22626 100%);
+    background: linear-gradient(172deg, #f0d8a8 0%, #d6b47c 50%, #a97b45 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -723,7 +728,7 @@ html.lenis, html.lenis body { height: auto; }
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #d6392f;
+  color: #d6b47c;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -735,7 +740,7 @@ html.lenis, html.lenis body { height: auto; }
   background: currentColor;
   opacity: 0.6;
 }
-.on-dark .kicker { color: #f88e86; } /* 4.79:1 on #313C59, 6.21 on #232A42 */
+.on-dark .kicker { color: #f0d8a8; }
 
 /* ── Clip reveal — bottom-to-top wipe for the flagship card. Driven by
       framer's whileInView so it only fires once and respects reduced motion;
@@ -783,7 +788,10 @@ html.lenis, html.lenis body { height: auto; }
 /* The AA-tuned reds are tuned for WHITE grounds — on navy they fall to ~3:1
    (measured: #D6392F on #232A42 = 3.03). The soft coral step is the accent
    that clears 4.5 on dark, so accent text swaps to it inside the scope. */
-.on-dark .text-gold-500, .on-dark .text-gold-600 { color: #f88e86; }
+.on-dark .text-gold-500, .on-dark .text-gold-600 { color: #f0d8a8; }
+/* Site-wide dark ground (ADR-0031): the red scale stays for surfaces and
+   buttons, but red TEXT on maroon fails contrast — accent text is gold. */
+.text-gold-300, .text-gold-400, .text-gold-500, .text-gold-600, .text-gold-700, .text-brand { color: #d6b47c; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Lenis is skipped for these users, which means the UA's own smooth scroll is

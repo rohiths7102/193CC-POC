@@ -175,7 +175,7 @@ export function Preloader() {
   return (
     <motion.div
       data-cc-preloader
-      className="preloader-failsafe fixed inset-0 z-100 flex items-center justify-center bg-white"
+      className="preloader-failsafe fixed inset-0 z-100 flex items-center justify-center bg-ink-950"
       initial={false}
       animate={leaving ? { y: "-100%" } : { y: 0 }}
       transition={{ duration: mode === "fast" ? 0.45 : 0.9, ease: EASE }}

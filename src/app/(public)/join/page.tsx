@@ -5,6 +5,8 @@ import { gbp } from "@/lib/utils";
 import { GlassCard, Badge } from "@/components/ui";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion";
 import { PublicHeader, PublicFooter } from "@/components/public-chrome";
+import { EventFilm } from "@/components/showcase";
+import { ChamberLight } from "@/components/magazine/motion";
 import { FaqBlock } from "@/components/editorial";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +23,16 @@ export default async function JoinIndex() {
   return (
     <div className="flex min-h-svh flex-col">
     <PublicHeader />
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+    <main className="relative isolate mx-auto w-full max-w-6xl flex-1 px-6 py-16">
+      <ChamberLight at="right" />
+      <div className="grid gap-12 lg:grid-cols-12">
+      <div className="lg:col-span-7">
       <Link href="/" className="-mx-2 inline-flex min-h-11 items-center gap-2 px-2 text-sm text-mist hover:text-ivory-100 lg:min-h-0">
         <ArrowLeft className="h-4 w-4" /> Back to site
       </Link>
       <Reveal>
-        <h1 className="mt-6 font-display text-4xl text-ivory-50">Choose your <span className="text-gold-grad">membership</span></h1>
-        <p className="mt-3 text-mist">Contract first, payment second, access instantly after both.</p>
+        <h1 className="mt-6 font-headline text-[clamp(2.6rem,6vw,4.5rem)] leading-[1.02] text-ivory-50">Choose your <em className="text-gilt">membership.</em></h1>
+        <p className="mt-4 text-lg text-mist">Contract first, payment second, access instantly after both.</p>
       </Reveal>
       <Stagger className="mt-10 space-y-4">
         {products.map((p) => (
@@ -36,14 +41,14 @@ export default async function JoinIndex() {
               <GlassCard className="flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="font-display text-xl text-ivory-50">{p.name}</h2>
+                    <h2 className="font-headline text-2xl text-ivory-50">{p.name}</h2>
                     {p.code === "ENT_INVESTOR" && <Badge>Flagship</Badge>}
                     {p.billing === "ONE_TIME" && <Badge tone="purple">Event-linked</Badge>}
                   </div>
                   <p className="mt-1 text-sm text-mist">{p.strapline}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-5">
-                  <p className="font-display text-2xl text-gold-grad">{gbp(p.priceMinor)}</p>
+                  <p className="font-headline text-3xl text-gold-grad">{gbp(p.priceMinor)}</p>
                   <ArrowRight className="h-5 w-5 text-gold-500" />
                 </div>
               </GlassCard>
@@ -51,8 +56,25 @@ export default async function JoinIndex() {
           </StaggerItem>
         ))}
       </Stagger>
+      </div>
+      <aside className="lg:col-span-5">
+        <figure className="lg:sticky lg:top-28">
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-night">
+            <EventFilm
+              src="/videos/193cc-brand-launch-sportto.mp4"
+              poster="/videos/193cc-brand-launch-sportto-poster.jpg"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <span aria-hidden="true" className="pointer-events-none absolute inset-3 border border-gilt/60" />
+          </div>
+          <figcaption className="mt-3 border-t hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-mist">
+            A member brand unveiled at the House of Lords · 21 July 2023
+          </figcaption>
+        </figure>
+      </aside>
+      </div>
 
-      <div className="mt-16">
+      <div className="mt-16 max-w-3xl">
         <FaqBlock
           title="Membership questions, answered plainly"
           faqs={[

@@ -62,6 +62,7 @@ export default async function SummitHub() {
   return (
     <GuideShell
       kicker="The UK Investors Summit"
+      hero={{ src: "/images/summit-2023-address.jpg", alt: "A speaker addresses the UK Investors Summit at the House of Lords", caption: "UK Investors Summit · House of Lords · 2023" }}
       title={<>Forty-five slots. Three stages. <span className="text-gold-grad">One room that matters.</span></>}
       dek="The consortium's flagship investor event: business-opportunity pitches before an investor panel, live brand launches and the business awards — followed by investor networking. Every slot is allocated through a formal intent-letter process, run entirely on this platform."
     >

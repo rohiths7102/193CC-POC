@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/logo";
-import { LinkButton } from "@/components/ui";
-import { MobileNav } from "@/components/mobile-nav";
+import { SiteHeader } from "@/components/site-header";
 
 /**
  * Shared chrome for public sub-pages (enrolment funnel, privacy, errors).
@@ -10,17 +8,9 @@ import { MobileNav } from "@/components/mobile-nav";
  * dark screen. These are deliberately minimal: identity + one legal row.
  */
 
+/** One header across the public site — the homepage's (ADR-0031). */
 export function PublicHeader() {
-  return (
-    <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
-      {/* min-h-11 gives the logo link a 44px touch target on phones. */}
-      <Link href="/" className="flex min-h-11 items-center text-sm"><Logo size={40} /></Link>
-      <div className="flex items-center gap-5">
-        <LinkButton href="/join" size="sm" className="shine hidden sm:inline-flex">Join</LinkButton>
-        <MobileNav />
-      </div>
-    </header>
-  );
+  return <SiteHeader />;
 }
 
 export function PublicFooter() {

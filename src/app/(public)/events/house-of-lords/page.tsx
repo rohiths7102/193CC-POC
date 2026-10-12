@@ -35,6 +35,7 @@ export default async function HouseOfLordsGuide() {
   return (
     <GuideShell
       kicker="Events · The definitive guide"
+      hero={{ src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests on the steps of Westminster Hall", caption: "Westminster Hall · 21 July 2023 · 193 Countries Consortium" }}
       title={<>Attending a business event at the <span className="text-gold-grad">House of Lords</span></>}
       dek="The consortium has held its receptions and summits at the House of Lords since 2023. This is the practical guide we send our own guests — invitations, entrances, security, dress and etiquette — checked against the parliamentary rules."
       updated="July 2026"

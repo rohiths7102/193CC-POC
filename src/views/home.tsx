@@ -21,11 +21,16 @@ import {
   IrisReveal,
   ScrollWords,
   VelocityMarquee,
+  Scramble,
+  PixelSwap,
+  WordStack,
   type ReelFrame,
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
 import { CountryBand } from "@/components/magazine/country-band";
 import { CountryGlobe } from "@/components/magazine/country-globe";
+import { LivingBackground } from "@/components/magazine/living-background";
+import { ChapterRail } from "@/components/magazine/chapter-rail";
 
 const LAUNCHED_BRANDS = [
   "Sportto",
@@ -99,7 +104,18 @@ export async function HomeView() {
 
   return (
     <MagazineMotion>
-      <main className="relative overflow-x-clip bg-paper font-body text-copy">
+      <main className="relative isolate overflow-x-clip font-body text-copy">
+        <LivingBackground />
+        <ChapterRail
+          chapters={[
+            { id: "consortium", n: "01", title: "The Consortium" },
+            { id: "summit", n: "02", title: "The Summit" },
+            { id: "launched", n: "03", title: "Launched at Parliament" },
+            { id: "circle", n: "04", title: "The circle" },
+            { id: "tiers", n: "05", title: "Membership" },
+            { id: "reach", n: "06", title: "Reach" },
+          ]}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
         <PreloaderGate />
         <SiteHeader />
@@ -167,6 +183,9 @@ export async function HomeView() {
         {/* ─── FIGURES ───────────────────────────────────────────── */}
         <section aria-label="The consortium in figures" className="on-dark relative isolate overflow-hidden bg-chamber text-night-copy">
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_15%_0%,var(--raw-color-chamber-500)_0%,transparent_60%)]" />
+          <p aria-hidden="true" className="text-outline-lords pointer-events-none absolute -right-6 top-1/2 -z-10 -translate-y-1/2 font-headline text-[22rem] leading-none opacity-40">
+            193
+          </p>
           <dl className="mx-auto grid max-w-7xl grid-cols-2 px-6 lg:grid-cols-4">
             {[
               { n: 193, label: "Countries in the consortium" },
@@ -188,7 +207,7 @@ export async function HomeView() {
         </section>
 
         {/* ─── № 01 THE CONSORTIUM ───────────────────────────────── */}
-        <section className="relative isolate mx-auto grid max-w-7xl gap-14 px-6 py-24 sm:py-32 lg:grid-cols-12">
+        <section id="consortium" className="relative isolate mx-auto grid max-w-7xl scroll-mt-24 gap-14 px-6 py-24 sm:py-32 lg:grid-cols-12">
           <ChamberLight at="right" />
           <div className="lg:col-span-6">
             <Reveal>
@@ -231,13 +250,13 @@ export async function HomeView() {
           </figure>
         </section>
 
-        <div className="bg-paper py-6">
+        <div className="py-6">
           <VelocityMarquee text="House of Lords · UK Investors Summit · " />
         </div>
 
         {/* ─── № 02 THE SUMMIT ───────────────────────────────────── */}
         <IrisReveal>
-        <section id="summit" className="on-dark scroll-mt-24 bg-night text-night-copy">
+        <section id="summit" className="on-dark scroll-mt-24 bg-night/85 text-night-copy">
           <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
             <div className="grid gap-12 lg:grid-cols-12">
               <div className="lg:col-span-5">
@@ -262,11 +281,15 @@ export async function HomeView() {
               </div>
               <div className="grid grid-cols-6 gap-3 lg:col-span-7">
                 <figure className="col-span-6">
-                  <ImageReveal
-                    src="/images/summit-2023-address.jpg"
-                    alt="A speaker addresses the UK Investors Summit beneath the UK Parliament, House of Lords banner"
+                  <PixelSwap
                     sizes="(min-width: 1024px) 55vw, 100vw"
                     className="aspect-video w-full"
+                    images={[
+                      { src: "/images/summit-2023-address.jpg", alt: "A speaker addresses the UK Investors Summit beneath the UK Parliament, House of Lords banner" },
+                      { src: "/images/summit-2023-brand-launch.jpg", alt: "Crystal London presented on stage at the UK Investors Summit" },
+                      { src: "/images/summit-2023-award.jpg", alt: "An award presented at the UK Investors Summit" },
+                      { src: "/images/summit-2023-handshake.jpg", alt: "Delegates shake hands at a Summit table" },
+                    ]}
                   />
                 </figure>
                 <figure className="col-span-3">
@@ -290,6 +313,8 @@ export async function HomeView() {
                 </p>
               </div>
             </div>
+
+            <WordStack words={["Pitch.", "Launch.", "Recognise."]} className="mt-24" />
 
             <div className="mt-24 grid gap-12 border-t border-night-copy/15 pt-14 lg:grid-cols-12">
               <div className="lg:col-span-4">
@@ -324,7 +349,7 @@ export async function HomeView() {
 
         {/* ─── № 03 LAUNCHED AT PARLIAMENT ───────────────────────── */}
         {/* 193 CC's own film and photographs (public/images/CREDITS.md). */}
-        <section className="relative isolate pt-24 sm:pt-32">
+        <section id="launched" className="relative isolate scroll-mt-24 pt-24 sm:pt-32">
           <ChamberLight at="left" />
           <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12">
             <div className="lg:col-span-5">
@@ -372,7 +397,7 @@ export async function HomeView() {
           <div className="mt-20 sm:mt-28">
             <ScrollReel frames={LAUNCH_REEL} />
           </div>
-          <div className="mx-auto mt-20 grid max-w-7xl items-end gap-10 px-6 sm:mt-28 lg:grid-cols-12">
+          <div className="mx-auto mt-20 grid max-w-7xl items-center gap-10 px-6 sm:mt-28 lg:grid-cols-12">
             <figure className="lg:col-span-4">
               <Reveal>
                 <div className="relative mx-auto aspect-[9/16] w-full max-w-sm overflow-hidden bg-night">
@@ -408,7 +433,7 @@ export async function HomeView() {
         {/* London School of Investors footage, used at 193 CC's request. LSI's
             watermark stays in frame and every caption names it as LSI's event
             (public/images/CREDITS.md). */}
-        <section className="relative isolate mx-auto max-w-7xl px-6 py-24 sm:py-32">
+        <section id="circle" className="relative isolate mx-auto max-w-7xl scroll-mt-24 px-6 py-24 sm:py-32">
           <ChamberLight at="right" />
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
@@ -550,7 +575,7 @@ export async function HomeView() {
         </section>
 
         {/* ─── № 05 REACH ────────────────────────────────────────── */}
-        <section className="on-dark overflow-hidden bg-night text-night-copy">
+        <section id="reach" className="on-dark scroll-mt-24 overflow-hidden bg-night/85 text-night-copy">
           <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
             <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-7">
@@ -581,7 +606,7 @@ export async function HomeView() {
           </div>
         </section>
 
-        <div className="bg-night py-6">
+        <div className="bg-night/60 py-6">
           <VelocityMarquee text="193 Countries · One London Hub · " />
         </div>
 
@@ -675,7 +700,7 @@ function Chapter({ n, title, onNight = false }: { n: string; title: string; onNi
     >
       <span className={onNight ? "text-accent-on-night" : "text-accent"}>№ {n}</span>
       <span aria-hidden className={`h-px w-10 ${onNight ? "bg-night-copy/30" : "bg-copy/30"}`} />
-      {title}
+      <Scramble text={title} />
     </p>
   );
 }

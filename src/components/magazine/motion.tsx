@@ -9,7 +9,7 @@
  * transforms and keeps the fades — no server/client markup branch.
  */
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import {
   MotionConfig,
@@ -18,6 +18,7 @@ import {
   useAnimationFrame,
   useInView,
   useMotionValue,
+  useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
@@ -40,7 +41,7 @@ export function MagazineMotion({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
       <noscript>
-        <style>{`[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}`}</style>
+        <style>{`[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}`}</style>
       </noscript>
       {children}
     </MotionConfig>
@@ -61,8 +62,8 @@ export function Reveal({
     <motion.div
       data-reveal
       className={className}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.9, delay, ease: EASE }}
     >
@@ -417,6 +418,121 @@ export function VelocityMarquee({ text, className }: { text: string; className?:
           </span>
         ))}
       </motion.div>
+    </div>
+  );
+}
+
+const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·";
+
+/**
+ * Text that decodes into place the first time it is seen: characters cycle
+ * through random glyphs and settle left to right. The server renders the
+ * final text, so no-JS readers and crawlers get it as written.
+ */
+export function Scramble({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.8 });
+  const [out, setOut] = useState(text);
+  useEffect(() => {
+    if (!inView || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t0 = performance.now(), dur = 700 + text.length * 18;
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / dur);
+      const settled = Math.floor(p * text.length);
+      setOut(
+        text
+          .split("")
+          .map((ch, i) => (i < settled || ch === " " ? ch : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]))
+          .join(""),
+      );
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, text]);
+  return (
+    <span ref={ref} className={className} aria-label={text}>
+      <span aria-hidden="true">{out}</span>
+    </span>
+  );
+}
+
+/**
+ * A photograph that changes in place with a pixel dissolve: chamber-red
+ * squares close over the frame in a random order, the next image is set
+ * behind them, and they open again. Cycles only while on screen; a static
+ * first image under reduced motion.
+ */
+export function PixelSwap({
+  images,
+  sizes,
+  className,
+  every = 4200,
+}: {
+  images: { src: string; alt: string }[];
+  sizes: string;
+  className?: string;
+  every?: number;
+}) {
+  const COLS = 14, ROWS = 8;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const [i, setI] = useState(0);
+  const [covered, setCovered] = useState(false);
+  const delays = useMemo(() => Array.from({ length: COLS * ROWS }, (_, k) => ((k * 7919) % 97) / 97), []);
+
+  useEffect(() => {
+    if (!inView || images.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let swap: ReturnType<typeof setTimeout>, open: ReturnType<typeof setTimeout>;
+    const cycle = setInterval(() => {
+      setCovered(true);
+      swap = setTimeout(() => setI((x) => (x + 1) % images.length), 520);
+      open = setTimeout(() => setCovered(false), 620);
+    }, every);
+    return () => { clearInterval(cycle); clearTimeout(swap); clearTimeout(open); };
+  }, [inView, images.length, every]);
+
+  return (
+    <div ref={ref} data-cursor="view" className={`relative overflow-hidden bg-night ${className ?? ""}`}>
+      <Image src={images[i].src} alt={images[i].alt} fill sizes={sizes} className="object-cover" />
+      <div aria-hidden="true" className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)`, gridTemplateRows: `repeat(${ROWS}, 1fr)` }}>
+        {delays.map((d, k) => (
+          <motion.span
+            key={k}
+            className="bg-chamber-deep"
+            initial={false}
+            animate={{ opacity: covered ? 1 : 0 }}
+            transition={{ duration: 0.12, delay: d * 0.38 }}
+          />
+        ))}
+      </div>
+      <span aria-hidden="true" className="pointer-events-none absolute inset-3 border border-gilt/60" />
+    </div>
+  );
+}
+
+/**
+ * Giant stacked words; the one the reader has reached fills with gold, the
+ * others stay as gilt outlines.
+ */
+export function WordStack({ words, className }: { words: string[]; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.75", "end 0.35"] });
+  const [active, setActive] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", (p) => setActive(Math.min(words.length - 1, Math.max(0, Math.floor(p * words.length)))));
+  return (
+    <div ref={ref} className={className}>
+      {words.map((w, k) => (
+        <p
+          key={w}
+          className={`font-headline text-[clamp(3.5rem,11vw,10rem)] uppercase leading-[0.92] tracking-[-0.01em] transition-colors duration-700 ${
+            k === active ? "text-gilt" : "text-outline-lords"
+          } ${k % 2 === 1 ? "pl-[12%]" : ""}`}
+        >
+          {w}
+        </p>
+      ))}
     </div>
   );
 }

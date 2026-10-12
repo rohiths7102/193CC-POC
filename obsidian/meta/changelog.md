@@ -16,6 +16,17 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (living background)
+
+**Always-on motion, from screen-recorded references** (Aura: Nexara, Kairo, Sequra).
+`LivingBackground`: fixed canvas behind the homepage — 193 gold motes converging on
+London, a chamber-red thread with a travelling gold pulse, diagonal hatching; 30fps,
+paused when hidden, static under reduced motion. Homepage sections now transparent /
+translucent over it. `ChapterRail` (rotating seal + chapter numbers), `Scramble`
+chapter labels, `PixelSwap` dissolve on the Summit stills, `WordStack`
+(PITCH / LAUNCH / RECOGNISE), outlined 193 behind the red band, blur-to-sharp
+`Reveal`. Measured 60fps, 0 long tasks while scrolling (headless, GPU off).
+
 ## 2026-10-12 (motion pass)
 
 **Ceremony motion layer.** Opening sequence (`Preloader`): chamber-red doors,

@@ -1,6 +1,6 @@
 ---
 tags: [architecture, stable]
-updated: 2026-10-07
+updated: 2026-10-12
 ---
 
 # Tech Stack
@@ -30,6 +30,22 @@ Package name: `next16-claude-starter` · version `0.1.0` · private.
 
 Tailwind v4 is configured entirely in `src/app/globals.css` via `@theme inline`.
 See [[design-system]].
+
+## Platform (193 Countries Consortium)
+
+| Package | Version | Role |
+|---------|---------|------|
+| `@prisma/client` / `prisma` | `^6` | Postgres ORM + migrations. Pinned to 6 — 7 changes client setup. |
+| `jose` | `^5` | Session JWTs (HS256), verified in `src/proxy.ts` and `src/server/auth.ts` |
+| `bcryptjs` | `^2.4.3` | Password hashing |
+| `qrcode` | `^1.5` | Public-profile share QR |
+| `lucide-react` | `^0.469.0` | Icons — pinned: newer releases dropped brand icons |
+| `clsx` | `^2` | Class composition (`cn` in `src/lib/utils.ts`) |
+| `framer-motion` | `^12` | Route in/out transitions + ported motion — ADR-0028 |
+| `tsx` (dev) | `^4` | Runs `prisma/seed.ts` |
+
+Scripts: `db:migrate`, `db:seed`, `db:studio`; `postinstall` runs `prisma generate`.
+Local DB: the `membership-db` Postgres container on `127.0.0.1:5434`.
 
 ## Animation (the heart of the starter)
 

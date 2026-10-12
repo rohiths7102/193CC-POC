@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
+import { RouteFade } from "@/components/premium";
 import {
   LayoutDashboard, BadgeCheck, CalendarClock, Landmark, PenSquare, Handshake,
   Users, Wallet, Ticket, ClipboardCheck, BarChart3, ScrollText, Mail, Settings,
@@ -309,7 +310,10 @@ export function PortalShell({
         <div className="mb-6 hidden items-center justify-end gap-3 lg:flex">
           <DemoTag>Demo environment — payments & signatures simulated</DemoTag>
         </div>
-        {children}
+        {/* Out-then-in route transition for the console content — the same
+            measured RouteFade the public pages use. The sidebar sits outside
+            it, so navigation never moves the chrome. */}
+        <RouteFade>{children}</RouteFade>
       </main>
     </div>
     </MotionConfig>

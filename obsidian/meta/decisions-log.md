@@ -17,6 +17,33 @@ Template: [[templates/adr-note]].
 
 ---
 
+## ADR-0029 — Port the platform at parity first, conform it second
+
+**Status:** Accepted
+
+**Decision.** The 193 Countries Consortium platform was ported into this starter
+*behaving exactly as it did* before any of it was rewritten to the starter's
+conventions. The ported pages keep their fixed 16px root and their own Lenis
+(`PremiumShell`); the starter's adaptive grid (viewport-scaled root font) and
+`ScrollLayout` are not applied to them yet.
+
+**Why.** "Works end to end" has to be provable, and it can only be proven against
+a known-good baseline. Changing framework version, Tailwind major *and* layout
+system in one step would make any regression impossible to attribute. The
+starter's grid scales every `rem` with the viewport, which would visibly shift
+pages tuned for a fixed root.
+
+**Consequence — known `verify.sh` FAILs until the redesign lands:**
+1. CSS keyframes (decorative loops + two no-JS failsafes that must stay CSS)
+2. hardcoded colours in class names
+3. routes that do not delegate to `views/`
+4. `process.env` read outside `src/env.ts`
+
+The redesign rebuilds styling to tokens and the starter's grid, which retires
+1–2; 3–4 are mechanical and are cleared independently.
+
+---
+
 ## ADR-0028 — framer-motion is allowed alongside the springs
 
 **Status:** Accepted · amends ADR-0002

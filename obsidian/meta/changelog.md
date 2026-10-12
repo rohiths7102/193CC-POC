@@ -1,6 +1,6 @@
 ---
 tags: [meta, changelog]
-updated: 2026-10-10
+updated: 2026-10-12
 ---
 
 # Changelog
@@ -15,6 +15,35 @@ remembering. Routine commits do not need an entry.
 For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
+
+## 2026-10-12
+
+**This repo is now the 193 Countries Consortium platform.** The whole
+membership platform (public site, join → verify email → sign → pay → status
+enrolment, member and admin portal, Prisma/Postgres, auth, wallet, summit,
+Companies House checks) was ported in from the previous Next 15 repo and now
+runs on Next 16.3. Proven end to end against the production build: a new member
+enrolled through the real UI, the database showed membership ACTIVE / contract
+SIGNED, and they logged into the portal from a clean session.
+
+- **framer-motion is allowed** — ADR-0028 amends ADR-0002. `verify.sh` updated.
+- **Route in/out transitions** on the public site *and* the portal (`RouteFade`):
+  measured fade out to 0 by ~215 ms, navigate at ~245 ms, back to 1 by ~510 ms.
+- **Tailwind v3 → v4** via the official `@tailwindcss/upgrade` codemod; the
+  config now lives in `@theme` in `src/app/globals.css`. `source("../")` kept
+  so the vault's docs never become utilities.
+- **middleware → `src/proxy.ts`** (Next 16). It now carries the portal role gate
+  and the "under development" holding gate, not the starter's robot-view rewrite.
+- **Removed starter demo routes:** `/` (empty home view), `/robot-view`,
+  `/privacy-policy`, `/api/contact` — they collided with the platform's routes.
+- **Pinned:** `@types/bcryptjs@^2.4.6` (the newest is an empty stub for bcryptjs
+  v3) and `lucide-react@^0.469.0` (newer releases removed brand icons).
+- **Gotcha recorded:** the Tailwind codemod emits `--font-display: var(--font-display)`
+  when next/font uses the same variable name — a self-reference that silently
+  drops the font. next/font variables are now `--font-roboto*` / `--font-jetbrains-mono`.
+- **Open — `verify.sh` still FAILs four starter conventions** the ported code does
+  not yet follow (CSS keyframes, hardcoded colours, routes not delegating to
+  `views/`, `process.env` outside `env.ts`). See ADR-0029.
 
 ## 2026-10-10
 

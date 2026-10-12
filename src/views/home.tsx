@@ -35,10 +35,11 @@ const ROMAN = ["i", "ii", "iii", "iv", "v", "vi"] as const;
 const LAUNCH_REEL: ReelFrame[] = [
   { src: "/images/193cc-launch-sportto-unveil.jpg", alt: "The Sportto brand being unveiled at the House of Lords", caption: "The unveiling · Sportto" },
   { src: "/images/193cc-launch-sportto-reveal.jpg", alt: "The Sportto mark held up to camera at the House of Lords", caption: "The reveal · Sportto" },
+  { src: "/images/193cc-launch-columbus-reveal.jpg", alt: "Columbus International's mark presented at the House of Lords", caption: "Columbus International" },
+  { src: "/images/193cc-launch-sicher-mayor-reveal.jpg", alt: "Sicher Mayor Tech's mark presented at the House of Lords", caption: "Sicher Mayor Tech" },
   { src: "/images/summit-2023-brand-launch.jpg", alt: "Crystal London presented on stage at the UK Investors Summit", caption: "Crystal London · UK Investors Summit 2023" },
   { src: "/images/summit-2023-award.jpg", alt: "An award presented at the UK Investors Summit", caption: "The awards · UK Investors Summit 2023" },
-  { src: "/images/summit-2023-roundtable.jpg", alt: "Delegates in discussion at a Summit table", caption: "Investor tables · UK Investors Summit 2023" },
-  { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests gathered on the steps of Westminster Hall", caption: "Westminster Hall · the full delegation" },
+  { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests gathered on the steps of Westminster Hall", caption: "Westminster Hall · 21 July 2023" },
 ];
 
 /**
@@ -317,8 +318,8 @@ export async function HomeView() {
               />
               <Reveal delay={0.2}>
                 <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
-                  Members launch in front of investors, peers and press. These six member brands were unveiled at the
-                  House of Lords through 193 CC — the drape coming off on the right is Sportto&rsquo;s.
+                  Members launch in front of investors, peers and press. On 21 July 2023 these six member brands were
+                  unveiled at the House of Lords through 193 CC — the drape coming off on the right is Sportto&rsquo;s.
                 </p>
               </Reveal>
               <Reveal delay={0.3}>
@@ -345,12 +346,42 @@ export async function HomeView() {
                 </div>
               </Reveal>
               <figcaption className="mt-4 border-t border-hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
-                Film: 193 Countries Consortium · Sportto brand launch · House of Lords
+                Film: 193 Countries Consortium · Sportto brand launch · House of Lords · 21 July 2023
               </figcaption>
             </figure>
           </div>
           <div className="mt-20 sm:mt-28">
             <ScrollReel frames={LAUNCH_REEL} />
+          </div>
+          <div className="mx-auto mt-20 grid max-w-7xl items-end gap-10 px-6 sm:mt-28 lg:grid-cols-12">
+            <figure className="lg:col-span-4">
+              <Reveal>
+                <div className="relative mx-auto aspect-[9/16] w-full max-w-sm overflow-hidden bg-night">
+                  <EventFilm
+                    src="/videos/193cc-gss-awards-2025.mp4"
+                    poster="/videos/193cc-gss-awards-2025-poster.jpg"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </div>
+              </Reveal>
+              <figcaption className="mx-auto mt-4 max-w-sm border-t border-hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
+                Film: 193 Countries Consortium · GSS Safety Awards &amp; Conference · House of Lords · October 2025
+              </figcaption>
+            </figure>
+            <div className="lg:col-span-6 lg:col-start-6">
+              <MaskedLines
+                as="p"
+                className={display}
+                lines={["And back again,", <em key="o" className="text-accent">October 2025.</em>]}
+              />
+              <Reveal delay={0.2}>
+                <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
+                  As a partner of the GSS Safety Awards &amp; Conference, 193 CC launched several new companies and
+                  brands at the House of Lords, and briefed founders on the Global Talent and
+                  Innovator Founder visas.
+                </p>
+              </Reveal>
+            </div>
           </div>
         </section>
 

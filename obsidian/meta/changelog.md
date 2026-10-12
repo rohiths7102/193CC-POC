@@ -21,7 +21,10 @@ For *why* the conventions are what they are, see [[decisions-log]].
 **№03 Launched at Parliament + 193 CC's own media.** New homepage chapter
 built from 193 CC's LinkedIn film (Sportto unveiling, House of Lords) and the
 full-resolution Summit 2023 originals from 193countriesconsortium.com; later
-chapters renumbered 04–06. New motion primitives: `ScrollReel` (pinned
+chapters renumbered 04–06. All seven 193 CC LinkedIn video posts
+archived locally; №03 adds Columbus and Sicher Mayor reveals, the 21 July 2023
+date (from the GSS banners) and an October 2025 coda with a vertical film of the
+GSS Safety Awards evening. New motion primitives: `ScrollReel` (pinned
 filmstrip driven by vertical scroll, desktop only, off under reduced motion)
 and `ReadingRule` (top progress hairline). Provenance in
 `public/images/CREDITS.md`.

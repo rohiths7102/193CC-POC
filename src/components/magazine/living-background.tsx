@@ -3,7 +3,10 @@
 /**
  * The living background — fixed behind every section of the homepage.
  *
- * Three layers, all deliberately quiet:
+ * Four layers, all deliberately quiet:
+ *  - Velvet: large, soft pools of chamber red and lacquer black drifting very
+ *    slowly (40–90s cycles), so the ground reads as moving light on velvet
+ *    rather than flat colour.
  *  - 193 gold motes, one per UN member state, drifting in from the edges and
  *    converging on a London point, then setting out again. They are nudged by
  *    the reader's scroll, deeper motes more than shallow ones.
@@ -24,6 +27,16 @@ const COUNT = 193;
 const FOCUS = { x: 0.5, y: 0.44 };
 
 type Mote = { x: number; y: number; z: number; phase: number; swirl: number };
+
+// [rgb, alpha, radius as share of the longer side, x/y centre, x/y amplitude, period s]
+const POOLS: [string, number, number, number, number, number, number, number][] = [
+  ["176,36,44", 0.16, 0.55, 0.18, 0.22, 0.12, 0.10, 70],
+  ["120,22,30", 0.18, 0.60, 0.82, 0.30, 0.10, 0.14, 90],
+  ["176,36,44", 0.10, 0.45, 0.60, 0.80, 0.16, 0.08, 55],
+  ["0,0,0", 0.35, 0.50, 0.35, 0.62, 0.12, 0.12, 80],
+  ["0,0,0", 0.28, 0.42, 0.92, 0.88, 0.08, 0.10, 45],
+  ["214,180,124", 0.035, 0.40, 0.45, 0.18, 0.14, 0.06, 65],
+];
 
 const spawn = (edge = true): Mote => {
   let x = Math.random(), y = Math.random();
@@ -61,6 +74,18 @@ export function LivingBackground() {
     const draw = (now: number) => {
       const t = (now - t0) / 1000;
       ctx.clearRect(0, 0, W, H);
+
+      // ── Velvet ──
+      const L = Math.max(W, H);
+      for (const [rgb, a, rad, cx0, cy0, ax, ay, period] of POOLS) {
+        const ph = (t / period) * Math.PI * 2;
+        const px = (cx0 + Math.sin(ph) * ax) * W, py = (cy0 + Math.cos(ph * 0.8) * ay) * H, r = rad * L;
+        const g = ctx.createRadialGradient(px, py, 0, px, py, r);
+        g.addColorStop(0, `rgba(${rgb},${a})`);
+        g.addColorStop(1, `rgba(${rgb},0)`);
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
 
       // ── The thread ──
       const amp = 10 + energy * 22;

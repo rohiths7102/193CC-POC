@@ -16,6 +16,17 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (globe stories, velvet, collage)
+
+**Globe story tour.** After ignition the Reach globe flies to London, Dubai and
+India; a gilt photo card pops out of each pin on a leader line, captioned only from
+193 CC's own posts. Drag pauses it; searching a story country opens its card.
+**Velvet ground** (Elysian reference): six slow radial pools of chamber red / black
+/ gold in `LivingBackground`. **`FloatingGallery`** replaces `ScrollReel` in №03 —
+scattered photos with depth parallax and caps + italic captions; two-up grid on
+phones. Measured 59fps, 0 long tasks. ui-design-system skill installed user-wide
+(~/.claude/skills; upstream literal bug on line 64 patched locally).
+
 ## 2026-10-12 (living background, site-wide)
 
 `LivingBackground` moved to the root layout — every public page, the portal, the

@@ -245,66 +245,6 @@ export function Counter({
   );
 }
 
-export type ReelFrame = { src: string; alt: string; caption: string };
-
-/**
- * Filmstrip that travels sideways while the page scrolls past it.
- *
- * Wide screens only, and never under reduced motion: there the section pins
- * and vertical scroll drives the strip. Everywhere else it is a plain
- * swipeable row, which is also the server render.
- */
-export function ScrollReel({ frames }: { frames: ReelFrame[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const track = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
-  const [shift, setShift] = useState(0);
-
-  useEffect(() => {
-    const wide = window.matchMedia("(min-width: 1024px)");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => {
-      setPinned(wide.matches && !reduced.matches);
-      if (track.current) setShift(Math.max(0, track.current.scrollWidth - window.innerWidth));
-    };
-    apply();
-    wide.addEventListener("change", apply);
-    window.addEventListener("resize", apply);
-    return () => {
-      wide.removeEventListener("change", apply);
-      window.removeEventListener("resize", apply);
-    };
-  }, []);
-
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -shift]);
-
-  return (
-    <div ref={ref} className={pinned ? "relative h-[240vh]" : "relative"}>
-      <div className={pinned ? "sticky top-0 flex h-svh flex-col justify-center overflow-hidden" : "overflow-x-auto pb-4"}>
-        <motion.div ref={track} style={pinned ? { x } : undefined} className="flex w-max gap-4 px-6 lg:gap-6">
-          {frames.map((f, i) => (
-            <figure key={f.src} className="shrink-0">
-              <div className="relative aspect-[3/2] h-[38vh] overflow-hidden bg-night lg:h-[60vh]">
-                <Image src={f.src} alt={f.alt} fill sizes="(min-width: 1024px) 60vw, 80vw" className="object-cover" />
-              </div>
-              <figcaption className="mt-3 flex gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
-                <span className="text-accent">{String(i + 1).padStart(2, "0")}</span>
-                <span>{f.caption}</span>
-              </figcaption>
-            </figure>
-          ))}
-        </motion.div>
-        {pinned && (
-          <div className="mx-6 mt-8 h-px bg-hairline">
-            <motion.div className="h-px origin-left bg-accent" style={{ scaleX: scrollYProgress }} />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 /** Hairline across the top of the viewport that fills as the page is read. */
 export function ReadingRule() {
   const { scrollYProgress } = useScroll();
@@ -534,5 +474,67 @@ export function WordStack({ words, className }: { words: string[]; className?: s
         </p>
       ))}
     </div>
+  );
+}
+
+export type GalleryItem = {
+  src: string;
+  alt: string;
+  title: string;
+  line: string;
+  /** Desktop placement inside the collage, in % of its box. */
+  left: number;
+  top: number;
+  width: number;
+  /** Parallax depth: higher drifts further against the scroll. */
+  depth: number;
+};
+
+function FloatingPhoto({ item, progress, still }: { item: GalleryItem; progress: MotionValue<number>; still: boolean }) {
+  const y = useTransform(progress, [0, 1], [item.depth * 140, -item.depth * 140]);
+  return (
+    <motion.figure
+      className="absolute"
+      style={{ left: `${item.left}%`, top: `${item.top}%`, width: `${item.width}%`, y: still ? 0 : y }}
+    >
+      <ImageReveal src={item.src} alt={item.alt} sizes="30vw" className="aspect-[4/3] w-full" />
+      <figcaption className="mt-3">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-copy">{item.title}</p>
+        <p className="mt-1.5 max-w-64 font-headline text-[15px] italic leading-snug text-copy-muted">{item.line}</p>
+      </figcaption>
+    </motion.figure>
+  );
+}
+
+/**
+ * Photographs scattered at different sizes, drifting at different speeds as
+ * the page scrolls — the floating-collage move. Phones get a plain two-up
+ * grid instead; the collage only exists where there is room for it.
+ */
+export function FloatingGallery({ items }: { items: GalleryItem[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const still = useStill();
+  return (
+    <>
+      <div ref={ref} className="relative mx-auto hidden h-[1080px] max-w-7xl px-6 lg:block">
+        <div className="relative h-full">
+          {items.map((it) => (
+            <FloatingPhoto key={it.src} item={it} progress={scrollYProgress} still={still} />
+          ))}
+        </div>
+      </div>
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-10 px-6 lg:hidden">
+        {items.map((it) => (
+          <figure key={it.src}>
+            <ImageReveal src={it.src} alt={it.alt} sizes="50vw" className="aspect-[4/3] w-full" />
+            <figcaption className="mt-2">
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-copy">{it.title}</p>
+              <p className="mt-1 font-headline text-sm italic leading-snug text-copy-muted">{it.line}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </>
   );
 }

@@ -15,7 +15,6 @@ import {
   ImageReveal,
   ParallaxImage,
   Counter,
-  ScrollReel,
   ReadingRule,
   ChamberLight,
   IrisReveal,
@@ -24,7 +23,8 @@ import {
   Scramble,
   PixelSwap,
   WordStack,
-  type ReelFrame,
+  FloatingGallery,
+  type GalleryItem,
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
 import { CountryBand } from "@/components/magazine/country-band";
@@ -42,14 +42,13 @@ const LAUNCHED_BRANDS = [
 
 const ROMAN = ["i", "ii", "iii", "iv", "v", "vi"] as const;
 
-const LAUNCH_REEL: ReelFrame[] = [
-  { src: "/images/193cc-launch-sportto-unveil.jpg", alt: "The Sportto brand being unveiled at the House of Lords", caption: "The unveiling · Sportto" },
-  { src: "/images/193cc-launch-sportto-reveal.jpg", alt: "The Sportto mark held up to camera at the House of Lords", caption: "The reveal · Sportto" },
-  { src: "/images/193cc-launch-columbus-reveal.jpg", alt: "Columbus International's mark presented at the House of Lords", caption: "Columbus International" },
-  { src: "/images/193cc-launch-sicher-mayor-reveal.jpg", alt: "Sicher Mayor Tech's mark presented at the House of Lords", caption: "Sicher Mayor Tech" },
-  { src: "/images/summit-2023-brand-launch.jpg", alt: "Crystal London presented on stage at the UK Investors Summit", caption: "Crystal London · UK Investors Summit 2023" },
-  { src: "/images/summit-2023-award.jpg", alt: "An award presented at the UK Investors Summit", caption: "The awards · UK Investors Summit 2023" },
-  { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests gathered on the steps of Westminster Hall", caption: "Westminster Hall · 21 July 2023" },
+const LAUNCH_GALLERY: GalleryItem[] = [
+  { src: "/images/193cc-launch-sportto-unveil.jpg", alt: "The Sportto brand being unveiled at the House of Lords", title: "The unveiling", line: "Sportto's mark, uncovered before investors, peers and press.", left: 0, top: 2, width: 34, depth: 0.6 },
+  { src: "/images/193cc-launch-columbus-reveal.jpg", alt: "Columbus International's mark presented at the House of Lords", title: "Columbus International", line: "A jobs and education consultancy, launched in the House of Lords.", left: 41, top: 12, width: 25, depth: 1.2 },
+  { src: "/images/193cc-launch-westminster-hall-group.jpg", alt: "Members and guests on the steps of Westminster Hall", title: "Westminster Hall", line: "The full delegation on the steps · 21 July 2023.", left: 72, top: 0, width: 28, depth: 0.4 },
+  { src: "/images/193cc-launch-sicher-mayor-reveal.jpg", alt: "Sicher Mayor Tech's mark presented at the House of Lords", title: "Sicher Mayor Tech", line: "Its mark held up to the room — “The scoring mode.”", left: 6, top: 50, width: 24, depth: 1.0 },
+  { src: "/images/summit-2023-brand-launch.jpg", alt: "Crystal London presented on stage at the UK Investors Summit", title: "Crystal London", line: "Presented at the UK Investors Summit 2023.", left: 38, top: 56, width: 30, depth: 0.5 },
+  { src: "/images/summit-2023-award.jpg", alt: "An award presented at the UK Investors Summit", title: "The awards", line: "Recognition before the consortium's international membership.", left: 75, top: 46, width: 22, depth: 1.4 },
 ];
 
 /**
@@ -393,7 +392,7 @@ export async function HomeView() {
             </figure>
           </div>
           <div className="mt-20 sm:mt-28">
-            <ScrollReel frames={LAUNCH_REEL} />
+            <FloatingGallery items={LAUNCH_GALLERY} />
           </div>
           <div className="mx-auto mt-20 grid max-w-7xl items-center gap-10 px-6 sm:mt-28 lg:grid-cols-12">
             <figure className="lg:col-span-4">

@@ -7,7 +7,7 @@ import { sendContentReviewReminders, sendRenewalReminders, sweepPendingVerificat
 
 /**
  * Housekeeping tick — every 60s in-process on a long-lived server
- * (instrumentation.ts), hourly via Vercel Cron (/api/cron/tick):
+ * (instrumentation.ts), daily at 03:00 via Vercel Cron (/api/cron/tick):
  *  1. Summits past their deadline auto-CLOSE; dangling INVITED apps EXPIRE.
  *  2. OFFERED slots past their window EXPIRE and the next applicant is promoted.
  *  3. Memberships past periodEnd + grace LAPSE (entitlements drop via resolver).

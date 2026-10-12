@@ -24,11 +24,11 @@ const HOME: Record<string, string> = {
   MENTOR: "/portal/mentor", INVESTOR: "/portal/investor", CONSULTANT: "/portal/consultant",
 };
 
-/** "Site under development" gate. ON in production; never in local dev, so
- *  work continues normally. Lift it by setting UNDER_CONSTRUCTION=false on
- *  the host and redeploying, or by reverting the commit that added this. */
+/** "Site under development" gate. OFF since the redesign went live
+ *  (2026-10-12). Turn it back on by setting UNDER_CONSTRUCTION=true on the
+ *  host and redeploying — it never applies in local dev. */
 const UNDER_CONSTRUCTION =
-  process.env.NODE_ENV === "production" && process.env.UNDER_CONSTRUCTION !== "false";
+  process.env.NODE_ENV === "production" && process.env.UNDER_CONSTRUCTION === "true";
 
 /** Stays reachable while the gate is up: the way in for staff, and the
  *  tokenised member flows that are emailed as direct links — blocking those

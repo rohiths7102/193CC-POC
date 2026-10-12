@@ -65,9 +65,9 @@ export const siteConfig = {
   /** Author / creator / publisher — the brand, not the agency. */
   author: "193 Countries Consortium",
   /** Browser theme-color (address bar / PWA) — the brand's ground. */
-  themeColor: "#FFFFFF",
+  themeColor: "#1A0709",
   /** The manifest and the PWA splash background. */
-  backgroundColor: "#FFFFFF",
+  backgroundColor: "#1A0709",
   locale: "en_GB",
 };
 

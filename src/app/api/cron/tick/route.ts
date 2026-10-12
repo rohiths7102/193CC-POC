@@ -11,7 +11,7 @@ export const maxDuration = 300;
  * same work: close passed Summit deadlines, expire waitlist offers, lapse
  * overdue memberships, collect due Direct Debit instalments, auto-verify
  * clean Companies House matches, send renewal and content-review reminders.
- * Scheduled hourly (vercel.json); every job is idempotent, so a duplicate
+ * Scheduled daily at 03:00 (vercel.json — Hobby plans allow daily crons only); every job is idempotent, so a duplicate
  * delivery or a manual re-run is harmless.
  *
  * Protected two ways:

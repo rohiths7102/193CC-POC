@@ -7,7 +7,7 @@ import { appUrl } from "@/lib/app-url";
 import { SiteHeader } from "@/components/site-header";
 import { Globe } from "@/components/globe";
 import { Logo } from "@/components/logo";
-import { Countdown } from "@/components/showcase";
+import { Countdown, EventFilm } from "@/components/showcase";
 import {
   MagazineMotion,
   Reveal,
@@ -279,12 +279,56 @@ export async function HomeView() {
           </div>
         </section>
 
-        {/* ─── № 03 MEMBERSHIP — the index ───────────────────────── */}
+        {/* ─── № 03 THE CIRCLE — LSI at the House of Lords ──────── */}
+        {/* London School of Investors footage, used at 193 CC's request. LSI's
+            watermark stays in frame and every caption names it as LSI's event
+            (public/images/CREDITS.md). */}
+        <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
+          <div className="grid gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <Reveal>
+                <Chapter n="03" title="The circle" />
+              </Reveal>
+              <MaskedLines
+                className={`mt-8 ${display}`}
+                lines={["Also at the", "House of Lords.", <em key="d" className="text-accent">23 July 2026.</em>]}
+              />
+              <Reveal delay={0.2}>
+                <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
+                  The Corporate Governance &amp; Investment Education Leadership Summit, hosted by the London School of
+                  Investors at UK Parliament — an evening of governance, investment education and leadership in the
+                  Palace of Westminster.
+                </p>
+              </Reveal>
+            </div>
+            <figure className="lg:col-span-7">
+              <Reveal>
+                <div className="relative aspect-video w-full overflow-hidden bg-night">
+                  <EventFilm
+                    src="/videos/lsi-summit-2026-reel.mp4"
+                    poster="/videos/lsi-summit-2026-reel-poster.jpg"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </div>
+              </Reveal>
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                <ImageReveal src="/images/lsi-summit-2026-westminster.jpg" alt="The Palace of Westminster beneath an evening sky" sizes="(min-width: 1024px) 19vw, 33vw" className="aspect-[4/3] w-full" />
+                <ImageReveal src="/images/lsi-summit-2026-networking.jpg" alt="Guests in conversation at the Leadership Summit" sizes="(min-width: 1024px) 19vw, 33vw" className="aspect-[4/3] w-full" />
+                <ImageReveal src="/images/lsi-summit-2026-westminster-hall.jpg" alt="Guests descending the steps of Westminster Hall" sizes="(min-width: 1024px) 19vw, 33vw" className="aspect-[4/3] w-full" />
+              </div>
+              <figcaption className="mt-4 border-t border-hairline pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-copy-muted">
+                Film &amp; stills: London School of Investors · Leadership Summit · House of Lords · 23 July 2026
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        {/* ─── № 04 MEMBERSHIP — the index ───────────────────────── */}
         <section id="tiers" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-24 sm:py-32">
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
-                <Chapter n="03" title="Membership" />
+                <Chapter n="04" title="Membership" />
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
@@ -378,12 +422,12 @@ export async function HomeView() {
           </figure>
         </section>
 
-        {/* ─── № 04 REACH ────────────────────────────────────────── */}
+        {/* ─── № 05 REACH ────────────────────────────────────────── */}
         <section className="on-dark overflow-hidden bg-night text-night-copy">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-24 sm:py-32 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
-                <Chapter n="04" title="Reach" onNight />
+                <Chapter n="05" title="Reach" onNight />
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}

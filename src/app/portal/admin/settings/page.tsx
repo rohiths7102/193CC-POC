@@ -16,7 +16,8 @@ const DESCRIPTIONS: Record<string, string> = {
 
 export default async function SettingsPage() {
   await requireUser("configure_system");
-  const settings = await db.setting.findMany({ orderBy: { key: "asc" } });
+  // assistant.* rows (incl. encrypted keys) are managed on Admin → AI assistant.
+  const settings = await db.setting.findMany({ where: { NOT: { key: { startsWith: "assistant." } } }, orderBy: { key: "asc" } });
   const rules = await db.thresholdRule.findMany();
   const products = await db.product.findMany({ orderBy: { sortOrder: "asc" } });
 

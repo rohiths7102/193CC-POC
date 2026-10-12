@@ -24,6 +24,7 @@ const NAV: Record<string, NavItem[]> = {
     { href: "/portal/admin/reports", label: "Reports", icon: "reports" },
     { href: "/portal/admin/audit", label: "Audit log", icon: "audit" },
     { href: "/portal/admin/emails", label: "Email log", icon: "emails" },
+    { href: "/portal/admin/assistant", label: "AI assistant", icon: "assistant" },
     { href: "/portal/admin/settings", label: "Settings", icon: "settings" },
   ],
   SALES_REP: [

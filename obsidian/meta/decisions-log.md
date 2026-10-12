@@ -17,6 +17,26 @@ Template: [[templates/adr-note]].
 
 ---
 
+## ADR-0032 — "Ask 193 CC": retrieval-augmented assistant
+
+**Status:** Accepted
+
+**Decision.** A public chatbot that answers only from 193 CC's own pages and live
+database facts. Generation: Groq (OpenAI-compatible API, model chosen in admin).
+Retrieval: hybrid — BM25 always, plus Gemini embeddings (gemini-embedding-001, 768d)
+when a Gemini key is set, merged by reciprocal-rank fusion. Vectors live in Postgres
+(`KnowledgeChunk.embedding Float[]`) and are scored in memory.
+
+**Why.** Groq has no embeddings endpoint, so semantic vectors need a second provider;
+BM25 keeps the bot useful with a Groq key alone. The corpus is hundreds of chunks, so
+in-memory cosine is milliseconds — no pgvector extension (which could fail a
+production `migrate deploy`) and no separate vector service to pay for.
+
+**Consequences.** API keys are entered on Admin → AI assistant, verified, stored
+AES-256-GCM-encrypted (key derived from SESSION_SECRET) and never returned to the
+browser; host env vars override. Re-index after content changes. Conversations and
+feedback are logged (IP hashed). `GROQ_BASE_URL` exists for proxies/test doubles.
+
 ## ADR-0031 — The Lords palette
 
 **Status:** Accepted · supersedes ADR-0030's paper / night / oxblood palette

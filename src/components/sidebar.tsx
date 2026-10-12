@@ -8,7 +8,7 @@ import {
   LayoutDashboard, BadgeCheck, CalendarClock, Landmark, PenSquare, Handshake,
   Users, Wallet, Ticket, ClipboardCheck, BarChart3, ScrollText, Mail, Settings,
   Briefcase, UserPlus, GraduationCap, Eye, LogOut, Menu, X, Newspaper,
-  Globe, ShieldCheck, Search, CornerDownLeft,
+  Globe, ShieldCheck, Search, CornerDownLeft, Bot,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, DemoTag } from "@/components/ui";
@@ -32,6 +32,7 @@ const ICONS: Record<string, React.ReactNode> = {
   audit: <ScrollText className="h-4 w-4" />,
   emails: <Mail className="h-4 w-4" />,
   settings: <Settings className="h-4 w-4" />,
+  assistant: <Bot className="h-4 w-4" />,
   pipeline: <Briefcase className="h-4 w-4" />,
   enrol: <UserPlus className="h-4 w-4" />,
   sessions: <GraduationCap className="h-4 w-4" />,

@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import Lenis from "lenis";
+import { ChatWidget } from "@/components/assistant/chat";
 import { usePathname, useRouter } from "next/navigation";
 import {
   motion, MotionConfig, useMotionValue, useSpring, useScroll,
@@ -625,6 +626,7 @@ export function PremiumShell({ children }: { children: ReactNode }) {
           <CustomCursor />
           <ScrollProgress />
           <RouteDoors>{children}</RouteDoors>
+          <ChatWidget />
         </SmoothScroll>
       </MotionConfig>
     </ShellCtx.Provider>

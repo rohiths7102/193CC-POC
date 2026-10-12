@@ -16,6 +16,15 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (assistant)
+
+**"Ask 193 CC" assistant (ADR-0032).** Floating gilt chat on every public page —
+streamed, cited answers grounded in the site + live tiers/prices/events; suggested
+questions; follow-up rewriting; thumbs feedback; session memory. Admin → AI
+assistant: encrypted keys, model/creativity/instructions, re-index, add documents,
+live test console, conversation log. New tables via migration `assistant_rag`
+(additive). Rate limit 20 questions / 10 min per visitor.
+
 ## 2026-10-12 (globe stories, velvet, collage)
 
 **Globe story tour.** After ignition the Reach globe flies to London, Dubai and

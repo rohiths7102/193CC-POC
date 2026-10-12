@@ -553,3 +553,55 @@ model EmailOutbox {
   body      String
   createdAt DateTime @default(now())
 }
+
+// ── AI assistant (RAG) ──────────────────────────────────────────────────────
+// Knowledge base for the public chatbot. A document is a page of the site or
+// text an admin added; it is split into chunks for retrieval. `embedding` is
+// empty until an embeddings provider (Gemini) is configured — retrieval then
+// becomes hybrid (vector + BM25); without it, BM25 alone.
+model KnowledgeDoc {
+  id        String           @id @default(cuid())
+  title     String
+  source    String // "site" (re-indexed from the public pages / database) | "admin"
+  url       String?
+  content   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  chunks    KnowledgeChunk[]
+
+  @@index([source])
+}
+
+model KnowledgeChunk {
+  id        String       @id @default(cuid())
+  docId     String
+  doc       KnowledgeDoc @relation(fields: [docId], references: [id], onDelete: Cascade)
+  ord       Int
+  text      String
+  embedding Float[]
+
+  @@index([docId])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  ipHash    String?
+  page      String?
+  createdAt DateTime      @default(now())
+  messages  ChatMessage[]
+
+  @@index([createdAt])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String // "user" | "assistant"
+  content   String
+  sources   Json?
+  feedback  Int? // 1 helpful, -1 not helpful
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId])
+}

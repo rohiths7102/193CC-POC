@@ -56,11 +56,11 @@ export const metadata: Metadata = {
   },
 };
 
-// The page ground is now white, so the toolbar must follow it. Leaving this on
-// navy would band the top of every mobile screen against a white hero.
+// The ground is the Lords maroon (ADR-0031); the mobile toolbar follows it so
+// the top of the screen doesn't band against a dark page.
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
-  colorScheme: "light",
+  themeColor: "#1A0709",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };

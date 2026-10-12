@@ -4,6 +4,9 @@ import { audit } from "./audit";
 import { promoteNext } from "./summit";
 import { collectNextInstalment } from "./enrolment";
 import { sendContentReviewReminders, sendRenewalReminders, sweepPendingVerifications } from "./automation";
+import { appUrl } from "@/lib/app-url";
+import { getAssistantConfig } from "./assistant/config";
+import { reindexSite } from "./assistant/knowledge";
 
 /**
  * Housekeeping tick — every 60s in-process on a long-lived server
@@ -39,11 +42,12 @@ export type TickReport = {
   orgExceptions: number;
   renewalReminders: number;
   contentReminders: number;
+  knowledgeReindexed: number;
 };
 
 const empty = (): TickReport => ({
   ddCollected: 0, ddAtRisk: 0, summitsClosed: 0, offersExpired: 0, lapsed: 0,
-  orgAutoApproved: 0, orgExceptions: 0, renewalReminders: 0, contentReminders: 0,
+  orgAutoApproved: 0, orgExceptions: 0, renewalReminders: 0, contentReminders: 0, knowledgeReindexed: 0,
 });
 
 export async function runTick(): Promise<TickReport> {
@@ -150,6 +154,16 @@ async function runJobs(): Promise<TickReport> {
   catch (e) { console.error("[tick] renewal reminders", e); }
   try { report.contentReminders = await sendContentReviewReminders(now); }
   catch (e) { console.error("[tick] content review reminders", e); }
+
+  // 8. Keep the assistant's knowledge in step with the site and live prices:
+  //    re-index when the site index is over 20 hours old (and the bot is on).
+  try {
+    const cfg = await getAssistantConfig();
+    const newest = await db.knowledgeDoc.findFirst({ where: { source: "site" }, orderBy: { updatedAt: "desc" }, select: { updatedAt: true } });
+    if (cfg.groqKey && (!newest || now.getTime() - newest.updatedAt.getTime() > 20 * 3_600_000)) {
+      report.knowledgeReindexed = (await reindexSite(appUrl(), cfg.geminiKey)).chunks;
+    }
+  } catch (e) { console.error("[tick] assistant re-index", e); }
 
   return report;
 }

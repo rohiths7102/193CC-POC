@@ -27,7 +27,9 @@ const SUGGESTIONS = [
 ];
 
 /** Light formatting: paragraphs, "- " bullets, **bold**, and [n] citations as links. */
-function Rich({ text, sources }: { text: string; sources?: Source[] }) {
+function Rich({ text: raw, sources }: { text: string; sources?: Source[] }) {
+  // Normalise model quirks: hidden reasoning, and 【1†L1-L3】-style citations.
+  const text = raw.replace(/<think>[\s\S]*?(<\/think>|$)/g, "").replace(/【(\d+)[^】]*】/g, "[$1]").trim();
   const inline = (s: string, key: string) =>
     s.split(/(\*\*[^*]+\*\*|\[\d+\])/g).map((part, i) => {
       const k = `${key}-${i}`;

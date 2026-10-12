@@ -17,7 +17,9 @@ export const ASSISTANT = {
   geminiKey: "assistant.gemini_key",
 } as const;
 
-export const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+// Fast, follows the [n] citation format exactly (checked against llama-3.3,
+// retired on Groq, and gpt-oss, which uses its own 【n†…】 marks).
+export const DEFAULT_MODEL = "qwen/qwen3.8-27b";
 export const EMBEDDING_MODEL = "gemini-embedding-001";
 export const EMBEDDING_DIMS = 768;
 

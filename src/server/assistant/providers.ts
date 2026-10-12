@@ -9,7 +9,7 @@ export type ChatTurn = { role: "system" | "user" | "assistant"; content: string 
 const GROQ = process.env.GROQ_BASE_URL?.replace(/\/$/, "") || "https://api.groq.com/openai/v1";
 
 export class ProviderError extends Error {
-  constructor(message: string, readonly status?: number) {
+  constructor(message: string, readonly status?: number, readonly retryAfter?: number) {
     super(message);
   }
 }
@@ -24,21 +24,52 @@ async function groqFetch(key: string, path: string, body?: unknown) {
   if (!res.ok) {
     let detail = "";
     try { detail = ((await res.json()) as { error?: { message?: string } }).error?.message ?? ""; } catch { /* not json */ }
-    throw new ProviderError(`Groq ${res.status}${detail ? `: ${detail}` : ""}`, res.status);
+    const retryAfter = Number(res.headers.get("retry-after"));
+    throw new ProviderError(`Groq ${res.status}${detail ? `: ${detail}` : ""}`, res.status, Number.isFinite(retryAfter) ? retryAfter : undefined);
   }
   return res;
 }
 
+/** Groq rate-limits each model separately, so a second model absorbs bursts. */
+const fallbackFor = (model: string) => (model === "openai/gpt-oss-20b" ? "openai/gpt-oss-120b" : "openai/gpt-oss-20b");
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * POST a chat completion, riding out rate limits: on a 429, wait if Groq asks
+ * for a short pause (≤ 6s) and retry once, then fall back to a second model.
+ */
+async function chatWithFallback(key: string, body: { model: string } & Record<string, unknown>) {
+  const opts = (model: string) => ({
+    ...body,
+    model,
+    ...(model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}),
+  });
+  try {
+    return await groqFetch(key, "/chat/completions", opts(body.model));
+  } catch (e) {
+    if (!(e instanceof ProviderError) || e.status !== 429) throw e;
+    if (e.retryAfter !== undefined && e.retryAfter <= 6) {
+      await sleep(e.retryAfter * 1000 + 250);
+      try { return await groqFetch(key, "/chat/completions", opts(body.model)); } catch (e2) {
+        if (!(e2 instanceof ProviderError) || e2.status !== 429) throw e2;
+      }
+    }
+    return groqFetch(key, "/chat/completions", opts(fallbackFor(body.model)));
+  }
+}
+
 /** One-shot completion (used to rewrite follow-up questions for search). */
 export async function groqComplete(key: string, model: string, messages: ChatTurn[], maxTokens = 120): Promise<string> {
-  const res = await groqFetch(key, "/chat/completions", { model, messages, temperature: 0, max_tokens: maxTokens });
+  // +400 tokens of room in case the fallback (a gpt-oss model) reasons first.
+  const res = await chatWithFallback(key, { model, messages, temperature: 0, max_completion_tokens: maxTokens + 400 });
   const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   return json.choices?.[0]?.message?.content?.trim() ?? "";
 }
 
 /** Streaming completion — yields text deltas as they arrive. */
 export async function* groqStream(key: string, model: string, messages: ChatTurn[], temperature: number): AsyncGenerator<string> {
-  const res = await groqFetch(key, "/chat/completions", { model, messages, temperature, max_tokens: 900, stream: true });
+  // gpt-oss models reason before answering; chatWithFallback keeps that short.
+  const res = await chatWithFallback(key, { model, messages, temperature, max_completion_tokens: 1500, stream: true });
   const reader = res.body!.getReader();
   const dec = new TextDecoder();
   let buf = "";
@@ -66,7 +97,7 @@ export async function groqModels(key: string): Promise<string[]> {
   const res = await groqFetch(key, "/models");
   const json = (await res.json()) as { data?: { id: string; active?: boolean }[] };
   return (json.data ?? [])
-    .filter((m) => m.active !== false && !/whisper|tts|guard|playai/i.test(m.id))
+    .filter((m) => m.active !== false && !/whisper|tts|guard|playai|orpheus|safeguard/i.test(m.id))
     .map((m) => m.id)
     .sort();
 }

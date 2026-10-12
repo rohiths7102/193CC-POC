@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 import { getAssistantConfig } from "@/server/assistant/config";
 import { prepareAnswer } from "@/server/assistant/answer";
 import { ProviderError } from "@/server/assistant/providers";
+import { reindexSite } from "@/server/assistant/knowledge";
 
 /**
  * The public chatbot endpoint.
@@ -68,6 +69,8 @@ export async function POST(req: Request) {
 
   let prepared;
   try {
+    // First question on a fresh install: build the knowledge base on the spot.
+    if ((await db.knowledgeChunk.count()) === 0) await reindexSite(new URL(req.url).origin, cfg.geminiKey);
     prepared = await prepareAnswer(cfg, messages);
   } catch (e) {
     console.error("[assistant] retrieval failed", e);

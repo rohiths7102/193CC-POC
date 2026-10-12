@@ -145,6 +145,13 @@ export function ImageReveal({
         >
           <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className={`object-cover ${imageClassName ?? ""}`} />
         </motion.div>
+        {/* Gilt hairline, set in from the edge like a mount, drawn after the wipe. */}
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-3 border border-gilt/60"
+          variants={{ hidden: { opacity: 0, scale: 1.03 }, shown: { opacity: 1, scale: 1 } }}
+          transition={{ duration: 1.2, delay: 0.8, ease: EASE }}
+        />
       </motion.div>
     </motion.div>
   );
@@ -281,5 +288,29 @@ export function ReadingRule() {
       className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-accent"
       style={{ scaleX: scrollYProgress }}
     />
+  );
+}
+
+/**
+ * A pool of chamber-red light behind a section that drifts against the
+ * scroll and swells as the section crosses the middle of the screen. Sits at
+ * -z-10, so its section needs `relative isolate`.
+ */
+export function ChamberLight({ at = "right" }: { at?: "left" | "right" }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-18%", "18%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.15, 0.55, 0.15]);
+  return (
+    <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <motion.div
+        style={{ y, opacity }}
+        className={
+          at === "right"
+            ? "absolute inset-0 bg-[radial-gradient(55%_45%_at_78%_35%,var(--chamber)_0%,transparent_70%)]"
+            : "absolute inset-0 bg-[radial-gradient(55%_45%_at_18%_55%,var(--chamber)_0%,transparent_70%)]"
+        }
+      />
+    </div>
   );
 }

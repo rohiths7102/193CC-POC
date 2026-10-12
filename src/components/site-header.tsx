@@ -5,8 +5,7 @@
  *
  * Over the hero it is transparent with white type, so the film runs edge to
  * edge under the wordmark instead of being capped by a white strip. Once
- * the page has scrolled past ~64px it settles into the solid white bar the
- * rest of the site uses. The flip is a class toggle driven by one passive
+ * the page has scrolled past ~64px it settles into a dark glass bar. The flip is a class toggle driven by one passive
  * scroll listener; the styles live in globals.css (`.nav-hero`).
  */
 
@@ -29,7 +28,7 @@ export function SiteHeader() {
   return (
     <header
       className={`nav-hero sticky top-0 z-40 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${
-        scrolled ? "is-scrolled hairline bg-white/96 backdrop-blur-xs" : "on-dark border-transparent bg-transparent"
+        scrolled ? "on-dark is-scrolled border-hairline bg-night/85 backdrop-blur-md" : "on-dark border-transparent bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">

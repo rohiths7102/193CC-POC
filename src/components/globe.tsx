@@ -114,13 +114,13 @@ export function Globe({ className }: { className?: string }) {
 
       // atmosphere
       const glow = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R * 1.35);
-      glow.addColorStop(0, "rgba(120,140,190,0.16)");
-      glow.addColorStop(0.55, "rgba(120,140,190,0.05)");
-      glow.addColorStop(1, "rgba(120,140,190,0)");
+      glow.addColorStop(0, "rgba(176,36,44,0.30)");
+      glow.addColorStop(0.55, "rgba(176,36,44,0.08)");
+      glow.addColorStop(1, "rgba(176,36,44,0)");
       ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, cy, R * 1.35, 0, Math.PI * 2); ctx.fill();
 
       // limb
-      ctx.strokeStyle = "rgba(255,255,255,0.10)"; ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(214,180,124,0.22)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
 
       // graticule — 5 parallels + 12 meridians, depth-faded
@@ -136,7 +136,7 @@ export function Globe({ className }: { className?: string }) {
           if (z < -0.02) { ctx.moveTo(cx + x * R, cy - y * R); continue; }
           i === 0 ? ctx.moveTo(cx + x * R, cy - y * R) : ctx.lineTo(cx + x * R, cy - y * R);
         }
-        ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.stroke();
+        ctx.strokeStyle = "rgba(214,180,124,0.10)"; ctx.stroke();
       }
       for (let m = 0; m < 12; m++) {
         const lon = (m / 12) * Math.PI * 2;
@@ -148,7 +148,7 @@ export function Globe({ className }: { className?: string }) {
           if (z < -0.02) { ctx.moveTo(cx + x * R, cy - y * R); continue; }
           i === 0 ? ctx.moveTo(cx + x * R, cy - y * R) : ctx.lineTo(cx + x * R, cy - y * R);
         }
-        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.stroke();
+        ctx.strokeStyle = "rgba(214,180,124,0.08)"; ctx.stroke();
       }
 
       // back hemisphere dots (faint) then front (bright) — painter's order
@@ -158,11 +158,11 @@ export function Globe({ className }: { className?: string }) {
           if (pass === 0 ? z >= 0 : z < 0) continue;
           const sx = cx + x * R, sy = cy - y * R;
           if (pass === 0) {
-            ctx.fillStyle = "rgba(255,255,255,0.10)";
+            ctx.fillStyle = "rgba(214,180,124,0.12)";
             ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI * 2); ctx.fill();
           } else {
             const a = 0.36 + z * 0.55; // brighter toward the viewer
-            ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+            ctx.fillStyle = `rgba(240,216,168,${a.toFixed(3)})`;
             ctx.beginPath(); ctx.arc(sx, sy, 1.3 + z * 0.7, 0, Math.PI * 2); ctx.fill();
           }
         }
@@ -187,13 +187,13 @@ export function Globe({ className }: { className?: string }) {
           const sx = cx + x * R, sy = cy - y * R;
           if (!started) { ctx.moveTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
         }
-        ctx.strokeStyle = `rgba(248,142,134,${(0.85 * fade).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(240,216,168,${(0.85 * fade).toFixed(3)})`;
         ctx.lineWidth = 1.2; ctx.stroke();
         // arrival dot
         if (grow >= 1) {
           const [x, y, z] = proj(c.v, Y, P);
           if (z > 0) {
-            ctx.fillStyle = `rgba(248,142,134,${(0.9 * fade).toFixed(3)})`;
+            ctx.fillStyle = `rgba(240,216,168,${(0.9 * fade).toFixed(3)})`;
             ctx.beginPath(); ctx.arc(cx + x * R, cy - y * R, 2.2, 0, Math.PI * 2); ctx.fill();
           }
         }
@@ -203,9 +203,9 @@ export function Globe({ className }: { className?: string }) {
       if (lz > -0.05) {
         const sx = cx + lx * R, sy = cy - ly * R;
         const ph = (t % 2.2) / 2.2;
-        ctx.strokeStyle = `rgba(239,70,59,${(0.55 * (1 - ph)).toFixed(3)})`; ctx.lineWidth = 1.2;
+        ctx.strokeStyle = `rgba(214,60,66,${(0.7 * (1 - ph)).toFixed(3)})`; ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.arc(sx, sy, 4 + ph * 16, 0, Math.PI * 2); ctx.stroke();
-        ctx.fillStyle = "#EF463B";
+        ctx.fillStyle = "#D6B47C";
         ctx.beginPath(); ctx.arc(sx, sy, 3.2, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "rgba(255,255,255,0.95)";
         ctx.beginPath(); ctx.arc(sx, sy, 1.3, 0, Math.PI * 2); ctx.fill();

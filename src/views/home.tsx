@@ -17,9 +17,11 @@ import {
   Counter,
   ScrollReel,
   ReadingRule,
+  ChamberLight,
   type ReelFrame,
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
+import { CountryBand } from "@/components/magazine/country-band";
 
 const LAUNCHED_BRANDS = [
   "Sportto",
@@ -121,7 +123,7 @@ export async function HomeView() {
               className="mt-6 max-w-5xl font-headline text-[clamp(3rem,8.4vw,8.25rem)] leading-[0.95] tracking-[-0.02em]"
               lines={[
                 "Membership that opens",
-                <span key="cover-2">the most <em className="text-accent-on-night">exclusive</em> doors</span>,
+                <span key="cover-2">the most <em className="text-gilt">exclusive</em> doors</span>,
                 "in British enterprise.",
               ]}
             />
@@ -169,7 +171,7 @@ export async function HomeView() {
                 className={`flex flex-col-reverse py-10 ${i % 2 === 1 ? "pl-6" : ""} ${i > 0 ? "lg:border-l lg:border-hairline lg:pl-8" : ""} ${i < 2 ? "border-b border-hairline lg:border-b-0" : ""}`}
               >
                 <dt className="mt-3 max-w-56 text-sm text-copy-muted">{f.label}</dt>
-                <dd className="font-headline text-[clamp(2.75rem,5vw,4.5rem)] leading-none">
+                <dd className="text-gilt font-headline text-[clamp(2.75rem,5vw,4.5rem)] leading-none">
                   <Counter value={f.n} prefix={f.prefix} suffix={f.suffix} />
                 </dd>
               </div>
@@ -178,14 +180,15 @@ export async function HomeView() {
         </section>
 
         {/* ─── № 01 THE CONSORTIUM ───────────────────────────────── */}
-        <section className="mx-auto grid max-w-7xl gap-14 px-6 py-24 sm:py-32 lg:grid-cols-12">
+        <section className="relative isolate mx-auto grid max-w-7xl gap-14 px-6 py-24 sm:py-32 lg:grid-cols-12">
+          <ChamberLight at="right" />
           <div className="lg:col-span-6">
             <Reveal>
               <Chapter n="01" title="The Consortium" />
             </Reveal>
             <MaskedLines
               className={`mt-8 ${display}`}
-              lines={["Where British", "enterprise meets", <em key="w" className="text-accent">the world.</em>]}
+              lines={["Where British", "enterprise meets", <em key="w" className="text-gilt">the world.</em>]}
             />
             <Reveal delay={0.2}>
               <p className="mt-10 max-w-xl text-lg leading-[1.75] text-copy-soft first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-headline first-letter:text-7xl first-letter:leading-[0.8] first-letter:text-accent">
@@ -208,7 +211,7 @@ export async function HomeView() {
           </div>
           <figure className="lg:col-span-5 lg:col-start-8">
             <ImageReveal
-              src="/images/leadenhall-building.jpg"
+              src="/images/leadenhall-building-warm.jpg"
               alt="The Leadenhall Building, seen from street level"
               sizes="(min-width: 1024px) 40vw, 100vw"
               className="aspect-[3/4] w-full"
@@ -233,7 +236,7 @@ export async function HomeView() {
                   lines={[
                     "Forty-five slots.",
                     "Three stages.",
-                    <em key="r" className="text-accent-on-night">One room that matters.</em>,
+                    <em key="r" className="text-gilt">One room that matters.</em>,
                   ]}
                 />
                 <Reveal delay={0.2}>
@@ -306,7 +309,8 @@ export async function HomeView() {
 
         {/* ─── № 03 LAUNCHED AT PARLIAMENT ───────────────────────── */}
         {/* 193 CC's own film and photographs (public/images/CREDITS.md). */}
-        <section className="pt-24 sm:pt-32">
+        <section className="relative isolate pt-24 sm:pt-32">
+          <ChamberLight at="left" />
           <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
@@ -314,7 +318,7 @@ export async function HomeView() {
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
-                lines={["Six brands,", "launched in", <em key="l" className="text-accent">the House of Lords.</em>]}
+                lines={["Six brands,", "launched in", <em key="l" className="text-gilt">the House of Lords.</em>]}
               />
               <Reveal delay={0.2}>
                 <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
@@ -372,7 +376,7 @@ export async function HomeView() {
               <MaskedLines
                 as="p"
                 className={display}
-                lines={["And back again,", <em key="o" className="text-accent">October 2025.</em>]}
+                lines={["And back again,", <em key="o" className="text-gilt">October 2025.</em>]}
               />
               <Reveal delay={0.2}>
                 <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
@@ -389,7 +393,8 @@ export async function HomeView() {
         {/* London School of Investors footage, used at 193 CC's request. LSI's
             watermark stays in frame and every caption names it as LSI's event
             (public/images/CREDITS.md). */}
-        <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
+        <section className="relative isolate mx-auto max-w-7xl px-6 py-24 sm:py-32">
+          <ChamberLight at="right" />
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
@@ -397,7 +402,7 @@ export async function HomeView() {
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
-                lines={["Also at the", "House of Lords.", <em key="d" className="text-accent">23 July 2026.</em>]}
+                lines={["Also at the", "House of Lords.", <em key="d" className="text-gilt">23 July 2026.</em>]}
               />
               <Reveal delay={0.2}>
                 <p className="mt-8 max-w-md text-lg leading-[1.75] text-copy-soft">
@@ -430,7 +435,8 @@ export async function HomeView() {
         </section>
 
         {/* ─── № 04 MEMBERSHIP — the index ───────────────────────── */}
-        <section id="tiers" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-24 sm:py-32">
+        <section id="tiers" className="relative isolate mx-auto max-w-7xl scroll-mt-24 px-6 py-24 sm:py-32">
+          <ChamberLight at="left" />
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <Reveal>
@@ -438,7 +444,7 @@ export async function HomeView() {
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
-                lines={["Four ways in.", <em key="s" className="text-accent">One standard.</em>]}
+                lines={["Four ways in.", <em key="s" className="text-gilt">One standard.</em>]}
               />
             </div>
             <Reveal delay={0.15} className="lg:col-span-5 lg:col-start-8 lg:self-end">
@@ -537,7 +543,7 @@ export async function HomeView() {
               </Reveal>
               <MaskedLines
                 className={`mt-8 ${display}`}
-                lines={["One London hub.", <em key="c" className="text-accent-on-night">193 countries.</em>]}
+                lines={["One London hub.", <em key="c" className="text-gilt">193 countries.</em>]}
               />
               <Reveal delay={0.2}>
                 <p className="mt-8 max-w-md text-lg leading-[1.75] text-night-copy/75">
@@ -549,6 +555,12 @@ export async function HomeView() {
             <div className="relative mx-auto aspect-square w-full max-w-xl lg:col-span-7">
               <Globe className="absolute inset-0 h-full w-full" />
             </div>
+          </div>
+          <div className="border-t border-night-copy/10 pb-20 pt-10">
+            <p className="mx-auto max-w-7xl px-6 font-mono text-[10px] uppercase tracking-[0.2em] text-night-copy/55">
+              Open to enterprises from all 193 UN member states
+            </p>
+            <CountryBand />
           </div>
         </section>
 
@@ -566,7 +578,7 @@ export async function HomeView() {
             <MaskedLines
               as="p"
               className="mx-auto max-w-4xl font-headline text-[clamp(2.75rem,6.5vw,6rem)] leading-none"
-              lines={["Your seat at the table", <em key="o" className="text-accent-on-night">is one signature away.</em>]}
+              lines={["Your seat at the table", <em key="o" className="text-gilt">is one signature away.</em>]}
             />
             <Reveal delay={0.3}>
               <Link

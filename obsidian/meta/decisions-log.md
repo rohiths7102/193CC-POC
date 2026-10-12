@@ -17,6 +17,25 @@ Template: [[templates/adr-note]].
 
 ---
 
+## ADR-0031 — The Lords palette
+
+**Status:** Accepted · supersedes ADR-0030's paper / night / oxblood palette
+
+**Decision.** The whole site is dark: maroon and warm black surfaces, gold-leaf
+accent, ivory type — sampled from 193 CC's own House of Lords footage (chamber
+red benches and carpet, gilded flock wallpaper, dark panelling). Only the tier-1
+primitives in `globals.css` changed; the semantic roles (`paper`, `night`,
+`copy`, `accent` …) kept their names, so every page built on them followed.
+New roles: `chamber`, `chamber-deep`, `gilt`; new utility `text-gilt`.
+
+**Why.** The client asked for a dark maroon/black site mapped to the event.
+Taking the colours from the venue makes the photography sit in the page rather
+than on it; gold carries contrast that red on maroon cannot.
+
+**Consequences.** Red is never used for text on maroon (fails contrast) — it is
+a surface and a light (`ChamberLight`). Cold licensed stock is regraded warm
+(`leadenhall-building-warm.jpg`).
+
 ## ADR-0030 — The editorial redesign
 
 **Status:** Accepted · first page shipped: `/` (`src/views/home.tsx`)

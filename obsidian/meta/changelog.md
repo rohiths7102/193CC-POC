@@ -16,6 +16,14 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (night)
+
+**Lords palette (ADR-0031).** Site-wide dark maroon / black / gold-leaf scheme
+taken from the House of Lords footage; scrolled header is dark glass; old
+`brand`/`gold`/`amber` scales remapped to chamber red and gold so legacy pages
+follow. Homepage: gilded headline words and figures, `ChamberLight` scroll glow,
+gilt mounts on revealed photos, gold/chamber globe, scroll-linked `CountryBand`.
+
 ## 2026-10-12 (evening)
 
 **№03 Launched at Parliament + 193 CC's own media.** New homepage chapter

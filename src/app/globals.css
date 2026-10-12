@@ -12,25 +12,25 @@
   --color-ivory-200: #4a5470;
   --color-ivory-300: #6a7286;
 
-  --color-gold-300: #f4776d;
-  --color-gold-400: #ef463b;
-  --color-gold-500: #d6392f;
-  --color-gold-600: #c22626;
-  --color-gold-700: #a01d1d;
+  --color-gold-300: #c9555c;
+  --color-gold-400: #b0242c;
+  --color-gold-500: #9e1f27;
+  --color-gold-600: #8e1a22;
+  --color-gold-700: #6e141b;
 
   --color-mist: #6a7286;
   --color-line: #e4e7ed;
 
-  --color-brand: #ef463b;
-  --color-brand-deep: #c22626;
-  --color-brand-soft: #f4776d;
+  --color-brand: #b0242c;
+  --color-brand-deep: #8e1a22;
+  --color-brand-soft: #c9555c;
 
   --color-navy: #313c59;
   --color-navy-deep: #232a42;
   --color-navy-soft: #444f6c;
 
-  --color-amber: #ffae29;
-  --color-amber-deep: #e09415;
+  --color-amber: #d6b47c;
+  --color-amber-deep: #a97b45;
 
   --font-display: var(--font-roboto-condensed), Arial Narrow, sans-serif;
   --font-sans: var(--font-roboto), system-ui, sans-serif;
@@ -139,10 +139,10 @@
 
 @layer utilities {
   :root {
-    --brand: #ef463b;
-    --brand-deep: #c22626;
+    --brand: #b0242c;
+    --brand-deep: #8e1a22;
     --navy: #313c59;
-    --amber: #ffae29;
+    --amber: #d6b47c;
     --line: rgba(16, 24, 40, 0.08);
   }
 
@@ -311,10 +311,10 @@
     color: #ffffff;
   }
   .nav-hero.is-scrolled .nav-link {
-    color: #6a7286;
+    color: var(--copy-soft);
   }
   .nav-hero.is-scrolled .nav-link:hover {
-    color: #1b2238;
+    color: var(--accent-on-night);
   }
 
   /* ── Section-title accent — LSI's hero move (one word in red) carried down
@@ -810,19 +810,23 @@ html.lenis, html.lenis body { height: auto; }
 
 /* TIER 1 — primitives. The only place a literal may appear. */
 :root {
-  --raw-color-paper-50: #f6f3ec;
-  --raw-color-paper-100: #ede8dd;
-  --raw-color-paper-200: #ddd6c7;
-  --raw-color-carbon-950: #111317;
-  --raw-color-carbon-900: #171a20;
-  --raw-color-carbon-700: #3a3f4a;
-  --raw-color-carbon-500: #626875;
-  --raw-color-oxblood-600: #b3261e;
-  --raw-color-oxblood-500: #d6392f;
-  --raw-color-oxblood-300: #f2a39d;
-  --raw-color-night-950: #0d1220;
-  --raw-color-night-900: #141b2e;
-  --raw-color-white: #ffffff;
+  /* The Lords palette — sampled from 193 CC's own House of Lords footage:
+     chamber red (benches, carpet, the lectern coat), gilded flock wallpaper,
+     dark panelling. */
+  --raw-color-maroon-950: #1a0709;
+  --raw-color-maroon-900: #26090d;
+  --raw-color-maroon-800: #3a0e14;
+  --raw-color-maroon-700: #5a141c;
+  --raw-color-chamber-600: #8e1a22;
+  --raw-color-chamber-500: #b0242c;
+  --raw-color-black-950: #0b0606;
+  --raw-color-black-900: #140a0b;
+  --raw-color-gold-600: #a97b45;
+  --raw-color-gold-400: #d6b47c;
+  --raw-color-gold-200: #f0d8a8;
+  --raw-color-ivory-50: #f6eee1;
+  --raw-color-ivory-300: #d4c6b0;
+  --raw-color-ivory-500: #a8977f;
 
   --raw-duration-quick: 180ms;
   --raw-duration-measured: 900ms;
@@ -830,18 +834,21 @@ html.lenis, html.lenis body { height: auto; }
 
 /* TIER 2 — semantic roles. Purpose, never appearance. */
 :root {
-  --paper: var(--raw-color-paper-50);
-  --paper-deep: var(--raw-color-paper-100);
-  --hairline: var(--raw-color-paper-200);
-  --copy: var(--raw-color-carbon-950);
-  --copy-soft: var(--raw-color-carbon-700);
-  --copy-muted: var(--raw-color-carbon-500);
-  --accent: var(--raw-color-oxblood-600);
-  --accent-bright: var(--raw-color-oxblood-500);
-  --accent-on-night: var(--raw-color-oxblood-300);
-  --night: var(--raw-color-night-950);
-  --night-raised: var(--raw-color-night-900);
-  --night-copy: var(--raw-color-white);
+  --paper: var(--raw-color-maroon-950);
+  --paper-deep: var(--raw-color-maroon-900);
+  --hairline: var(--raw-color-maroon-700);
+  --copy: var(--raw-color-ivory-50);
+  --copy-soft: var(--raw-color-ivory-300);
+  --copy-muted: var(--raw-color-ivory-500);
+  --accent: var(--raw-color-gold-400);
+  --accent-bright: var(--raw-color-chamber-500);
+  --accent-on-night: var(--raw-color-gold-200);
+  --night: var(--raw-color-black-950);
+  --night-raised: var(--raw-color-black-900);
+  --night-copy: var(--raw-color-ivory-50);
+  --chamber: var(--raw-color-chamber-600);
+  --chamber-deep: var(--raw-color-maroon-800);
+  --gilt: var(--raw-color-gold-600);
   --headline: var(--font-instrument-serif), Georgia, serif;
   --body: var(--font-geist), system-ui, sans-serif;
   --duration-quick: var(--raw-duration-quick);
@@ -862,7 +869,23 @@ html.lenis, html.lenis body { height: auto; }
   --color-night: var(--night);
   --color-night-raised: var(--night-raised);
   --color-night-copy: var(--night-copy);
+  --color-chamber: var(--chamber);
+  --color-chamber-deep: var(--chamber-deep);
+  --color-gilt: var(--gilt);
   --font-headline: var(--headline);
   --font-body: var(--body);
   --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Gilded type — gold leaf graded top to bottom, as on the Lords' wallpaper. */
+@utility text-gilt {
+  background-image: linear-gradient(
+    172deg,
+    var(--raw-color-gold-200) 0%,
+    var(--raw-color-gold-400) 48%,
+    var(--raw-color-gold-600) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }

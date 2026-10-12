@@ -7,7 +7,7 @@ Places only. No stock person is ever presented as a 193 CC member or attendee.
 |------|--------|
 | westminster-dusk.jpg | https://unsplash.com/photos/szj72gcdtkU |
 | westminster-thames.jpg | https://unsplash.com/photos/WWMuKwBgOKg |
-| leadenhall-building.jpg | https://unsplash.com/photos/KvFa3khqeiE |
+| leadenhall-building-warm.jpg (warm duotone regrade) | https://unsplash.com/photos/KvFa3khqeiE |
 | city-night.jpg | https://unsplash.com/photos/flGvLDMtSK4 |
 | london-skyline-green.jpg | https://unsplash.com/photos/xqFwaRfW-Ac |
 

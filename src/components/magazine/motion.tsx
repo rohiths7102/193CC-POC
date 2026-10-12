@@ -15,12 +15,26 @@ import {
   MotionConfig,
   animate,
   motion,
+  useAnimationFrame,
   useInView,
+  useMotionValue,
   useScroll,
+  useSpring,
   useTransform,
+  useVelocity,
+  type MotionValue,
 } from "framer-motion";
+import { useIntroDone } from "@/components/premium";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/** Scroll-linked styles bypass MotionConfig, so these check the preference
+ *  themselves. False for SSR and first paint (no hydration mismatch). */
+function useStill(): boolean {
+  const [still, setStill] = useState(false);
+  useEffect(() => setStill(window.matchMedia("(prefers-reduced-motion: reduce)").matches), []);
+  return still;
+}
 
 export function MagazineMotion({ children }: { children: ReactNode }) {
   return (
@@ -71,20 +85,26 @@ export function MaskedLines({
   lineClassName,
   delay = 0,
   as = "h2",
+  afterIntro = false,
 }: {
   lines: ReactNode[];
   className?: string;
   lineClassName?: string;
   delay?: number;
   as?: "h1" | "h2" | "p";
+  /** Hold until the opening doors have parted (pages with PreloaderGate). */
+  afterIntro?: boolean;
 }) {
   const Tag = motion[as];
+  const introDone = useIntroDone();
+  const trigger = afterIntro
+    ? { animate: introDone ? "shown" : "hidden" }
+    : { whileInView: "shown", viewport: { once: true, amount: 0.4 } };
   return (
     <Tag
       className={className}
       initial="hidden"
-      whileInView="shown"
-      viewport={{ once: true, amount: 0.4 }}
+      {...trigger}
       transition={{ staggerChildren: 0.09, delayChildren: delay }}
     >
       {lines.map((line, i) => (
@@ -127,6 +147,7 @@ export function ImageReveal({
 }) {
   return (
     <motion.div
+      data-cursor="view"
       className={`relative ${className ?? ""}`}
       initial="hidden"
       whileInView="shown"
@@ -165,6 +186,7 @@ export function ParallaxImage({
   className,
   priority = false,
   strength = 12,
+  zoom = 0,
 }: {
   src: string;
   alt: string;
@@ -172,13 +194,16 @@ export function ParallaxImage({
   className?: string;
   priority?: boolean;
   strength?: number;
+  /** Extra scale reached as the image scrolls out (0.2 = 120%). */
+  zoom?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [`-${strength}%`, `${strength}%`]);
+  const scale = useTransform(scrollYProgress, [0.5, 1], [1, 1 + zoom]);
   return (
     <div ref={ref} className={`overflow-hidden ${className ?? "relative"}`}>
-      <motion.div className="absolute -inset-y-[14%] inset-x-0" style={{ y }}>
+      <motion.div className="absolute -inset-y-[14%] inset-x-0" style={{ y, scale }}>
         <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
       </motion.div>
     </div>
@@ -311,6 +336,87 @@ export function ChamberLight({ at = "right" }: { at?: "left" | "right" }) {
             : "absolute inset-0 bg-[radial-gradient(55%_45%_at_18%_55%,var(--chamber)_0%,transparent_70%)]"
         }
       />
+    </div>
+  );
+}
+
+/**
+ * A section that opens as an iris: a circle of the section grows from the
+ * centre as it scrolls up into view, until it fills the screen. Scroll-linked,
+ * so it opens exactly as fast as the reader scrolls.
+ */
+export function IrisReveal({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 0.15"] });
+  const r = useTransform(scrollYProgress, [0, 1], [8, 150]);
+  const clipPath = useTransform(r, (v) => `circle(${v}% at 50% 40%)`);
+  const still = useStill();
+  return (
+    <motion.div ref={ref} className={className} style={{ clipPath: still ? "none" : clipPath }}>
+      {children}
+    </motion.div>
+  );
+}
+
+function ScrollWord({ word, progress, range, still }: { word: string; progress: MotionValue<number>; range: [number, number]; still: boolean }) {
+  const opacity = useTransform(progress, range, [0.16, 1]);
+  return (
+    <motion.span style={{ opacity: still ? 1 : opacity }} className="inline-block whitespace-pre">
+      {word}{" "}
+    </motion.span>
+  );
+}
+
+/** Text that lights up word by word as it is scrolled through. */
+export function ScrollWords({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.45"] });
+  const words = text.split(" ");
+  const still = useStill();
+  return (
+    <p ref={ref} className={className} aria-label={text}>
+      <span aria-hidden="true">
+        {words.map((w, i) => (
+          <ScrollWord key={i} word={w} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]} still={still} />
+        ))}
+      </span>
+    </p>
+  );
+}
+
+/**
+ * Giant outlined type that drifts sideways forever and surges with scroll
+ * velocity — scroll faster and it runs faster (and reverses when you scroll
+ * back up). Reduced motion: it stays still.
+ */
+export function VelocityMarquee({ text, className }: { text: string; className?: string }) {
+  const x = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 300 });
+  const boost = useTransform(velocity, [-2000, 0, 2000], [-6, 0, 6], { clamp: false });
+  const dir = useRef(1);
+  const still = useStill();
+  useAnimationFrame((_, delta) => {
+    if (still) return;
+    const b = boost.get();
+    if (b < 0) dir.current = -1;
+    else if (b > 0) dir.current = 1;
+    let next = x.get() - dir.current * (delta / 1000) * 3 * (1 + Math.abs(b));
+    // The text is repeated four times; wrap after one copy (25%).
+    if (next <= -25) next += 25;
+    if (next > 0) next -= 25;
+    x.set(next);
+  });
+  const xPct = useTransform(x, (v) => `${v}%`);
+  return (
+    <div className={`overflow-hidden whitespace-nowrap ${className ?? ""}`} aria-hidden="true">
+      <motion.div style={{ x: xPct }} className="flex w-max">
+        {[0, 1, 2, 3].map((i) => (
+          <span key={i} className="text-outline-lords pr-[0.4em] font-headline text-[clamp(4.5rem,13vw,12rem)] leading-[1.05]">
+            {text}
+          </span>
+        ))}
+      </motion.div>
     </div>
   );
 }

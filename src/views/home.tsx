@@ -5,6 +5,7 @@ import { gbp, ukDate } from "@/lib/utils";
 import { entitlementLabel, SLOT_KIND_LABEL } from "@/lib/labels";
 import { appUrl } from "@/lib/app-url";
 import { SiteHeader } from "@/components/site-header";
+import { PreloaderGate, IntroReveal, FadeOutOnScroll } from "@/components/premium";
 import { Logo } from "@/components/logo";
 import { Countdown, EventFilm } from "@/components/showcase";
 import {
@@ -17,6 +18,9 @@ import {
   ScrollReel,
   ReadingRule,
   ChamberLight,
+  IrisReveal,
+  ScrollWords,
+  VelocityMarquee,
   type ReelFrame,
 } from "@/components/magazine/motion";
 import { SlotFigure, type SlotColumn } from "@/components/magazine/slot-figure";
@@ -97,6 +101,7 @@ export async function HomeView() {
     <MagazineMotion>
       <main className="relative overflow-x-clip bg-paper font-body text-copy">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
+        <PreloaderGate />
         <SiteHeader />
         <ReadingRule />
 
@@ -109,16 +114,18 @@ export async function HomeView() {
             priority
             className="absolute inset-0"
             strength={8}
+            zoom={0.25}
           />
           <div className="absolute inset-0 bg-linear-to-t from-night via-night/55 to-night/20" />
-          <div className="relative mx-auto w-full max-w-7xl px-6 pb-14 pt-40 sm:pb-20">
-            <Reveal>
+          <FadeOutOnScroll className="relative mx-auto w-full max-w-7xl px-6 pb-14 pt-40 sm:pb-20">
+            <IntroReveal>
               <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-night-copy/70">
                 The 193 Countries Consortium · London · Est. 2022
               </p>
-            </Reveal>
+            </IntroReveal>
             <MaskedLines
               as="h1"
+              afterIntro
               delay={0.15}
               className="mt-6 max-w-5xl font-headline text-[clamp(3rem,8.4vw,8.25rem)] leading-[0.95] tracking-[-0.02em]"
               lines={[
@@ -127,7 +134,7 @@ export async function HomeView() {
                 "in British enterprise.",
               ]}
             />
-            <Reveal
+            <IntroReveal
               delay={0.55}
               className="mt-10 flex flex-col gap-8 border-t border-night-copy/20 pt-8 md:flex-row md:items-end md:justify-between"
             >
@@ -150,15 +157,16 @@ export async function HomeView() {
                   The UK Investors Summit
                 </Link>
               </div>
-            </Reveal>
+            </IntroReveal>
             <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.2em] text-night-copy/45">
               Cover — Palace of Westminster, dusk
             </p>
-          </div>
+          </FadeOutOnScroll>
         </section>
 
         {/* ─── FIGURES ───────────────────────────────────────────── */}
-        <section aria-label="The consortium in figures" className="border-b border-hairline">
+        <section aria-label="The consortium in figures" className="on-dark relative isolate overflow-hidden bg-chamber text-night-copy">
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_15%_0%,var(--raw-color-chamber-500)_0%,transparent_60%)]" />
           <dl className="mx-auto grid max-w-7xl grid-cols-2 px-6 lg:grid-cols-4">
             {[
               { n: 193, label: "Countries in the consortium" },
@@ -168,10 +176,10 @@ export async function HomeView() {
             ].map((f, i) => (
               <div
                 key={f.label}
-                className={`flex flex-col-reverse py-10 ${i % 2 === 1 ? "pl-6" : ""} ${i > 0 ? "lg:border-l lg:border-hairline lg:pl-8" : ""} ${i < 2 ? "border-b border-hairline lg:border-b-0" : ""}`}
+                className={`flex flex-col-reverse py-12 ${i % 2 === 1 ? "pl-6" : ""} ${i > 0 ? "lg:border-l lg:border-night-copy/20 lg:pl-8" : ""} ${i < 2 ? "border-b border-night-copy/20 lg:border-b-0" : ""}`}
               >
-                <dt className="mt-3 max-w-56 text-sm text-copy-muted">{f.label}</dt>
-                <dd className="text-gilt font-headline text-[clamp(2.75rem,5vw,4.5rem)] leading-none">
+                <dt className="mt-3 max-w-56 text-sm text-night-copy/85">{f.label}</dt>
+                <dd className="font-headline text-[clamp(3rem,6vw,5.5rem)] leading-none text-night-copy">
                   <Counter value={f.n} prefix={f.prefix} suffix={f.suffix} />
                 </dd>
               </div>
@@ -199,10 +207,10 @@ export async function HomeView() {
             </Reveal>
             <Reveal delay={0.3}>
               <blockquote className="mt-12 border-l-2 border-accent pl-6">
-                <p className="font-headline text-2xl italic leading-snug text-copy sm:text-3xl">
-                  “A single standard of access — so that an enterprise from any of 193 countries stands in the same room,
-                  on the same terms, as one from London.”
-                </p>
+                <ScrollWords
+                  className="font-headline text-2xl italic leading-snug text-copy sm:text-3xl"
+                  text="“A single standard of access — so that an enterprise from any of 193 countries stands in the same room, on the same terms, as one from London.”"
+                />
                 <footer className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-copy-muted">
                   Founding principle
                 </footer>
@@ -223,7 +231,12 @@ export async function HomeView() {
           </figure>
         </section>
 
+        <div className="bg-paper py-6">
+          <VelocityMarquee text="House of Lords · UK Investors Summit · " />
+        </div>
+
         {/* ─── № 02 THE SUMMIT ───────────────────────────────────── */}
+        <IrisReveal>
         <section id="summit" className="on-dark scroll-mt-24 bg-night text-night-copy">
           <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
             <div className="grid gap-12 lg:grid-cols-12">
@@ -306,6 +319,8 @@ export async function HomeView() {
             </div>
           </div>
         </section>
+
+        </IrisReveal>
 
         {/* ─── № 03 LAUNCHED AT PARLIAMENT ───────────────────────── */}
         {/* 193 CC's own film and photographs (public/images/CREDITS.md). */}
@@ -565,6 +580,10 @@ export async function HomeView() {
             <CountryBand />
           </div>
         </section>
+
+        <div className="bg-night py-6">
+          <VelocityMarquee text="193 Countries · One London Hub · " />
+        </div>
 
         {/* ─── CLOSE ─────────────────────────────────────────────── */}
         <section className="on-dark relative overflow-hidden bg-night text-night-copy">

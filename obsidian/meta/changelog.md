@@ -16,6 +16,17 @@ For *why* the conventions are what they are, see [[decisions-log]].
 
 ---
 
+## 2026-10-12 (motion pass)
+
+**Ceremony motion layer.** Opening sequence (`Preloader`): chamber-red doors,
+gilt seam, counter to 193, doors part onto the cover — once per session, decided
+once per page load (dev StrictMode double-effect fix). `RouteDoors` replaces
+`RouteFade` on public pages (portal keeps `RouteFade`). Gold cursor with a
+"View" lens on photographs. Homepage: cover push-in zoom + dim on exit; chamber-red
+figures band (tonal ladder: black / maroon / chamber red); `ScrollWords` founding
+quote; `IrisReveal` Summit chapter; two `VelocityMarquee` outline bands. All
+scroll-linked pieces check prefers-reduced-motion themselves (`useStill`).
+
 ## 2026-10-12 (late)
 
 **Reach globe rebuilt (`CountryGlobe`).** Real continents as a gold dot-matrix

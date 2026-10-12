@@ -136,6 +136,11 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       counter runs 0→100, curtain lifts. Repeat visits: instant fast-exit.
       Always ends by flipping the intro store so the hero can begin. */
 const INTRO_KEY = "cc193-intro-seen";
+let introDecision: "full" | "fast" | null = null;
+
+/** Panelled-door texture: vertical joins plus a pool of chamber light. */
+const DOOR_GRAIN =
+  "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 72px), radial-gradient(120% 80% at 50% 50%, rgba(176,36,44,0.55), transparent 70%)";
 
 export function Preloader() {
   const reduced = useReducedMotion();
@@ -145,9 +150,15 @@ export function Preloader() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    let seen = false;
-    try { seen = sessionStorage.getItem(INTRO_KEY) === "1"; } catch { /* private mode */ }
-    if (seen || reduced) {
+    // Decided once per page load: React's dev StrictMode runs this effect
+    // twice, and the first run's sessionStorage write would otherwise make the
+    // second run think the intro had already been seen.
+    if (introDecision === null) {
+      let seen = false;
+      try { seen = sessionStorage.getItem(INTRO_KEY) === "1"; } catch { /* private mode */ }
+      introDecision = seen || reduced ? "fast" : "full";
+    }
+    if (introDecision === "fast") {
       setMode("fast");
       setLeaving(true);
       introStore.finish();
@@ -156,13 +167,13 @@ export function Preloader() {
     setMode("full");
     try { sessionStorage.setItem(INTRO_KEY, "1"); } catch { /* ignore */ }
 
-    // Counter: 0 → 100 over ~1.4s with an eased curve.
+    // Counter: 0 → 193 over ~1.4s with an eased curve — the countries.
     const t0 = performance.now();
     const DUR = 1400;
     let raf = 0;
     const tick = (t: number) => {
       const p = Math.min(1, (t - t0) / DUR);
-      setCount(Math.round((1 - Math.pow(1 - p, 3)) * 100));
+      setCount(Math.round((1 - Math.pow(1 - p, 3)) * 193));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -172,75 +183,54 @@ export function Preloader() {
     return () => { cancelAnimationFrame(raf); clearTimeout(leave); clearTimeout(done); };
   }, [reduced]);
 
-  return (
+  // Two chamber-red doors with a gilt seam (ADR-0031). They part on exit.
+  const door = (side: "left" | "right") => (
     <motion.div
-      data-cc-preloader
-      className="preloader-failsafe fixed inset-0 z-100 flex items-center justify-center bg-ink-950"
+      aria-hidden
+      className={`absolute inset-y-0 ${side === "left" ? "left-0" : "right-0"} w-1/2 bg-chamber-deep`}
+      style={{ backgroundImage: DOOR_GRAIN, willChange: "transform" }}
       initial={false}
-      animate={leaving ? { y: "-100%" } : { y: 0 }}
-      transition={{ duration: mode === "fast" ? 0.45 : 0.9, ease: EASE }}
-      style={{ willChange: "transform" }}
-    >
+      animate={leaving ? { x: side === "left" ? "-101%" : "101%" } : { x: 0 }}
+      transition={{ duration: mode === "fast" ? 0.5 : 1.05, ease: EASE_WIPE }}
+    />
+  );
+
+  return (
+    <div data-cc-preloader className="preloader-failsafe fixed inset-0 z-100 overflow-hidden" style={{ pointerEvents: leaving ? "none" : "auto" }}>
+      {door("left")}
+      {door("right")}
+      {/* The gilt seam where the doors meet. */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-linear-to-b from-transparent via-amber to-transparent"
+        initial={{ scaleY: 0, opacity: 1 }}
+        animate={leaving ? { opacity: 0 } : { scaleY: 1 }}
+        transition={{ duration: leaving ? 0.25 : 1.2, ease: EASE }}
+      />
       {/* If JS is disabled or the chunk never loads, the curtain must not
           entomb the server-rendered page: noscript kills it outright, and a
-          pure-CSS failsafe (globals.css) fades it away after 5s regardless.
-          The normal JS path unmounts it long before either fires. */}
+          pure-CSS failsafe (globals.css) fades it away after 5s regardless. */}
       <noscript>
         <style>{`[data-cc-preloader]{display:none!important}.intro-gate{opacity:1!important;transform:none!important}`}</style>
       </noscript>
-      {/* `mode` is null until the effect picks full-vs-fast, so the SSR curtain
-          was an empty opaque rectangle. On a slow phone that is several seconds
-          of featureless white; paint the brand mark so the wait is branded. */}
-      {mode === null && (
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        initial={false}
+        animate={leaving ? { opacity: 0, scale: 1.06 } : { opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, ease: EASE }}
+      >
         <div className="flex flex-col items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/193cc-logo.png" alt="" width={72} height={72} className="rounded-full" />
-          <p className="mt-6 font-display text-xl tracking-wide text-ivory-50">
-            193 Countries <span className="text-gold-grad italic">Consortium</span>
+          <img src="/brand/193cc-logo.png" alt="" width={64} height={64} className="rounded-full" />
+          <p className="text-gilt mt-8 font-headline text-[clamp(6rem,18vw,13rem)] leading-none tabular-nums">
+            {mode === "full" ? String(count).padStart(3, "0") : "193"}
           </p>
-          <div className="mt-5 h-px w-44 bg-linear-to-r from-gold-500/0 via-gold-500 to-gold-500/0" />
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.5em] text-ivory-200">
+            Countries · One London hub
+          </p>
         </div>
-      )}
-      {mode === "full" && (
-            <div className="relative flex flex-col items-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, ease: EASE }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/193cc-logo.png" alt="" width={72} height={72} className="rounded-full" />
-              </motion.div>
-              <div className="mt-6 overflow-hidden">
-                <motion.p
-                  initial={{ y: "110%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-                  className="font-display text-xl tracking-wide text-ivory-50"
-                >
-                  193 Countries <span className="text-gold-grad italic">Consortium</span>
-                </motion.p>
-              </div>
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1.1, delay: 0.3, ease: EASE }}
-                className="mt-5 h-px w-44 origin-left bg-linear-to-r from-gold-500/0 via-gold-500 to-gold-500/0"
-              />
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mt-4 text-[10px] uppercase tracking-[0.5em] text-mist"
-              >
-                Membership · London
-              </motion.p>
-              <p className="pointer-events-none absolute -bottom-24 right-1/2 translate-x-1/2 font-display text-sm tabular-nums text-gold-500/70 sm:right-[-30vw] sm:translate-x-0 sm:text-base">
-                {String(count).padStart(3, "0")}
-              </p>
-        </div>
-      )}
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -291,6 +281,7 @@ export function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
   const [overInput, setOverInput] = useState(false);
+  const [viewing, setViewing] = useState(false);
   const [pressed, setPressed] = useState(false);
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
@@ -308,6 +299,7 @@ export function CustomCursor() {
       const t = e.target as HTMLElement | null;
       setOverInput(Boolean(t?.closest("input, select, textarea, [data-cursor='hide']")));
       setHovering(Boolean(t?.closest("a, button, [role='button'], label, summary")));
+      setViewing(Boolean(t?.closest("[data-cursor='view']")));
     };
     const down = () => setPressed(true);
     const up = () => setPressed(false);
@@ -329,17 +321,25 @@ export function CustomCursor() {
       aria-hidden
       // The structural `line` token is far too faint to track against white —
       // the ring needs the brand hue to stay legible on a light ground.
-      className="pointer-events-none fixed left-0 top-0 z-119 rounded-full border border-gold-500/50"
+      className="pointer-events-none fixed left-0 top-0 z-119 flex items-center justify-center rounded-full border border-amber/70"
       style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
       animate={{
-        width: hovering ? 46 : 30,
-        height: hovering ? 46 : 30,
-        opacity: overInput ? 0 : pressed ? 0.4 : hovering ? 0.95 : 0.5,
+        width: viewing ? 92 : hovering ? 50 : 30,
+        height: viewing ? 92 : hovering ? 50 : 30,
+        opacity: overInput ? 0 : pressed ? 0.5 : hovering || viewing ? 1 : 0.6,
         scale: pressed ? 0.82 : 1,
-        backgroundColor: hovering ? "rgba(239,70,59,0.10)" : "rgba(239,70,59,0)",
+        backgroundColor: viewing ? "rgba(26,7,9,0.72)" : hovering ? "rgba(214,180,124,0.14)" : "rgba(214,180,124,0)",
       }}
-      transition={{ duration: 0.25, ease: EASE }}
-    />
+      transition={{ duration: 0.3, ease: EASE }}
+    >
+      <motion.span
+        className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber"
+        animate={{ opacity: viewing ? 1 : 0, scale: viewing ? 1 : 0.6 }}
+        transition={{ duration: 0.25, ease: EASE }}
+      >
+        View
+      </motion.span>
+    </motion.div>
   );
 }
 
@@ -542,6 +542,79 @@ export function RouteFade({ children }: { children: ReactNode }) {
   );
 }
 
+/* ── RouteDoors — the public route transition (ADR-0031). Chamber-red doors
+      close from both edges over the crest, the route changes behind them,
+      and they open on the new page. Same capture-phase click interception
+      as RouteFade (see there for why capture). The portal keeps RouteFade —
+      a data console should not make you wait for a ceremony. ────────────── */
+export function RouteDoors({ children }: { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [closed, setClosed] = useState(false);
+  const navTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    if (reduced) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as HTMLElement | null)?.closest?.("a");
+      if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+      const href = a.getAttribute("href");
+      if (!href || !href.startsWith("/") || href.startsWith("//")) return;
+      if (href.split("#")[0] === window.location.pathname) return;
+      e.preventDefault();
+      setClosed(true);
+      clearTimeout(navTimer.current);
+      navTimer.current = setTimeout(() => router.push(href), 560);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => { document.removeEventListener("click", onClick, true); clearTimeout(navTimer.current); };
+  }, [reduced, router]);
+
+  // Open once the new route has rendered.
+  useEffect(() => {
+    const t = setTimeout(() => setClosed(false), 140);
+    return () => clearTimeout(t);
+  }, [pathname]);
+
+  // Failsafe: never leave the doors shut.
+  useEffect(() => {
+    if (!closed) return;
+    const t = setTimeout(() => setClosed(false), 2600);
+    return () => clearTimeout(t);
+  }, [closed]);
+
+  const door = (side: "left" | "right") => (
+    <motion.div
+      className={`absolute inset-y-0 ${side === "left" ? "left-0 origin-left" : "right-0 origin-right"} w-1/2 bg-chamber-deep`}
+      style={{ backgroundImage: DOOR_GRAIN }}
+      initial={false}
+      animate={{ scaleX: closed ? 1 : 0 }}
+      transition={{ duration: closed ? 0.5 : 0.7, ease: EASE_WIPE }}
+    />
+  );
+
+  return (
+    <>
+      {children}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-110">
+        {door("left")}
+        {door("right")}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          initial={false}
+          animate={{ opacity: closed ? 1 : 0, scale: closed ? 1 : 0.9 }}
+          transition={{ duration: 0.3, delay: closed ? 0.3 : 0, ease: EASE }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/193cc-logo.png" alt="" width={72} height={72} className="rounded-full" />
+        </motion.div>
+      </div>
+    </>
+  );
+}
+
 /* ── Public shell — one wrapper the (public) layout mounts ─────────────── */
 const ShellCtx = createContext(false);
 export function PremiumShell({ children }: { children: ReactNode }) {
@@ -551,7 +624,7 @@ export function PremiumShell({ children }: { children: ReactNode }) {
         <SmoothScroll>
           <CustomCursor />
           <ScrollProgress />
-          <RouteFade>{children}</RouteFade>
+          <RouteDoors>{children}</RouteDoors>
         </SmoothScroll>
       </MotionConfig>
     </ShellCtx.Provider>

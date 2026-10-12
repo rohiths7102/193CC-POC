@@ -897,3 +897,9 @@ html.lenis, html.lenis body { height: auto; }
   -webkit-background-clip: text;
   color: transparent;
 }
+
+/* Giant outlined type for VelocityMarquee — a gilt hairline, no fill. */
+@utility text-outline-lords {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--raw-color-gold-400);
+}
